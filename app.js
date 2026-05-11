@@ -751,7 +751,7 @@ const modal = document.getElementById('media-modal');
 const searchInput = document.getElementById('global-search');
 
 // Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
     renderApp();
     setupNavigation();
     setupModalEvents();
@@ -765,7 +765,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('theme-toggle').addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
     });
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
 function renderApp() {
     updateStats();
