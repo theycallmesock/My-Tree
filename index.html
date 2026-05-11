@@ -3,51 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trackr | Personal Media Dashboard</title>
+    <title>My Media Showcase</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts & Phosphor Icons for modern UI -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="dark-mode">
     <div class="app-container">
-        <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="brand">
-                <i class="ph-fill ph-infinity"></i>
-                <h2>Trackr.</h2>
+                <i class="ph-fill ph-game-controller"></i>
+                <h2>My Showcase.</h2>
             </div>
             <ul class="nav-links">
-                <li class="active" data-view="dashboard"><i class="ph ph-squares-four"></i> Dashboard</li>
-                <li data-view="anime"><i class="ph ph-television"></i> Anime</li>
-                <li data-view="games"><i class="ph ph-game-controller"></i> Games</li>
-                <li data-view="profile"><i class="ph ph-user"></i> Profile</li>
+                <li class="active" data-view="dashboard"><i class="ph ph-squares-four"></i> Overview</li>
+                <li data-view="anime"><i class="ph ph-television"></i> Anime Library</li>
+                <li data-view="games"><i class="ph ph-game-controller"></i> Game Library</li>
+                <li data-view="profile"><i class="ph ph-user"></i> About Me</li>
             </ul>
             <div class="sidebar-bottom">
                 <button id="theme-toggle" class="btn-icon"><i class="ph ph-sun"></i> Toggle Theme</button>
-                <button id="export-btn" class="btn-icon"><i class="ph ph-download-simple"></i> Export Data</button>
-                <label class="btn-icon upload-label">
-                    <i class="ph ph-upload-simple"></i> Import JSON
-                    <input type="file" id="import-btn" accept=".json" style="display: none;">
-                </label>
             </div>
         </nav>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
                 <div class="search-bar">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" id="global-search" placeholder="Search your library...">
+                    <input type="text" id="global-search" placeholder="Search my library...">
                 </div>
-                <button id="add-new-btn" class="btn-primary"><i class="ph ph-plus"></i> Add Entry</button>
             </header>
 
-            <!-- Views Container -->
             <div id="views">
-                <!-- Dashboard View -->
                 <section id="view-dashboard" class="view active">
-                    <h1 class="page-title">Overview</h1>
+                    <h1 class="page-title">Welcome to my Library</h1>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <h3>Total Anime</h3>
@@ -66,7 +55,6 @@
                     <div id="recent-grid" class="media-grid"></div>
                 </section>
 
-                <!-- Anime Library View -->
                 <section id="view-anime" class="view">
                     <div class="view-header">
                         <h1 class="page-title">Anime Library</h1>
@@ -81,7 +69,6 @@
                     <div id="anime-grid" class="media-grid"></div>
                 </section>
 
-                <!-- Game Library View -->
                 <section id="view-games" class="view">
                     <div class="view-header">
                         <h1 class="page-title">Game Library</h1>
@@ -96,17 +83,17 @@
                     <div id="game-grid" class="media-grid"></div>
                 </section>
 
-                <!-- Profile View -->
                 <section id="view-profile" class="view">
                     <div class="profile-header">
                         <img src="https://images.unsplash.com/photo-1560233026-ad254fa8dba4?w=400&q=80" alt="Avatar" class="profile-avatar">
                         <div class="profile-info">
-                            <h1>User101</h1>
-                            <p>Media enthusiast. Tracking everything I watch and play.</p>
+                            <h1>About Me</h1>
+                            <p>Hi, I'm a massive media enthusiast! This website is a showcase of every game I've played and anime I've watched. Feel free to browse through my ratings and reviews.</p>
                             <div class="social-links">
-                                <i class="ph ph-discord-logo"></i>
-                                <i class="ph ph-twitter-logo"></i>
-                                <i class="ph ph-github-logo"></i>
+                                <a href="#" target="_blank" title="Discord"><i class="ph ph-discord-logo"></i></a>
+                                <a href="#" target="_blank" title="Twitter"><i class="ph ph-twitter-logo"></i></a>
+                                <a href="#" target="_blank" title="GitHub"><i class="ph ph-github-logo"></i></a>
+                                <a href="#" target="_blank" title="Twitch"><i class="ph ph-twitch-logo"></i></a>
                             </div>
                         </div>
                     </div>
@@ -117,59 +104,24 @@
         </main>
     </div>
 
-    <!-- Modal for Add/Edit/View -->
     <div id="media-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content view-only">
             <span class="close-modal"><i class="ph ph-x"></i></span>
-            <h2 id="modal-title">Add New Entry</h2>
-            
-            <form id="media-form">
-                <input type="hidden" id="entry-id">
-                
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" id="entry-title" required placeholder="e.g., Attack on Titan">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Type</label>
-                        <select id="entry-type" required>
-                            <option value="anime">Anime</option>
-                            <option value="game">Video Game</option>
-                        </select>
+            <div class="modal-body">
+                <img id="view-image" src="" alt="Cover Image">
+                <div class="modal-info">
+                    <h2 id="view-title">Title</h2>
+                    <div class="tags">
+                        <span id="view-type" class="tag type-tag">Game</span>
+                        <span id="view-status" class="tag">Completed</span>
+                        <span class="tag rating-tag"><i class="ph-fill ph-star"></i> <span id="view-rating">10</span>/10</span>
                     </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="entry-status" required>
-                            <option value="watching">Watching / Playing</option>
-                            <option value="completed">Completed</option>
-                            <option value="planned">Plan to Watch/Play</option>
-                            <option value="dropped">Dropped</option>
-                        </select>
+                    <div class="notes-section">
+                        <h3>My Review</h3>
+                        <p id="view-notes">No review provided yet.</p>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label>Rating: <span id="rating-val">5</span>/10</label>
-                    <input type="range" id="entry-rating" min="1" max="10" value="5" step="1">
-                </div>
-
-                <div class="form-group">
-                    <label>Cover Image URL</label>
-                    <input type="url" id="entry-image" placeholder="https://example.com/image.jpg">
-                </div>
-
-                <div class="form-group">
-                    <label>Notes / Review</label>
-                    <textarea id="entry-notes" rows="3" placeholder="Your thoughts..."></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" id="btn-delete" class="btn-danger hidden">Delete</button>
-                    <button type="submit" class="btn-primary">Save Entry</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
