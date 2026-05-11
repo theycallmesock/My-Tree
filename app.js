@@ -739,7 +739,6 @@ const mediaData = [
         "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Goat+Simulator+3",
         "notes": ""
     }
-]
     // ... Copy your entire defaultData array over here
 ];
 
