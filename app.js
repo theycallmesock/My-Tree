@@ -1,5 +1,6 @@
-// Sample Default Data to demonstrate the UI
-const defaultData = [
+// Data acts as your website's database. 
+// Simply edit this array in your code editor to add/remove items for the public to see.
+const mediaData = [
     {
         "id": "101",
         "title": "Bloodborne",
@@ -441,17 +442,15 @@ const defaultData = [
         "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hearts+of+Iron+IV",
         "notes": ""
     }
+    // ... Copy your entire defaultData array over here
 ];
 
-// Initialize Data
-let mediaData = JSON.parse(localStorage.getItem('trackr_data')) || defaultData;
 let currentView = 'dashboard';
 
 // DOM Elements
 const views = document.querySelectorAll('.view');
 const navLinks = document.querySelectorAll('.nav-links li');
 const modal = document.getElementById('media-modal');
-const form = document.getElementById('media-form');
 const searchInput = document.getElementById('global-search');
 
 // Event Listeners
@@ -469,15 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('theme-toggle').addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
     });
-
-    document.getElementById('export-btn').addEventListener('click', exportJSON);
-    document.getElementById('import-btn').addEventListener('change', importJSON);
 });
-
-function saveData() {
-    localStorage.setItem('trackr_data', JSON.stringify(mediaData));
-    renderApp();
-}
 
 function renderApp() {
     updateStats();
@@ -533,7 +524,9 @@ function renderGrids(searchQuery = '') {
             </div>
             <div class="card-content">
                 <div class="card-title">${item.title}</div>
-                <div class="card-rating"><i class="ph-fill ph-star"></i> ${item.rating}/10</div>
+                <div class="card-rating">
+                    ${item.rating > 0 ? `<i class="ph-fill ph-star"></i> ${item.rating}/10` : 'Unrated'}
+                </div>
             </div>
         </div>
     `;
@@ -556,7 +549,7 @@ function renderGrids(searchQuery = '') {
 
     if(activeGrid && currentView === 'profile') {
         const activeItems = filteredData.filter(d => d.status === 'watching' || d.status === 'playing');
-        activeGrid.innerHTML = activeItems.map(createCard).join('');
+        activeGrid.innerHTML = activeItems.map(createCard).join('') || '<p style="grid-column: 1/-1; color: var(--text-secondary);">Nothing currently active.</p>';
     }
 }
 
@@ -572,111 +565,32 @@ function setupFilters() {
     });
 }
 
-// Modal & Form Logic
+// Modal View Logic
 function setupModalEvents() {
-    document.getElementById('add-new-btn').addEventListener('click', () => openModal());
     document.querySelector('.close-modal').addEventListener('click', closeModal);
-    
     // Close on outside click
     modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
-
-    // Live rating update
-    document.getElementById('entry-rating').addEventListener('input', (e) => {
-        document.getElementById('rating-val').textContent = e.target.value;
-    });
-
-    form.addEventListener('submit', handleFormSubmit);
-    
-    document.getElementById('btn-delete').addEventListener('click', () => {
-        const id = document.getElementById('entry-id').value;
-        if(confirm("Are you sure you want to delete this entry?")) {
-            mediaData = mediaData.filter(item => item.id !== id);
-            saveData();
-            closeModal();
-        }
-    });
 }
 
-function openModal(id = null) {
-    modal.classList.add('active');
-    const deleteBtn = document.getElementById('btn-delete');
+function openModal(id) {
+    const item = mediaData.find(d => d.id === id);
+    if (!item) return;
+
+    document.getElementById('view-image').src = item.image || 'https://via.placeholder.com/200x300?text=No+Cover';
+    document.getElementById('view-title').textContent = item.title;
     
-    if (id) {
-        document.getElementById('modal-title').textContent = 'Edit Entry';
-        const item = mediaData.find(d => d.id === id);
-        document.getElementById('entry-id').value = item.id;
-        document.getElementById('entry-title').value = item.title;
-        document.getElementById('entry-type').value = item.type;
-        document.getElementById('entry-status').value = item.status;
-        document.getElementById('entry-rating').value = item.rating;
-        document.getElementById('rating-val').textContent = item.rating;
-        document.getElementById('entry-image').value = item.image;
-        document.getElementById('entry-notes').value = item.notes || '';
-        deleteBtn.classList.remove('hidden');
-    } else {
-        document.getElementById('modal-title').textContent = 'Add New Entry';
-        form.reset();
-        document.getElementById('entry-id').value = '';
-        document.getElementById('rating-val').textContent = '5';
-        // Auto select type based on current view
-        if(currentView === 'anime') document.getElementById('entry-type').value = 'anime';
-        if(currentView === 'games') document.getElementById('entry-type').value = 'game';
-        deleteBtn.classList.add('hidden');
-    }
+    document.getElementById('view-type').textContent = item.type === 'game' ? 'Video Game' : 'Anime';
+    
+    const statusEl = document.getElementById('view-status');
+    statusEl.textContent = item.status.toUpperCase();
+    statusEl.className = `tag status-${item.status}`;
+    
+    document.getElementById('view-rating').textContent = item.rating > 0 ? item.rating : 'N/A';
+    document.getElementById('view-notes').textContent = item.notes ? item.notes : 'No thoughts or review left for this entry yet.';
+
+    modal.classList.add('active');
 }
 
 function closeModal() {
     modal.classList.remove('active');
-}
-
-function handleFormSubmit(e) {
-    e.preventDefault();
-    const id = document.getElementById('entry-id').value || Date.now().toString();
-    const newItem = {
-        id: id,
-        title: document.getElementById('entry-title').value,
-        type: document.getElementById('entry-type').value,
-        status: document.getElementById('entry-status').value,
-        rating: document.getElementById('entry-rating').value,
-        image: document.getElementById('entry-image').value,
-        notes: document.getElementById('entry-notes').value
-    };
-
-    const existingIndex = mediaData.findIndex(item => item.id === id);
-    if (existingIndex > -1) {
-        mediaData[existingIndex] = newItem;
-    } else {
-        mediaData.push(newItem);
-    }
-
-    saveData();
-    closeModal();
-}
-
-// Export / Import JSON Logic
-function exportJSON() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mediaData));
-    const dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "trackr_backup.json");
-    dlAnchorElem.click();
-}
-
-function importJSON(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        try {
-            const importedData = JSON.parse(event.target.result);
-            if(Array.isArray(importedData)) {
-                mediaData = importedData;
-                saveData();
-                alert("Data imported successfully!");
-            }
-        } catch (err) {
-            alert("Invalid JSON file.");
-        }
-    };
-    reader.readAsText(file);
 }
