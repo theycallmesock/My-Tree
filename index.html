@@ -1,279 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Media Tracker</title>
-
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #0f1115;
-        color: #e6e6e6;
-    }
-
-    header {
-        padding: 20px;
-        text-align: center;
-        background: #161a22;
-        font-size: 22px;
-        font-weight: bold;
-    }
-
-    .controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        padding: 15px;
-        background: #121621;
-    }
-
-    input, select, button {
-        padding: 10px;
-        border-radius: 6px;
-        border: none;
-        outline: none;
-    }
-
-    input, select {
-        background: #1c2230;
-        color: white;
-    }
-
-    button {
-        background: #2b6cff;
-        color: white;
-        cursor: pointer;
-    }
-
-    button:hover {
-        background: #1f5ae0;
-    }
-
-    .container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 15px;
-        padding: 20px;
-    }
-
-    .card {
-        background: #1a1f2b;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        display: flex;
-        flex-direction: column;
-    }
-
-    .card img {
-        width: 100%;
-        height: 220px;
-        object-fit: cover;
-        background: #111;
-    }
-
-    .card-content {
-        padding: 10px;
-    }
-
-    .title {
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .meta {
-        font-size: 12px;
-        opacity: 0.8;
-    }
-
-    .rating {
-        margin-top: 5px;
-        color: gold;
-    }
-
-    .card button {
-        margin-top: 8px;
-        width: 100%;
-        font-size: 12px;
-    }
-
-    .add-box {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #161a22;
-        padding: 20px;
-        border-radius: 10px;
-        width: 300px;
-        z-index: 10;
-    }
-
-    .add-box input, .add-box select {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .overlay {
-        display: none;
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.6);
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trackr | Personal Media Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts & Phosphor Icons for modern UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-
-<body>
-
-<header>Media Tracker</header>
-
-<div class="controls">
-    <input id="search" placeholder="Search..." />
-
-    <select id="filter">
-        <option value="all">All</option>
-        <option value="watched">Watched</option>
-        <option value="watching">Watching</option>
-        <option value="dropped">Dropped</option>
-    </select>
-
-    <button onclick="openForm()">+ Add</button>
-</div>
-
-<div class="container" id="list"></div>
-
-<!-- Add/Edit Form -->
-<div class="overlay" id="overlay"></div>
-
-<div class="add-box" id="formBox">
-    <input id="title" placeholder="Title" />
-    
-    <select id="type">
-        <option>Anime</option>
-        <option>Game</option>
-    </select>
-
-    <select id="status">
-        <option value="watching">Watching</option>
-        <option value="watched">Watched</option>
-        <option value="dropped">Dropped</option>
-    </select>
-
-    <input id="rating" type="number" min="1" max="10" placeholder="Rating (1-10)" />
-
-    <input id="image" placeholder="Image URL (optional)" />
-
-    <button onclick="saveItem()">Save</button>
-    <button onclick="closeForm()" style="background:#444;">Cancel</button>
-</div>
-
-<script>
-let data = JSON.parse(localStorage.getItem("media")) || [];
-let editIndex = null;
-
-function saveToStorage() {
-    localStorage.setItem("media", JSON.stringify(data));
-}
-
-function render() {
-    const list = document.getElementById("list");
-    const search = document.getElementById("search").value.toLowerCase();
-    const filter = document.getElementById("filter").value;
-
-    list.innerHTML = "";
-
-    data
-    .filter(item => {
-        const matchSearch = item.title.toLowerCase().includes(search);
-        const matchFilter = filter === "all" || item.status === filter;
-        return matchSearch && matchFilter;
-    })
-    .forEach((item, index) => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-            <img src="${item.image || 'https://via.placeholder.com/300x400'}"/>
-            <div class="card-content">
-                <div class="title">${item.title}</div>
-                <div class="meta">${item.type} • ${item.status}</div>
-                <div class="rating">Rating: ${item.rating}/10</div>
-                <button onclick="editItem(${index})">Edit</button>
-                <button onclick="deleteItem(${index})" style="background:#c0392b;">Delete</button>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="brand">
+                <i class="ph-fill ph-infinity"></i>
+                <h2>Trackr.</h2>
             </div>
-        `;
+            <ul class="nav-links">
+                <li class="active" data-view="dashboard"><i class="ph ph-squares-four"></i> Dashboard</li>
+                <li data-view="anime"><i class="ph ph-television"></i> Anime</li>
+                <li data-view="games"><i class="ph ph-game-controller"></i> Games</li>
+                <li data-view="profile"><i class="ph ph-user"></i> Profile</li>
+            </ul>
+            <div class="sidebar-bottom">
+                <button id="theme-toggle" class="btn-icon"><i class="ph ph-sun"></i> Toggle Theme</button>
+                <button id="export-btn" class="btn-icon"><i class="ph ph-download-simple"></i> Export Data</button>
+                <label class="btn-icon upload-label">
+                    <i class="ph ph-upload-simple"></i> Import JSON
+                    <input type="file" id="import-btn" accept=".json" style="display: none;">
+                </label>
+            </div>
+        </nav>
 
-        list.appendChild(card);
-    });
-}
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" id="global-search" placeholder="Search your library...">
+                </div>
+                <button id="add-new-btn" class="btn-primary"><i class="ph ph-plus"></i> Add Entry</button>
+            </header>
 
-function openForm() {
-    document.getElementById("overlay").style.display = "block";
-    document.getElementById("formBox").style.display = "block";
-}
+            <!-- Views Container -->
+            <div id="views">
+                <!-- Dashboard View -->
+                <section id="view-dashboard" class="view active">
+                    <h1 class="page-title">Overview</h1>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Anime</h3>
+                            <p id="stat-anime">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Games</h3>
+                            <p id="stat-games">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Average Rating</h3>
+                            <p id="stat-rating">0.0 <i class="ph-fill ph-star" style="color: gold; font-size: 1.2rem;"></i></p>
+                        </div>
+                    </div>
+                    <h2 class="section-title">Recently Added</h2>
+                    <div id="recent-grid" class="media-grid"></div>
+                </section>
 
-function closeForm() {
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("formBox").style.display = "none";
-    editIndex = null;
+                <!-- Anime Library View -->
+                <section id="view-anime" class="view">
+                    <div class="view-header">
+                        <h1 class="page-title">Anime Library</h1>
+                        <div class="filters" id="anime-filters">
+                            <button class="filter-btn active" data-status="all">All</button>
+                            <button class="filter-btn" data-status="watching">Watching</button>
+                            <button class="filter-btn" data-status="completed">Completed</button>
+                            <button class="filter-btn" data-status="planned">Planned</button>
+                            <button class="filter-btn" data-status="dropped">Dropped</button>
+                        </div>
+                    </div>
+                    <div id="anime-grid" class="media-grid"></div>
+                </section>
 
-    document.getElementById("title").value = "";
-    document.getElementById("rating").value = "";
-    document.getElementById("image").value = "";
-}
+                <!-- Game Library View -->
+                <section id="view-games" class="view">
+                    <div class="view-header">
+                        <h1 class="page-title">Game Library</h1>
+                        <div class="filters" id="game-filters">
+                            <button class="filter-btn active" data-status="all">All</button>
+                            <button class="filter-btn" data-status="playing">Playing</button>
+                            <button class="filter-btn" data-status="completed">Completed</button>
+                            <button class="filter-btn" data-status="planned">Planned</button>
+                            <button class="filter-btn" data-status="dropped">Dropped</button>
+                        </div>
+                    </div>
+                    <div id="game-grid" class="media-grid"></div>
+                </section>
 
-function saveItem() {
-    const item = {
-        title: document.getElementById("title").value,
-        type: document.getElementById("type").value,
-        status: document.getElementById("status").value,
-        rating: document.getElementById("rating").value,
-        image: document.getElementById("image").value
-    };
+                <!-- Profile View -->
+                <section id="view-profile" class="view">
+                    <div class="profile-header">
+                        <img src="https://images.unsplash.com/photo-1560233026-ad254fa8dba4?w=400&q=80" alt="Avatar" class="profile-avatar">
+                        <div class="profile-info">
+                            <h1>User101</h1>
+                            <p>Media enthusiast. Tracking everything I watch and play.</p>
+                            <div class="social-links">
+                                <i class="ph ph-discord-logo"></i>
+                                <i class="ph ph-twitter-logo"></i>
+                                <i class="ph ph-github-logo"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="section-title" style="margin-top: 2rem;">Currently Active</h2>
+                    <div id="active-grid" class="media-grid"></div>
+                </section>
+            </div>
+        </main>
+    </div>
 
-    if (!item.title) return;
+    <!-- Modal for Add/Edit/View -->
+    <div id="media-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal"><i class="ph ph-x"></i></span>
+            <h2 id="modal-title">Add New Entry</h2>
+            
+            <form id="media-form">
+                <input type="hidden" id="entry-id">
+                
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="entry-title" required placeholder="e.g., Attack on Titan">
+                </div>
 
-    if (editIndex !== null) {
-        data[editIndex] = item;
-    } else {
-        data.push(item);
-    }
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="entry-type" required>
+                            <option value="anime">Anime</option>
+                            <option value="game">Video Game</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="entry-status" required>
+                            <option value="watching">Watching / Playing</option>
+                            <option value="completed">Completed</option>
+                            <option value="planned">Plan to Watch/Play</option>
+                            <option value="dropped">Dropped</option>
+                        </select>
+                    </div>
+                </div>
 
-    saveToStorage();
-    closeForm();
-    render();
-}
+                <div class="form-group">
+                    <label>Rating: <span id="rating-val">5</span>/10</label>
+                    <input type="range" id="entry-rating" min="1" max="10" value="5" step="1">
+                </div>
 
-function editItem(i) {
-    const item = data[i];
-    editIndex = i;
+                <div class="form-group">
+                    <label>Cover Image URL</label>
+                    <input type="url" id="entry-image" placeholder="https://example.com/image.jpg">
+                </div>
 
-    document.getElementById("title").value = item.title;
-    document.getElementById("type").value = item.type;
-    document.getElementById("status").value = item.status;
-    document.getElementById("rating").value = item.rating;
-    document.getElementById("image").value = item.image;
+                <div class="form-group">
+                    <label>Notes / Review</label>
+                    <textarea id="entry-notes" rows="3" placeholder="Your thoughts..."></textarea>
+                </div>
 
-    openForm();
-}
+                <div class="form-actions">
+                    <button type="button" id="btn-delete" class="btn-danger hidden">Delete</button>
+                    <button type="submit" class="btn-primary">Save Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-function deleteItem(i) {
-    data.splice(i, 1);
-    saveToStorage();
-    render();
-}
-
-document.getElementById("search").addEventListener("input", render);
-document.getElementById("filter").addEventListener("change", render);
-
-render();
-</script>
-
+    <script src="app.js"></script>
 </body>
 </html>
