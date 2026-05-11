@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Media Tracker</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0f1115;
+        color: #e6e6e6;
+    }
+
+    header {
+        padding: 20px;
+        text-align: center;
+        background: #161a22;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        padding: 15px;
+        background: #121621;
+    }
+
+    input, select, button {
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        outline: none;
+    }
+
+    input, select {
+        background: #1c2230;
+        color: white;
+    }
+
+    button {
+        background: #2b6cff;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1f5ae0;
+    }
+
+    .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .card {
+        background: #1a1f2b;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        background: #111;
+    }
+
+    .card-content {
+        padding: 10px;
+    }
+
+    .title {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .meta {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    .rating {
+        margin-top: 5px;
+        color: gold;
+    }
+
+    .card button {
+        margin-top: 8px;
+        width: 100%;
+        font-size: 12px;
+    }
+
+    .add-box {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #161a22;
+        padding: 20px;
+        border-radius: 10px;
+        width: 300px;
+        z-index: 10;
+    }
+
+    .add-box input, .add-box select {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+    }
+</style>
+</head>
+
+<body>
+
+<header>Media Tracker</header>
+
+<div class="controls">
+    <input id="search" placeholder="Search..." />
+
+    <select id="filter">
+        <option value="all">All</option>
+        <option value="watched">Watched</option>
+        <option value="watching">Watching</option>
+        <option value="dropped">Dropped</option>
+    </select>
+
+    <button onclick="openForm()">+ Add</button>
+</div>
+
+<div class="container" id="list"></div>
+
+<!-- Add/Edit Form -->
+<div class="overlay" id="overlay"></div>
+
+<div class="add-box" id="formBox">
+    <input id="title" placeholder="Title" />
+    
+    <select id="type">
+        <option>Anime</option>
+        <option>Game</option>
+    </select>
+
+    <select id="status">
+        <option value="watching">Watching</option>
+        <option value="watched">Watched</option>
+        <option value="dropped">Dropped</option>
+    </select>
+
+    <input id="rating" type="number" min="1" max="10" placeholder="Rating (1-10)" />
+
+    <input id="image" placeholder="Image URL (optional)" />
+
+    <button onclick="saveItem()">Save</button>
+    <button onclick="closeForm()" style="background:#444;">Cancel</button>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("media")) || [];
+let editIndex = null;
+
+function saveToStorage() {
+    localStorage.setItem("media", JSON.stringify(data));
+}
+
+function render() {
+    const list = document.getElementById("list");
+    const search = document.getElementById("search").value.toLowerCase();
+    const filter = document.getElementById("filter").value;
+
+    list.innerHTML = "";
+
+    data
+    .filter(item => {
+        const matchSearch = item.title.toLowerCase().includes(search);
+        const matchFilter = filter === "all" || item.status === filter;
+        return matchSearch && matchFilter;
+    })
+    .forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <img src="${item.image || 'https://via.placeholder.com/300x400'}"/>
+            <div class="card-content">
+                <div class="title">${item.title}</div>
+                <div class="meta">${item.type} • ${item.status}</div>
+                <div class="rating">Rating: ${item.rating}/10</div>
+                <button onclick="editItem(${index})">Edit</button>
+                <button onclick="deleteItem(${index})" style="background:#c0392b;">Delete</button>
+            </div>
+        `;
+
+        list.appendChild(card);
+    });
+}
+
+function openForm() {
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("formBox").style.display = "block";
+}
+
+function closeForm() {
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("formBox").style.display = "none";
+    editIndex = null;
+
+    document.getElementById("title").value = "";
+    document.getElementById("rating").value = "";
+    document.getElementById("image").value = "";
+}
+
+function saveItem() {
+    const item = {
+        title: document.getElementById("title").value,
+        type: document.getElementById("type").value,
+        status: document.getElementById("status").value,
+        rating: document.getElementById("rating").value,
+        image: document.getElementById("image").value
+    };
+
+    if (!item.title) return;
+
+    if (editIndex !== null) {
+        data[editIndex] = item;
+    } else {
+        data.push(item);
+    }
+
+    saveToStorage();
+    closeForm();
+    render();
+}
+
+function editItem(i) {
+    const item = data[i];
+    editIndex = i;
+
+    document.getElementById("title").value = item.title;
+    document.getElementById("type").value = item.type;
+    document.getElementById("status").value = item.status;
+    document.getElementById("rating").value = item.rating;
+    document.getElementById("image").value = item.image;
+
+    openForm();
+}
+
+function deleteItem(i) {
+    data.splice(i, 1);
+    saveToStorage();
+    render();
+}
+
+document.getElementById("search").addEventListener("input", render);
+document.getElementById("filter").addEventListener("change", render);
+
+render();
+</script>
+
+</body>
+</html>
