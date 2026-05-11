@@ -441,7 +441,305 @@ const mediaData = [
         "rating": 5.8,
         "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hearts+of+Iron+IV",
         "notes": ""
+    },
+    {
+        "id": "150",
+        "title": "Black Myth: Wukong",
+        "type": "game",
+        "status": "playing",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Black+Myth+Wukong",
+        "notes": ""
+    },
+    {
+        "id": "151",
+        "title": "Nioh 2",
+        "type": "game",
+        "status": "dropped",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Nioh+2",
+        "notes": ""
+    },
+    {
+        "id": "152",
+        "title": "Batman: Arkham Knight",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Batman+Arkham+Knight",
+        "notes": ""
+    },
+    {
+        "id": "153",
+        "title": "God of War Ragnarök",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.3,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=God+of+War+Ragnarok",
+        "notes": ""
+    },
+    {
+        "id": "154",
+        "title": "Hogwarts Legacy",
+        "type": "game",
+        "status": "dropped",
+        "rating": 4.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hogwarts+Legacy",
+        "notes": ""
+    },
+    {
+        "id": "155",
+        "title": "Rise of the Tomb Raider",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Rise+of+the+Tomb+Raider",
+        "notes": ""
+    },
+    {
+        "id": "156",
+        "title": "Shadow of the Tomb Raider",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Shadow+of+the+Tomb+Raider",
+        "notes": ""
+    },
+    {
+        "id": "157",
+        "title": "Tomb Raider (2013)",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Tomb+Raider+2013",
+        "notes": ""
+    },
+    {
+        "id": "158",
+        "title": "Red Dead Redemption (1)",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Red+Dead+Redemption+1",
+        "notes": ""
+    },
+    {
+        "id": "159",
+        "title": "Infamous Second Son",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Infamous+Second+Son",
+        "notes": ""
+    },
+    {
+        "id": "160",
+        "title": "Half-Life",
+        "type": "game",
+        "status": "completed",
+        "rating": 10.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Half-Life",
+        "notes": ""
+    },
+    {
+        "id": "161",
+        "title": "Black Mesa",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Black+Mesa",
+        "notes": ""
+    },
+    {
+        "id": "162",
+        "title": "Call of Duty: Modern Warfare (2019)",
+        "type": "game",
+        "status": "dropped",
+        "rating": 3.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Modern+Warfare+2019",
+        "notes": ""
+    },
+    {
+        "id": "163",
+        "title": "Call of Duty: Black Ops Cold War",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Black+Ops+Cold+War",
+        "notes": ""
+    },
+    {
+        "id": "164",
+        "title": "Green Hell",
+        "type": "game",
+        "status": "completed",
+        "rating": 4.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Green+Hell",
+        "notes": ""
+    },
+    {
+        "id": "165",
+        "title": "Raft",
+        "type": "game",
+        "status": "dropped",
+        "rating": 5.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Raft",
+        "notes": ""
+    },
+    {
+        "id": "166",
+        "title": "Don't Starve Together",
+        "type": "game",
+        "status": "dropped",
+        "rating": 3.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dont+Starve+Together",
+        "notes": ""
+    },
+    {
+        "id": "167",
+        "title": "Hollow Knight",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hollow+Knight",
+        "notes": ""
+    },
+    {
+        "id": "168",
+        "title": "Firewatch",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.1,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Firewatch",
+        "notes": ""
+    },
+    {
+        "id": "169",
+        "title": "SOMA",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.6,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=SOMA",
+        "notes": ""
+    },
+    {
+        "id": "170",
+        "title": "It Takes Two",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.8,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=It+Takes+Two",
+        "notes": ""
+    },
+    {
+        "id": "171",
+        "title": "A Way Out",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=A+Way+Out",
+        "notes": ""
+    },
+    {
+        "id": "172",
+        "title": "Little Nightmares",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Little+Nightmares",
+        "notes": ""
+    },
+    {
+        "id": "173",
+        "title": "Little Nightmares II",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.2,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Little+Nightmares+II",
+        "notes": ""
+    },
+    {
+        "id": "174",
+        "title": "Elden Ring: Shadow of the Erdtree",
+        "type": "game",
+        "status": "completed",
+        "rating": 10.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Shadow+of+the+Erdtree",
+        "notes": ""
+    },
+    {
+        "id": "175",
+        "title": "Assassin's Creed I",
+        "type": "game",
+        "status": "completed",
+        "rating": 7.8,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+I",
+        "notes": ""
+    },
+    {
+        "id": "176",
+        "title": "Assassin's Creed II",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+II",
+        "notes": ""
+    },
+    {
+        "id": "177",
+        "title": "Assassin's Creed Brotherhood",
+        "type": "game",
+        "status": "playing",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+Brotherhood",
+        "notes": ""
+    },
+    {
+        "id": "178",
+        "title": "Assassin's Creed III",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+III",
+        "notes": ""
+    },
+    {
+        "id": "179",
+        "title": "Assassin's Creed Revelations",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+Revelations",
+        "notes": ""
+    },
+    {
+        "id": "180",
+        "title": "Lethal Company",
+        "type": "game",
+        "status": "playing",
+        "rating": 6.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Lethal+Company",
+        "notes": ""
+    },
+    {
+        "id": "181",
+        "title": "Brawlhalla",
+        "type": "game",
+        "status": "dropped",
+        "rating": 4.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Brawlhalla",
+        "notes": ""
+    },
+    {
+        "id": "182",
+        "title": "Goat Simulator 3",
+        "type": "game",
+        "status": "completed",
+        "rating": 5.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Goat+Simulator+3",
+        "notes": ""
     }
+]
     // ... Copy your entire defaultData array over here
 ];
 
