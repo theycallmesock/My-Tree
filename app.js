@@ -1,9 +1,446 @@
 // Sample Default Data to demonstrate the UI
 const defaultData = [
-    { id: '1', title: 'Cyberpunk: Edgerunners', type: 'anime', status: 'completed', rating: 10, image: 'https://m.media-amazon.com/images/M/MV5BODcwOTE1NDktZjA0ZC00NTNmLTgwOGMtOWQ5YzNkNzc1ZTJjXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', notes: 'Absolute masterpiece.' },
-    { id: '2', title: 'Hollow Knight', type: 'game', status: 'completed', rating: 9, image: 'https://cdn.akamai.steamstatic.com/steam/apps/367520/capsule_616x353.jpg', notes: 'Best metroidvania.' },
-    { id: '3', title: 'Elden Ring', type: 'game', status: 'playing', rating: 10, image: 'https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/aGhopp3MHppi7kooGE2Dtt8C.png', notes: 'Still stuck on Malenia.' },
-    { id: '4', title: 'Jujutsu Kaisen', type: 'anime', status: 'watching', rating: 8, image: 'https://m.media-amazon.com/images/M/MV5BNGY4MTg3NzgtNjAwMC00ZGNhLThkZjctNjk0MDZkOWM5NWIxXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', notes: 'Great animation.' }
+    {
+        "id": "101",
+        "title": "Bloodborne",
+        "type": "game",
+        "status": "playing",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Bloodborne",
+        "notes": ""
+    },
+    {
+        "id": "102",
+        "title": "God of War (2018)",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=God+of+War+%282018%29",
+        "notes": ""
+    },
+    {
+        "id": "103",
+        "title": "The Last of Us Part I",
+        "type": "game",
+        "status": "playing",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=The+Last+of+Us+Part+I",
+        "notes": ""
+    },
+    {
+        "id": "104",
+        "title": "Ghost of Tsushima",
+        "type": "game",
+        "status": "dropped",
+        "rating": 6.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Ghost+of+Tsushima",
+        "notes": ""
+    },
+    {
+        "id": "105",
+        "title": "Horizon Zero Dawn",
+        "type": "game",
+        "status": "dropped",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Horizon+Zero+Dawn",
+        "notes": ""
+    },
+    {
+        "id": "106",
+        "title": "Forza Horizon 5",
+        "type": "game",
+        "status": "completed",
+        "rating": 6.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Forza+Horizon+5",
+        "notes": ""
+    },
+    {
+        "id": "107",
+        "title": "The Witcher 3: Wild Hunt",
+        "type": "game",
+        "status": "completed",
+        "rating": 7.8,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=The+Witcher+3%3A+Wild+Hunt",
+        "notes": ""
+    },
+    {
+        "id": "108",
+        "title": "Red Dead Redemption 2",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.3,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Red+Dead+Redemption+2",
+        "notes": ""
+    },
+    {
+        "id": "109",
+        "title": "Grand Theft Auto V",
+        "type": "game",
+        "status": "completed",
+        "rating": 7.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Grand+Theft+Auto+V",
+        "notes": ""
+    },
+    {
+        "id": "110",
+        "title": "Cyberpunk 2077",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Cyberpunk+2077",
+        "notes": ""
+    },
+    {
+        "id": "111",
+        "title": "The Elder Scrolls V: Skyrim",
+        "type": "game",
+        "status": "dropped",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=The+Elder+Scrolls+V%3A+Skyrim",
+        "notes": ""
+    },
+    {
+        "id": "112",
+        "title": "Half-Life 2",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.6,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Half-Life+2",
+        "notes": ""
+    },
+    {
+        "id": "113",
+        "title": "Portal 2",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.8,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Portal+2",
+        "notes": ""
+    },
+    {
+        "id": "114",
+        "title": "Dishonored",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dishonored",
+        "notes": ""
+    },
+    {
+        "id": "115",
+        "title": "Dark Souls",
+        "type": "game",
+        "status": "completed",
+        "rating": 10.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dark+Souls",
+        "notes": ""
+    },
+    {
+        "id": "116",
+        "title": "Dark Souls III",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.8,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dark+Souls+III",
+        "notes": ""
+    },
+    {
+        "id": "117",
+        "title": "Elden Ring",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.9,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Elden+Ring",
+        "notes": ""
+    },
+    {
+        "id": "118",
+        "title": "Sekiro: Shadows Die Twice",
+        "type": "game",
+        "status": "completed",
+        "rating": 10.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Sekiro%3A+Shadows+Die+Twice",
+        "notes": ""
+    },
+    {
+        "id": "119",
+        "title": "Baldur's Gate 3",
+        "type": "game",
+        "status": "dropped",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Baldur%27s+Gate+3",
+        "notes": ""
+    },
+    {
+        "id": "120",
+        "title": "World of Warcraft: Wotlk",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=World+of+Warcraft%3A+Wotlk",
+        "notes": ""
+    },
+    {
+        "id": "121",
+        "title": "Genshin Impact",
+        "type": "game",
+        "status": "dropped",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Genshin+Impact",
+        "notes": ""
+    },
+    {
+        "id": "122",
+        "title": "Terraria",
+        "type": "game",
+        "status": "completed",
+        "rating": 7.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Terraria",
+        "notes": ""
+    },
+    {
+        "id": "123",
+        "title": "Minecraft",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Minecraft",
+        "notes": ""
+    },
+    {
+        "id": "124",
+        "title": "Outer Wilds",
+        "type": "game",
+        "status": "completed",
+        "rating": 10.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Outer+Wilds",
+        "notes": ""
+    },
+    {
+        "id": "125",
+        "title": "StarCraft II",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=StarCraft+II",
+        "notes": ""
+    },
+    {
+        "id": "126",
+        "title": "Counter-Strike 2 / CS:GO",
+        "type": "game",
+        "status": "playing",
+        "rating": 8.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Counter-Strike+2+%2F+CS%3AGO",
+        "notes": ""
+    },
+    {
+        "id": "127",
+        "title": "Valorant",
+        "type": "game",
+        "status": "playing",
+        "rating": 8.4,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Valorant",
+        "notes": ""
+    },
+    {
+        "id": "128",
+        "title": "League of Legends",
+        "type": "game",
+        "status": "playing",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=League+of+Legends",
+        "notes": ""
+    },
+    {
+        "id": "129",
+        "title": "Fortnite",
+        "type": "game",
+        "status": "playing",
+        "rating": 9.9,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Fortnite",
+        "notes": ""
+    },
+    {
+        "id": "130",
+        "title": "Overwatch 2",
+        "type": "game",
+        "status": "dropped",
+        "rating": 1.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Overwatch+2",
+        "notes": ""
+    },
+    {
+        "id": "131",
+        "title": "Rocket League",
+        "type": "game",
+        "status": "dropped",
+        "rating": 4.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Rocket+League",
+        "notes": ""
+    },
+    {
+        "id": "132",
+        "title": "Tom Clancy's Rainbow Six Siege",
+        "type": "game",
+        "status": "dropped",
+        "rating": 6.5,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Tom+Clancy%27s+Rainbow+Six+Siege",
+        "notes": ""
+    },
+    {
+        "id": "133",
+        "title": "Call of Duty: Warzone",
+        "type": "game",
+        "status": "dropped",
+        "rating": 6.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Call+of+Duty%3A+Warzone",
+        "notes": ""
+    },
+    {
+        "id": "134",
+        "title": "Super Mario 64",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Super+Mario+64",
+        "notes": ""
+    },
+    {
+        "id": "135",
+        "title": "Dark Souls II: Scholar of the First Sin",
+        "type": "game",
+        "status": "planned",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dark+Souls+II%3A+Scholar+of+the+First+Sin",
+        "notes": ""
+    },
+    {
+        "id": "136",
+        "title": "Lies of P",
+        "type": "game",
+        "status": "playing",
+        "rating": 0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Lies+of+P",
+        "notes": ""
+    },
+    {
+        "id": "137",
+        "title": "Nioh",
+        "type": "game",
+        "status": "dropped",
+        "rating": 3.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Nioh",
+        "notes": ""
+    },
+    {
+        "id": "138",
+        "title": "Sifu",
+        "type": "game",
+        "status": "completed",
+        "rating": 7.8,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Sifu",
+        "notes": ""
+    },
+    {
+        "id": "139",
+        "title": "Cyberpunk 2077: Phantom Liberty",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.0,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Cyberpunk+2077%3A+Phantom+Liberty",
+        "notes": ""
+    },
+    {
+        "id": "140",
+        "title": "Hell Let Loose",
+        "type": "game",
+        "status": "dropped",
+        "rating": 5.6,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hell+Let+Loose",
+        "notes": ""
+    },
+    {
+        "id": "141",
+        "title": "Far Cry 3",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.7,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Far+Cry+3",
+        "notes": ""
+    },
+    {
+        "id": "142",
+        "title": "Deep Rock Galactic",
+        "type": "game",
+        "status": "dropped",
+        "rating": 6.7,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Deep+Rock+Galactic",
+        "notes": ""
+    },
+    {
+        "id": "143",
+        "title": "Alien: Isolation",
+        "type": "game",
+        "status": "completed",
+        "rating": 8.7,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Alien%3A+Isolation",
+        "notes": ""
+    },
+    {
+        "id": "144",
+        "title": "Outlast",
+        "type": "game",
+        "status": "completed",
+        "rating": 9.3,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Outlast",
+        "notes": ""
+    },
+    {
+        "id": "145",
+        "title": "Phasmophobia",
+        "type": "game",
+        "status": "dropped",
+        "rating": 3.2,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Phasmophobia",
+        "notes": ""
+    },
+    {
+        "id": "146",
+        "title": "Valheim",
+        "type": "game",
+        "status": "dropped",
+        "rating": 6.9,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Valheim",
+        "notes": ""
+    },
+    {
+        "id": "147",
+        "title": "The Forest",
+        "type": "game",
+        "status": "completed",
+        "rating": 7.8,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=The+Forest",
+        "notes": ""
+    },
+    {
+        "id": "148",
+        "title": "Sons of the Forest",
+        "type": "game",
+        "status": "dropped",
+        "rating": 6.2,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Sons+of+the+Forest",
+        "notes": ""
+    },
+    {
+        "id": "149",
+        "title": "Hearts of Iron IV",
+        "type": "game",
+        "status": "playing",
+        "rating": 5.8,
+        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hearts+of+Iron+IV",
+        "notes": ""
+    }
 ];
 
 // Initialize Data
