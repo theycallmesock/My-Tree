@@ -1,5 +1,3 @@
-// Data acts as your website's database. 
-// Simply edit this array in your code editor to add/remove items for the public to see.
 const mediaData = [
     {
         "id": "101",
@@ -7,7 +5,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Bloodborne",
+        "image": "https://upload.wikimedia.org/wikipedia/en/6/68/Bloodborne_Cover_Wallpaper.jpg",
         "notes": ""
     },
     {
@@ -16,7 +14,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=God+of+War+%282018%29",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -25,7 +23,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=The+Last+of+Us+Part+I",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -34,7 +32,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 6.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Ghost+of+Tsushima",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -43,7 +41,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Horizon+Zero+Dawn",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1151640/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -52,7 +50,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 6.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Forza+Horizon+5",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551360/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -61,7 +59,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 7.8,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=The+Witcher+3%3A+Wild+Hunt",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/292030/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -70,7 +68,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.3,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Red+Dead+Redemption+2",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -79,7 +77,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 7.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Grand+Theft+Auto+V",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -88,7 +86,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Cyberpunk+2077",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -97,7 +95,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=The+Elder+Scrolls+V%3A+Skyrim",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/489830/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -106,7 +104,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.6,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Half-Life+2",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -115,7 +113,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.8,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Portal+2",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/620/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -124,7 +122,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dishonored",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/205100/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -133,7 +131,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 10.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dark+Souls",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/570940/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -142,7 +140,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.8,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dark+Souls+III",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/374320/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -151,7 +149,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.9,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Elden+Ring",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -160,7 +158,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 10.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Sekiro%3A+Shadows+Die+Twice",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/814380/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -169,7 +167,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Baldur%27s+Gate+3",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1086940/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -178,7 +176,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=World+of+Warcraft%3A+Wotlk",
+        "image": "https://upload.wikimedia.org/wikipedia/en/e/e5/World_of_Warcraft_Wrath_of_the_Lich_King_box_art.jpg",
         "notes": ""
     },
     {
@@ -187,7 +185,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Genshin+Impact",
+        "image": "https://upload.wikimedia.org/wikipedia/en/5/5d/Genshin_Impact_logo.png",
         "notes": ""
     },
     {
@@ -196,7 +194,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 7.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Terraria",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/105600/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -205,7 +203,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Minecraft",
+        "image": "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",
         "notes": ""
     },
     {
@@ -214,7 +212,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 10.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Outer+Wilds",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/753640/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -223,7 +221,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=StarCraft+II",
+        "image": "https://upload.wikimedia.org/wikipedia/en/2/20/StarCraft_II_-_Box_Art.jpg",
         "notes": ""
     },
     {
@@ -232,7 +230,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 8.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Counter-Strike+2+%2F+CS%3AGO",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -241,7 +239,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 8.4,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Valorant",
+        "image": "https://upload.wikimedia.org/wikipedia/en/a/ab/Valorant_cover_art.jpg",
         "notes": ""
     },
     {
@@ -250,7 +248,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=League+of+Legends",
+        "image": "https://upload.wikimedia.org/wikipedia/en/7/77/League_of_Legends_logo.png",
         "notes": ""
     },
     {
@@ -259,7 +257,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 9.9,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Fortnite",
+        "image": "https://upload.wikimedia.org/wikipedia/en/a/a8/FortniteCoverArt.jpg",
         "notes": ""
     },
     {
@@ -268,7 +266,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 1.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Overwatch+2",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2356500/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -277,7 +275,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 4.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Rocket+League",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252950/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -286,7 +284,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 6.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Tom+Clancy%27s+Rainbow+Six+Siege",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -295,7 +293,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 6.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Call+of+Duty%3A+Warzone",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962660/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -304,7 +302,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Super+Mario+64",
+        "image": "https://upload.wikimedia.org/wikipedia/en/6/6a/Super_Mario_64_box_cover.jpg",
         "notes": ""
     },
     {
@@ -313,7 +311,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dark+Souls+II%3A+Scholar+of+the+First+Sin",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/335300/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -322,7 +320,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Lies+of+P",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1627720/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -331,7 +329,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 3.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Nioh",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/485510/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -340,7 +338,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 7.8,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Sifu",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2138710/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -349,7 +347,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Cyberpunk+2077%3A+Phantom+Liberty",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2138330/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -358,7 +356,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 5.6,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hell+Let+Loose",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/686810/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -367,7 +365,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.7,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Far+Cry+3",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220240/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -376,7 +374,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 6.7,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Deep+Rock+Galactic",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/548430/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -385,7 +383,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.7,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Alien%3A+Isolation",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/214490/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -394,7 +392,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.3,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Outlast",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/238320/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -403,7 +401,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 3.2,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Phasmophobia",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/739630/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -412,7 +410,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 6.9,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Valheim",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/892970/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -421,7 +419,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 7.8,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=The+Forest",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/242760/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -430,7 +428,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 6.2,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Sons+of+the+Forest",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1326470/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -439,7 +437,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 5.8,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hearts+of+Iron+IV",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/394360/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -448,7 +446,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Black+Myth+Wukong",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -457,7 +455,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Nioh+2",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1301210/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -466,7 +464,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Batman+Arkham+Knight",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/208650/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -475,7 +473,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.3,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=God+of+War+Ragnarok",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2322010/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -484,7 +482,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 4.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hogwarts+Legacy",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -493,7 +491,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Rise+of+the+Tomb+Raider",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/391220/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -502,7 +500,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Shadow+of+the+Tomb+Raider",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/750920/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -511,7 +509,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Tomb+Raider+2013",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/203160/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -520,7 +518,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Red+Dead+Redemption+1",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2668510/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -529,7 +527,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Infamous+Second+Son",
+        "image": "https://upload.wikimedia.org/wikipedia/en/b/b6/Infamous_Second_Son_cover.jpg",
         "notes": ""
     },
     {
@@ -538,7 +536,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 10.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Half-Life",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/70/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -547,7 +545,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Black+Mesa",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/362890/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -556,7 +554,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 3.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Modern+Warfare+2019",
+        "image": "https://upload.wikimedia.org/wikipedia/en/e/e9/CallofDutyModernWarfare%282019%29.jpg",
         "notes": ""
     },
     {
@@ -565,7 +563,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Black+Ops+Cold+War",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1985810/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -574,7 +572,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 4.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Green+Hell",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/815370/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -583,7 +581,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 5.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Raft",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/648800/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -592,7 +590,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 3.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Dont+Starve+Together",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/322330/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -601,7 +599,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Hollow+Knight",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/367520/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -610,7 +608,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.1,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Firewatch",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/383870/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -619,7 +617,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.6,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=SOMA",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/282140/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -628,7 +626,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.8,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=It+Takes+Two",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -637,7 +635,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=A+Way+Out",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1222700/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -646,7 +644,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Little+Nightmares",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/424840/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -655,7 +653,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 8.2,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Little+Nightmares+II",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/860510/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -664,7 +662,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 10.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Shadow+of+the+Erdtree",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2778580/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -673,7 +671,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 7.8,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+I",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/15100/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -682,7 +680,7 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 9.0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+II",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/33230/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -691,7 +689,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+Brotherhood",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/48190/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -700,7 +698,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+III",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/208480/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -709,7 +707,7 @@ const mediaData = [
         "type": "game",
         "status": "planned",
         "rating": 0,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Assassins+Creed+Revelations",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/201870/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -718,7 +716,7 @@ const mediaData = [
         "type": "game",
         "status": "playing",
         "rating": 6.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Lethal+Company",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1966720/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -727,7 +725,7 @@ const mediaData = [
         "type": "game",
         "status": "dropped",
         "rating": 4.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Brawlhalla",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/329860/library_600x900.jpg",
         "notes": ""
     },
     {
@@ -736,21 +734,18 @@ const mediaData = [
         "type": "game",
         "status": "completed",
         "rating": 5.5,
-        "image": "https://via.placeholder.com/200x300/262629/ffffff?text=Goat+Simulator+3",
+        "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2144740/library_600x900.jpg",
         "notes": ""
     }
-    // ... Copy your entire defaultData array over here
 ];
 
 let currentView = 'dashboard';
 
-// DOM Elements
 const views = document.querySelectorAll('.view');
 const navLinks = document.querySelectorAll('.nav-links li');
 const modal = document.getElementById('media-modal');
 const searchInput = document.getElementById('global-search');
 
-// Event Listeners
 function initApp() {
     renderApp();
     setupNavigation();
@@ -778,7 +773,6 @@ function renderApp() {
     renderGrids(searchInput.value.toLowerCase());
 }
 
-// Navigation
 function setupNavigation() {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -789,13 +783,12 @@ function setupNavigation() {
             currentView = link.dataset.view;
             document.getElementById(`view-${currentView}`).classList.add('active');
             
-            searchInput.value = ''; // Reset search on nav
+            searchInput.value = '';
             renderGrids();
         });
     });
 }
 
-// Statistics
 function updateStats() {
     const animes = mediaData.filter(d => d.type === 'anime');
     const games = mediaData.filter(d => d.type === 'game');
@@ -808,7 +801,6 @@ function updateStats() {
     document.getElementById('stat-rating').innerHTML = `${avg} <i class="ph-fill ph-star" style="color: gold;"></i>`;
 }
 
-// Render Cards based on Filters and Search
 function renderGrids(searchQuery = '') {
     const recentGrid = document.getElementById('recent-grid');
     const animeGrid = document.getElementById('anime-grid');
@@ -818,7 +810,6 @@ function renderGrids(searchQuery = '') {
     const animeFilter = document.querySelector('#anime-filters .active').dataset.status;
     const gameFilter = document.querySelector('#game-filters .active').dataset.status;
 
-    // Helper to generate Card HTML
     const createCard = (item) => `
         <div class="card" onclick="openModal('${item.id}')">
             <div class="card-img-wrap">
@@ -856,7 +847,6 @@ function renderGrids(searchQuery = '') {
     }
 }
 
-// Filter Logic
 function setupFilters() {
     document.querySelectorAll('.filters .filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -868,10 +858,8 @@ function setupFilters() {
     });
 }
 
-// Modal View Logic
 function setupModalEvents() {
     document.querySelector('.close-modal').addEventListener('click', closeModal);
-    // Close on outside click
     modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
 }
 
