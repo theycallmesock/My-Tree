@@ -759,8 +759,14 @@ select { appearance: none; cursor: pointer; }
   flex-wrap: wrap;
 }
 .filter-pills-wrap {
-  display: flex; flex-wrap: wrap; gap: 6px;
+  display: flex; gap: 8px;
+  /* Enables native horizontal swiping on mobile */
+  overflow-x: auto; 
+  scrollbar-width: none; 
+  -webkit-overflow-scrolling: touch; 
+  padding-bottom: 4px;
 }
+.filter-pills-wrap::-webkit-scrollbar { display: none; }
 .filter-pill {
   padding: 5px 14px;
   border-radius: 20px;
@@ -770,6 +776,9 @@ select { appearance: none; cursor: pointer; }
   background: var(--bg-card);
   border: 1px solid var(--border);
   transition: all var(--transition);
+  /* Prevents pills from squishing on small screens */
+  flex-shrink: 0; 
+  white-space: nowrap; 
 }
 .filter-pill:hover { color: var(--text-primary); border-color: var(--border-strong); }
 .filter-pill.active {
@@ -1217,14 +1226,15 @@ select { appearance: none; cursor: pointer; }
 .bottom-nav {
   display: none;
   position: fixed; bottom: 0; left: 0; right: 0;
-  height: var(--bottomnav-h);
+  /* Dynamically adds padding for iPhone home swipe bar */
+  padding: 0 0.5rem env(safe-area-inset-bottom);
+  height: calc(var(--bottomnav-h) + env(safe-area-inset-bottom));
   background: rgba(8,8,16,0.95);
   backdrop-filter: blur(20px);
   border-top: 1px solid var(--border);
   z-index: 100;
   justify-content: space-around;
   align-items: center;
-  padding: 0 0.5rem;
 }
 .bnav-item {
   flex: 1;
@@ -1269,7 +1279,8 @@ select { appearance: none; cursor: pointer; }
   .main-content {
     margin-left: 0;
     padding-top: var(--topbar-h);
-    padding-bottom: calc(var(--bottomnav-h) + 1rem);
+    /* Ensures you can scroll past the bottom nav */
+    padding-bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom) + 1.5rem);
   }
   .hero-content { left: 1.5rem; bottom: 1.5rem; max-width: calc(100vw - 3rem); }
   .hero-title { font-size: 2rem; }
