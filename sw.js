@@ -1,50 +1,57 @@
 /**
- * THE CURATOR - ZERO-MAINTENANCE SERVICE WORKER
- * Strategy: Network-First for Core Assets (HTML/JS/CSS), Cache-First for Media/Fonts
- * Purpose: Guarantee 100% fresh code on every visit, no manual versioning required.
+ * THE CURATOR - AGGRESSIVE ZERO-CACHE SERVICE WORKER
+ * Strategy: NO CACHE for HTML/CSS/JS. Only cache external images to save bandwidth.
+ * Purpose: Guarantee 100% fresh code on every single visit automatically.
  */
 
-const CACHE_CORE = 'showcase-core-cache-auto';
-const CACHE_MEDIA = 'showcase-media-cache-auto';
+const CACHE_MEDIA = 'showcase-media-cache-v1';
 
-// Core assets that should always be fetched from the network first
-const CORE_ROUTES = [
-    '/',
-    '/index.html',
-    '/app.js',
-    '/style.css'
-];
-
-// 1. INSTALLATION: Skip waiting to immediately replace any old, broken service workers
+// 1. INSTALLATION: Take over instantly
 self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
 
-// 2. ACTIVATION: Take immediate control and nuke all legacy caches
+// 2. ACTIVATION: Nuke any legacy core caches that might have trapped older versions
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    // Wipe everything that isn't our current auto-caches
-                    if (cacheName !== CACHE_CORE && cacheName !== CACHE_MEDIA) {
-                        console.log('[Service Worker] Eradicating legacy cache:', cacheName);
+                    // Wipe any old cache that is NOT the current media cache
+                    if (cacheName !== CACHE_MEDIA) {
+                        console.log('[Service Worker] Eradicating cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
         }).then(() => {
-            return self.clients.claim(); // Take control of all open tabs instantly
+            return self.clients.claim(); 
         })
     );
 });
 
-// 3. FETCH STRATEGY: The Engine of Freshness
+// 3. FETCH STRATEGY: Bypass cache for logic, cache images only.
 self.addEventListener('fetch', (event) => {
     const requestUrl = new URL(event.request.url);
 
-    // STRATEGY A: CACHE-FIRST (For external images, fonts, and icons)
-    // These rarely change, so caching them saves bandwidth and speeds up load times.
+    // If it is an HTML, CSS, or JS file (Core Logic), FORCE NETWORK ONLY
+    // We add cache: 'no-store' to explicitly forbid the browser from answering with cache
+    if (
+        requestUrl.pathname.endsWith('.html') || 
+        requestUrl.pathname.endsWith('.js') || 
+        requestUrl.pathname.endsWith('.css') ||
+        requestUrl.pathname === '/'
+    ) {
+        event.respondWith(
+            fetch(event.request, { cache: 'no-store' }).catch(() => {
+                // If offline, just return a fake 503 response. It's a static site, so it requires internet to fetch fresh JS.
+                return new Response('Network required to load site.', { status: 503 });
+            })
+        );
+        return;
+    }
+
+    // STRATEGY: CACHE-FIRST (For external images, fonts, and icons only)
     if (
         requestUrl.hostname.includes('placeholder.com') ||
         requestUrl.hostname.includes('steamstatic.com') ||
@@ -52,7 +59,8 @@ self.addEventListener('fetch', (event) => {
         requestUrl.hostname.includes('unsplash.com') ||
         requestUrl.hostname.includes('fonts.googleapis.com') ||
         requestUrl.hostname.includes('fonts.gstatic.com') ||
-        requestUrl.hostname.includes('unpkg.com')
+        requestUrl.hostname.includes('unpkg.com') ||
+        requestUrl.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp)$/)
     ) {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
@@ -67,55 +75,10 @@ self.addEventListener('fetch', (event) => {
                     }
                     return networkResponse;
                 }).catch(() => {
-                    // Ignore media fetch failures gracefully
+                    // Fail gracefully on images
                     return new Response('', { status: 404, statusText: 'Offline' });
                 });
             })
         );
-        return;
     }
-
-    // STRATEGY B: NETWORK-FIRST (For HTML, JS, and CSS)
-    // Always go to GitHub Pages to get the absolute newest version. 
-    // Only fall back to cache if the network fails (user is offline).
-    event.respondWith(
-        fetch(event.request).then((networkResponse) => {
-            // If the network succeeds, save a backup to the cache
-            if (networkResponse && networkResponse.status === 200) {
-                const responseToCache = networkResponse.clone();
-                caches.open(CACHE_CORE).then((cache) => {
-                    // Clean up old timestamped JS/CSS before adding the new one
-                    // This prevents cache storage bloat over time
-                    if (requestUrl.pathname.includes('app.js') || requestUrl.pathname.includes('style.css')) {
-                        cleanOldTimestampedCaches(cache, requestUrl.pathname);
-                    }
-                    cache.put(event.request, responseToCache);
-                });
-            }
-            return networkResponse;
-        }).catch(() => {
-            // If offline, attempt to serve from cache
-            console.warn('[Service Worker] Network unavailable, serving from cache:', requestUrl.pathname);
-            
-            // For JS/CSS, we might have a timestamped version in the cache that doesn't 
-            // perfectly match the URL requested by the offline HTML. We need to fuzzy match.
-            return caches.open(CACHE_CORE).then(cache => {
-                return cache.match(event.request, { ignoreSearch: true }).then(cached => {
-                    return cached || new Response('Offline Content Not Available', { status: 503 });
-                });
-            });
-        })
-    );
 });
-
-// Helper function to prevent cache bloating from ?t= timestamps
-function cleanOldTimestampedCaches(cache, pathname) {
-    cache.keys().then((keys) => {
-        keys.forEach((request) => {
-            const cachedUrl = new URL(request.url);
-            if (cachedUrl.pathname === pathname) {
-                cache.delete(request);
-            }
-        });
-    });
-}
