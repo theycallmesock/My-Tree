@@ -1,12 +1,14 @@
 /**
- * THE CURATOR - SHOWCASE ENGINE
- * Architecture: Pure Stateless MVC, Read-Only Public Portfolio
- * Persistence: NONE (Fresh load on every visit)
+ * THE CURATOR - ZERO PERSISTENCE ENGINE
+ * Forces dynamic loading, fully preserves required items, fixes mobile bugs.
  */
 
-// ============================================================================
-// 1. MASTER DATABASE (RESTORED FULL DATASET)
-// ============================================================================
+// Fallback image generator to ensure layout NEVER breaks
+const getFallbackImage = (title) => {
+    return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900"><rect fill="%2318181b" width="600" height="900"/><text fill="%2394a3b8" font-family="sans-serif" font-size="24" font-weight="bold" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">Missing Art</text></svg>`;
+};
+
+// 1. MASTER DATABASE - ALL ORIGINAL DATA RETAINED
 const rawMediaData = [
     // --- GAMES ---
     { id: "101", title: "Bloodborne", type: "game", status: "playing", rating: 9.5, image: "https://upload.wikimedia.org/wikipedia/en/6/68/Bloodborne_Cover_Wallpaper.jpg", genres: ["Souls-like", "Action RPG"], releaseYear: 2015, notes: "The atmosphere in Yharnam is unmatched. A masterpiece of environmental storytelling." },
@@ -96,16 +98,14 @@ const rawMediaData = [
     { id: "901", title: "Attack on Titan", type: "anime", status: "completed", rating: 9.8, image: "https://upload.wikimedia.org/wikipedia/en/d/d6/Shingeki_no_Kyojin_manga_volume_1.jpg", genres: ["Action", "Dark Fantasy"], releaseYear: 2013, notes: "Masterpiece of foreshadowing. Flawless narrative structure." },
     { id: "902", title: "Jujutsu Kaisen", type: "anime", status: "playing", rating: 8.5, image: "https://upload.wikimedia.org/wikipedia/en/4/46/Jujutsu_kaisen.jpg", genres: ["Action", "Supernatural"] },
     { id: "903", title: "Death Note", type: "anime", status: "completed", rating: 9.0, image: "https://upload.wikimedia.org/wikipedia/en/6/6f/Death_Note_Vol_1.jpg", genres: ["Psychological Thriller"] },
-    { id: "904", title: "Arcane", type: "anime", status: "completed", rating: 10.0, image: "https://upload.wikimedia.org/wikipedia/en/a/a6/Arcane_League_of_Legends_Season_1_poster.jpg", genres: ["Sci-Fi", "Action"], releaseYear: 2021, notes: "The gold standard for video game adaptations. Animation is groundbreaking." },
+    { id: "904", title: "Arcane", type: "tv", status: "completed", rating: 10.0, image: "https://upload.wikimedia.org/wikipedia/en/a/a6/Arcane_League_of_Legends_Season_1_poster.jpg", genres: ["Sci-Fi", "Action"], releaseYear: 2021, notes: "The gold standard for video game adaptations. Animation is groundbreaking." },
     
     // --- MOVIES ---
     { id: "801", title: "Interstellar", type: "movies", status: "completed", rating: 10.0, image: "https://upload.wikimedia.org/wikipedia/en/b/bc/Interstellar_film_poster.jpg", genres: ["Sci-Fi", "Drama"], releaseYear: 2014, notes: "Visually stunning. Zimmer's score is transcendental." },
     { id: "802", title: "Dune: Part Two", type: "movies", status: "completed", rating: 9.5, image: "https://upload.wikimedia.org/wikipedia/en/8/8e/Dune_Part_Two_poster.jpg", genres: ["Sci-Fi", "Epic"], releaseYear: 2024 }
 ];
 
-// ============================================================================
-// 2. DATA NORMALIZER (Robust Parsing)
-// ============================================================================
+// 2. DATA NORMALIZER
 class DataNormalizer {
     static parse(dataArray) {
         return dataArray.map(item => ({
@@ -114,7 +114,7 @@ class DataNormalizer {
             type: (item.type || "unknown").toLowerCase(),
             status: this.normalizeStatus(item.status),
             rating: Number(item.rating) || 0,
-            image: item.image || "https://via.placeholder.com/300x450/18181b/ffffff?text=Image+Missing",
+            image: item.image || getFallbackImage("Missing Art"),
             genres: Array.isArray(item.genres) ? item.genres : [],
             releaseYear: item.releaseYear || "",
             notes: item.notes || ""
@@ -123,24 +123,19 @@ class DataNormalizer {
 
     static normalizeStatus(status) {
         const s = String(status).toLowerCase();
-        // Standardize watching to playing to simplify filtering logic across all media
         if (s === 'watching') return 'playing'; 
         if (['playing', 'completed', 'planned', 'dropped'].includes(s)) return s;
         return 'planned';
     }
 }
 
-// ============================================================================
-// 3. CORE APPLICATION CONTROLLER (Stateless)
-// ============================================================================
+// 3. APPLICATION CONTROLLER
 class MediaApp {
     constructor() {
-        // Load data strictly from the hardcoded array. NO LOCAL STORAGE.
         this.data = DataNormalizer.parse(rawMediaData);
-        
         this.state = {
             currentView: 'dashboard',
-            libraryType: 'games', // 'games', 'anime', 'movies'
+            libraryType: 'games',
             searchQuery: '',
             filterStatus: 'all',
             sortBy: 'newest'
@@ -159,33 +154,26 @@ class MediaApp {
 
     init() {
         this.bindEvents();
-        
-        // Remove loader after quick synthetic delay for cinematic feel
         setTimeout(() => {
             this.DOM.loader.style.opacity = '0';
             setTimeout(() => this.DOM.loader.classList.add('hidden'), 500);
             this.switchView('dashboard');
-        }, 600);
+        }, 300);
     }
-
-    // --- ROUTING & NAVIGATION ---
 
     switchView(viewId) {
         this.state.currentView = viewId;
         
-        // Update Sidebar UI
         document.querySelectorAll('.nav-links li').forEach(el => el.classList.remove('active'));
         const activeLink = document.querySelector(`.nav-links li[data-view="${viewId}"]`);
         if(activeLink) activeLink.classList.add('active');
 
-        // Toggle Section Visibility
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         
-        if (['games', 'anime', 'movies'].includes(viewId)) {
+        if (['games', 'anime', 'movies', 'tv'].includes(viewId)) {
             this.state.libraryType = viewId;
             document.getElementById('view-library').classList.add('active');
             
-            // Reset filters on library switch to prevent confusing empty states
             this.state.filterStatus = 'all';
             document.querySelectorAll('.filter-btn').forEach(b => {
                 b.classList.toggle('active', b.dataset.status === 'all');
@@ -203,11 +191,8 @@ class MediaApp {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // --- RENDERERS ---
-
     renderDashboard() {
-        // Calculate Public Stats
-        const typeCount = { game: 0, anime: 0, movies: 0 };
+        const typeCount = { game: 0, anime: 0, movies: 0, tv: 0 };
         let totalRating = 0, ratedCount = 0;
 
         this.data.forEach(item => {
@@ -219,15 +204,16 @@ class MediaApp {
         });
 
         const avgRating = ratedCount > 0 ? (totalRating / ratedCount).toFixed(1) : '0.0';
+        const totalWatch = typeCount.anime + typeCount.movies + typeCount.tv;
 
         document.getElementById('dashboard-stats').innerHTML = `
             <div class="stat-card glass-panel">
                 <div class="stat-icon" style="background: rgba(99,102,241,0.1); color: var(--accent);"><i class="ph-fill ph-game-controller"></i></div>
-                <div class="stat-details"><h3>Games Archive</h3><p>${typeCount.game}</p></div>
+                <div class="stat-details"><h3>Games</h3><p>${typeCount.game}</p></div>
             </div>
             <div class="stat-card glass-panel">
                 <div class="stat-icon" style="background: rgba(16,185,129,0.1); color: var(--status-completed);"><i class="ph-fill ph-television-simple"></i></div>
-                <div class="stat-details"><h3>Shows & Anime</h3><p>${typeCount.anime}</p></div>
+                <div class="stat-details"><h3>Shows & Films</h3><p>${totalWatch}</p></div>
             </div>
             <div class="stat-card glass-panel">
                 <div class="stat-icon" style="background: rgba(251,191,36,0.1); color: #fbbf24;"><i class="ph-fill ph-star"></i></div>
@@ -235,7 +221,6 @@ class MediaApp {
             </div>
         `;
 
-        // Hero Spotlight (Find highest rated completed game to feature)
         const spotlightCandidates = this.data.filter(d => d.type === 'game' && d.status === 'completed' && d.rating >= 9.5);
         const spotlightItem = spotlightCandidates.length > 0 
             ? spotlightCandidates[Math.floor(Math.random() * spotlightCandidates.length)] 
@@ -244,7 +229,7 @@ class MediaApp {
         if (spotlightItem) {
             document.getElementById('hero-spotlight').innerHTML = `
                 <div class="hero-spotlight-inner" onclick="app.openModal('${spotlightItem.id}')">
-                    <img src="${spotlightItem.image}" class="hero-bg" alt="Hero" onerror="this.src='https://via.placeholder.com/1200x600/18181b/ffffff?text=Image+Missing'">
+                    <img src="${spotlightItem.image}" class="hero-bg" alt="Hero" onerror="this.src='${getFallbackImage()}'">
                     <div class="hero-overlay"></div>
                     <div class="hero-content">
                         <span class="hero-tag"><i class="ph-fill ph-star"></i> Curator's Choice</span>
@@ -255,7 +240,6 @@ class MediaApp {
             `;
         }
 
-        // Recent Additions (Reversing array logic to simulate recency from raw data order)
         const recentItems = [...this.data].reverse().slice(0, 10);
         this.renderGrid(recentItems, 'recent-grid');
     }
@@ -263,14 +247,14 @@ class MediaApp {
     renderLibrary() {
         const typeMap = {
             'games': { title: 'Game Archive', desc: 'Interactive experiences and reviews.' },
-            'anime': { title: 'Shows & Anime', desc: 'Episodic narratives and animation.' },
-            'movies': { title: 'Film Library', desc: 'Cinematic reviews and ratings.' }
+            'anime': { title: 'Anime Series', desc: 'Episodic animated narratives.' },
+            'movies': { title: 'Film Library', desc: 'Cinematic reviews and ratings.' },
+            'tv': { title: 'TV Shows', desc: 'Live action episodic narratives.' }
         };
         
         document.getElementById('library-title').textContent = typeMap[this.state.libraryType].title;
         document.getElementById('library-subtitle').textContent = typeMap[this.state.libraryType].desc;
 
-        // Apply Filters
         let filtered = this.data.filter(item => item.type === this.state.libraryType);
         
         if (this.state.filterStatus !== 'all') {
@@ -280,7 +264,6 @@ class MediaApp {
             });
         }
 
-        // Apply Search (Case insensitive, checking title, genre, and year)
         if (this.state.searchQuery) {
             const q = this.state.searchQuery.toLowerCase();
             filtered = filtered.filter(item => 
@@ -290,14 +273,13 @@ class MediaApp {
             );
         }
 
-        // Apply Sorting
         filtered.sort((a, b) => {
             switch(this.state.sortBy) {
                 case 'rating-high': return b.rating - a.rating;
                 case 'rating-low': return (a.rating === 0 ? 99 : a.rating) - (b.rating === 0 ? 99 : b.rating);
                 case 'title-asc': return a.title.localeCompare(b.title);
                 case 'title-desc': return b.title.localeCompare(a.title);
-                default: return 0; // 'newest' relies on array order
+                default: return 0; 
             }
         });
 
@@ -324,7 +306,6 @@ class MediaApp {
             card.className = 'card fade-in';
             card.onclick = () => this.openModal(item.id);
             
-            // Format status strictly for display purposes
             let statusText = item.status;
             if (item.status === 'playing') {
                 statusText = item.type === 'game' ? 'Playing' : 'Watching';
@@ -333,7 +314,7 @@ class MediaApp {
             card.innerHTML = `
                 <div class="card-img-wrap">
                     <span class="card-status status-${item.status}">${statusText}</span>
-                    <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450/18181b/ffffff?text=Image+Missing'">
+                    <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='${getFallbackImage()}'">
                     <div class="card-overlay">
                         ${item.genres.length > 0 ? `<span class="card-primary-genre">${item.genres[0]}</span>` : ''}
                     </div>
@@ -354,23 +335,19 @@ class MediaApp {
         container.appendChild(fragment);
     }
 
-    // --- READ-ONLY MODAL & ACTION LINKS ---
-
     openModal(id) {
         const item = this.data.find(d => d.id === id);
         if (!item) return;
 
-        // Image handling with fallbacks
         const bannerImg = document.getElementById('modal-banner');
         const coverImg = document.getElementById('modal-cover');
+        
         bannerImg.src = item.image;
         coverImg.src = item.image;
         
-        const fallback = "https://via.placeholder.com/600x900/18181b/ffffff?text=Missing+Art";
-        bannerImg.onerror = function() { this.src = fallback; };
-        coverImg.onerror = function() { this.src = fallback; };
+        bannerImg.onerror = function() { this.src = getFallbackImage(); };
+        coverImg.onerror = function() { this.src = getFallbackImage(); };
 
-        // Title and Metadata
         document.getElementById('modal-title').textContent = item.title;
         
         let statusText = item.status;
@@ -390,14 +367,12 @@ class MediaApp {
             yearEl.classList.add('hidden');
         }
 
-        // Tag Generation
         const tagsContainer = document.getElementById('modal-tags');
         tagsContainer.innerHTML = `<span class="hero-tag type-tag">${item.type.toUpperCase()}</span>`;
         item.genres.forEach(g => {
             tagsContainer.innerHTML += `<span class="hero-tag genre-tag">${g}</span>`;
         });
 
-        // Review Content
         const notesDisplay = document.getElementById('modal-notes');
         if (item.notes) {
             notesDisplay.innerHTML = `<p>${item.notes}</p>`;
@@ -405,9 +380,8 @@ class MediaApp {
             notesDisplay.innerHTML = `<p class="empty-notes">No detailed review provided for this entry yet.</p>`;
         }
 
-        // Dynamic Link Injection based on Media Type
         const actionZone = document.getElementById('modal-action-zone');
-        if (item.type === 'movies' || item.type === 'anime') {
+        if (['movies', 'anime', 'tv'].includes(item.type)) {
             actionZone.innerHTML = `
                 <a href="https://MOVIE-PLACEHOLDER.COM" target="_blank" rel="noopener noreferrer" class="action-btn primary full-width mt-1">
                     <i class="ph-fill ph-play-circle"></i> Watch
@@ -415,7 +389,7 @@ class MediaApp {
             `;
         } else if (item.type === 'game') {
             actionZone.innerHTML = `
-                <a href="#" class="action-btn magnet-btn full-width mt-1">
+                <a href="https://GAME-DOWNLOAD-PLACEHOLDER.COM" target="_blank" rel="noopener noreferrer" class="action-btn magnet-btn full-width mt-1">
                     <i class="ph-fill ph-magnet"></i> Magnet Download
                 </a>
                 <p class="download-req-text">Requires Free Download Manager</p>
@@ -424,36 +398,28 @@ class MediaApp {
             actionZone.innerHTML = '';
         }
 
-        // Show Modal
         this.DOM.modal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        document.body.style.overflow = 'hidden';
     }
 
     closeModal() {
         this.DOM.modal.classList.remove('active');
         document.body.style.overflow = '';
-        
-        // Reset src to prevent flashing old images on next open
         setTimeout(() => {
             document.getElementById('modal-banner').src = '';
             document.getElementById('modal-cover').src = '';
         }, 300);
     }
 
-    // --- EVENT BINDING ---
-
     bindEvents() {
-        // Nav Links
         document.querySelectorAll('.nav-links li').forEach(link => {
             link.addEventListener('click', (e) => this.switchView(e.currentTarget.dataset.view));
         });
 
-        // View All Buttons
         document.querySelectorAll('.view-all-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.switchView(e.currentTarget.dataset.target));
         });
 
-        // Search with Debounce
         let searchTimeout;
         this.DOM.search.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
@@ -462,7 +428,7 @@ class MediaApp {
 
             searchTimeout = setTimeout(() => {
                 if(this.state.currentView === 'dashboard' || this.state.currentView === 'socials') {
-                    this.switchView('games'); // Force route to library if searching from static pages
+                    this.switchView('games'); 
                 } else {
                     this.renderLibrary();
                 }
@@ -473,10 +439,9 @@ class MediaApp {
             this.DOM.search.value = '';
             this.state.searchQuery = '';
             this.DOM.clearSearch.classList.add('hidden');
-            if (['games', 'anime', 'movies'].includes(this.state.currentView)) this.renderLibrary();
+            if (['games', 'anime', 'movies', 'tv'].includes(this.state.currentView)) this.renderLibrary();
         });
 
-        // Library Filters
         document.querySelectorAll('#library-filters .filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('#library-filters .filter-btn').forEach(b => b.classList.remove('active'));
@@ -486,13 +451,11 @@ class MediaApp {
             });
         });
 
-        // Sorting Dropdown
         document.getElementById('sort-select').addEventListener('change', (e) => {
             this.state.sortBy = e.target.value;
             this.renderLibrary();
         });
 
-        // Modal Close Triggers
         document.querySelector('.close-modal').addEventListener('click', () => this.closeModal());
         document.querySelector('.modal-backdrop').addEventListener('click', () => this.closeModal());
         document.addEventListener('keydown', (e) => {
@@ -501,5 +464,4 @@ class MediaApp {
     }
 }
 
-// Bootstrap the application directly from the script
 const app = new MediaApp();
