@@ -3,223 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Curator | Premium Media Showcase</title>
-    
+    <title>The Curator | Personal Media Archive</title>
+
+    <!-- Aggressive no-cache headers -->
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
+    <meta http-equiv="Surrogate-Control" content="no-store">
+
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+    <!-- Distinctive font pairing: Syne (display) + DM Sans (body) -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+
+    <!-- Dynamic cache-busting CSS injection -->
     <script>
-        // Bulletproof dynamic cache busting for current session
-        (function() {
-            window.APP_FRESH_CACHE_STAMP = new Date().getTime();
-            const head = document.getElementsByTagName('head')[0];
-            const css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.href = 'style.css?t=' + window.APP_FRESH_CACHE_STAMP;
-            head.appendChild(css);
+        (function () {
+            var stamp = Date.now();
+            window.__CACHE_STAMP = stamp;
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'style.css?v=' + stamp;
+            document.head.appendChild(link);
         })();
     </script>
 </head>
-<body class="dark-mode theme-transition">
-    <div id="app-loader" class="app-loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <p>Syncing Library...</p>
+<body>
+
+    <!-- ============================================================
+         APP LOADER
+    ============================================================ -->
+    <div id="app-loader" class="app-loader" aria-hidden="true">
+        <div class="loader-inner">
+            <div class="loader-ring"></div>
+            <p class="loader-text">Loading Archive</p>
         </div>
     </div>
 
-    <div class="app-container">
-        <nav class="sidebar glass-panel">
-            <div class="brand">
-                <div class="brand-icon"><i class="ph-fill ph-planet"></i></div>
-                <h2>Showcase<span class="accent-dot">.</span></h2>
-            </div>
-            
-            <div class="nav-section">
-                <span class="nav-label">Library</span>
-                <ul class="nav-links">
-                    <li class="active" data-view="dashboard"><i class="ph ph-squares-four"></i> <span class="nav-text">Home</span></li>
-                    <li data-view="games"><i class="ph ph-game-controller"></i> <span class="nav-text">Games</span></li>
-                    <li data-view="movies"><i class="ph ph-film-strip"></i> <span class="nav-text">Movies</span></li>
-                    <li data-view="anime"><i class="ph ph-television-simple"></i> <span class="nav-text">Anime</span></li>
-                    <li data-view="tv"><i class="ph ph-monitor-play"></i> <span class="nav-text">TV Shows</span></li>
-                </ul>
-            </div>
+    <!-- ============================================================
+         MOBILE TOP BAR (search, visible on mobile)
+    ============================================================ -->
+    <header class="mobile-topbar" id="mobile-topbar">
+        <div class="mobile-brand">
+            <i class="ph-fill ph-film-strip"></i>
+            <span>Curator</span>
+        </div>
+        <div class="mobile-search-wrap">
+            <button class="mobile-search-toggle" id="mobile-search-toggle" aria-label="Search">
+                <i class="ph ph-magnifying-glass"></i>
+            </button>
+        </div>
+    </header>
 
-            <div class="nav-section">
-                <span class="nav-label">Connect</span>
-                <ul class="nav-links">
-                    <li data-view="socials"><i class="ph ph-link"></i> <span class="nav-text">Socials</span></li>
-                </ul>
+    <!-- ============================================================
+         SEARCH OVERLAY (mobile)
+    ============================================================ -->
+    <div class="search-overlay" id="search-overlay">
+        <div class="search-overlay-inner">
+            <div class="search-overlay-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="overlay-search-input" placeholder="Search titles, genres, years…" autocomplete="off" spellcheck="false">
+                <button id="overlay-search-close" aria-label="Close search"><i class="ph ph-x"></i></button>
             </div>
+        </div>
+    </div>
 
-            <div class="sidebar-bottom">
-                <div class="sidebar-footer-info">
-                    <p>Curated Collection</p>
-                    <span>Read-Only Archive</span>
+    <!-- ============================================================
+         MAIN APP CONTAINER
+    ============================================================ -->
+    <div class="app-shell">
+
+        <!-- SIDEBAR NAV -->
+        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+            <div class="sidebar-brand">
+                <div class="brand-icon-wrap">
+                    <i class="ph-fill ph-film-strip"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Curator</span>
+                    <span class="brand-sub">Personal Archive</span>
                 </div>
             </div>
-        </nav>
 
-        <main class="main-content">
-            <header class="top-bar glass-panel">
-                <div class="search-bar">
-                    <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" id="global-search" placeholder="Search titles, genres, or years..." autocomplete="off">
-                    <button id="clear-search" class="hidden"><i class="ph ph-x-circle"></i></button>
+            <nav class="sidebar-nav">
+                <div class="nav-group">
+                    <span class="nav-group-label">Browse</span>
+                    <ul class="nav-list" role="list">
+                        <li class="nav-item active" data-view="dashboard" role="listitem" tabindex="0" aria-label="Home">
+                            <i class="ph ph-house-simple"></i>
+                            <span class="nav-label">Home</span>
+                        </li>
+                        <li class="nav-item" data-view="games" role="listitem" tabindex="0" aria-label="Games">
+                            <i class="ph ph-game-controller"></i>
+                            <span class="nav-label">Games</span>
+                        </li>
+                        <li class="nav-item" data-view="movies" role="listitem" tabindex="0" aria-label="Movies">
+                            <i class="ph ph-film-strip"></i>
+                            <span class="nav-label">Movies</span>
+                        </li>
+                        <li class="nav-item" data-view="anime" role="listitem" tabindex="0" aria-label="Anime">
+                            <i class="ph ph-star-four"></i>
+                            <span class="nav-label">Anime</span>
+                        </li>
+                        <li class="nav-item" data-view="tv" role="listitem" tabindex="0" aria-label="TV Shows">
+                            <i class="ph ph-monitor-play"></i>
+                            <span class="nav-label">TV Shows</span>
+                        </li>
+                    </ul>
                 </div>
-            </header>
 
-            <div id="views-container">
-                <section id="view-dashboard" class="view active fade-in">
-                    <div id="hero-spotlight"></div>
+                <div class="nav-group">
+                    <span class="nav-group-label">More</span>
+                    <ul class="nav-list" role="list">
+                        <li class="nav-item" data-view="socials" role="listitem" tabindex="0" aria-label="Socials">
+                            <i class="ph ph-link-simple"></i>
+                            <span class="nav-label">Socials</span>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-                    <div class="stats-grid" id="dashboard-stats"></div>
-
-                    <div class="section-header">
-                        <h2 class="section-title">Recently Added</h2>
-                        <div class="controls-group">
-                            <button class="view-all-btn" data-target="games">Browse Full Library <i class="ph ph-arrow-right"></i></button>
-                        </div>
-                    </div>
-                    <div id="recent-grid" class="media-grid"></div>
-                </section>
-
-                <section id="view-library" class="view fade-in">
-                    <div class="view-header">
-                        <div class="header-titles">
-                            <h1 class="page-title" id="library-title">Library</h1>
-                            <p class="page-subtitle" id="library-subtitle">Browsing collection.</p>
-                        </div>
-                        
-                        <div class="library-controls">
-                            <div class="custom-select glass-panel">
-                                <i class="ph ph-sort-ascending"></i>
-                                <select id="sort-select">
-                                    <option value="newest">Date Added (Newest)</option>
-                                    <option value="rating-high">Highest Rated</option>
-                                    <option value="rating-low">Lowest Rated</option>
-                                    <option value="title-asc">Title (A-Z)</option>
-                                    <option value="title-desc">Title (Z-A)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="filters glass-panel" id="library-filters">
-                        <button class="filter-btn active" data-status="all">All</button>
-                        <button class="filter-btn" data-status="active">Active</button>
-                        <button class="filter-btn" data-status="completed">Completed</button>
-                        <button class="filter-btn" data-status="planned">Planned</button>
-                        <button class="filter-btn" data-status="dropped">Dropped</button>
-                    </div>
-
-                    <div id="library-grid" class="media-grid"></div>
-                    
-                    <div id="empty-state" class="empty-state hidden">
-                        <i class="ph-duotone ph-ghost"></i>
-                        <h3>No entries found</h3>
-                        <p>Adjust the search or filters to see results.</p>
-                    </div>
-                </section>
-
-                <section id="view-socials" class="view fade-in">
-                    <div class="profile-hero glass-panel">
-                        <div class="profile-hero-bg"></div>
-                        <div class="profile-content">
-                            <div class="profile-avatar-placeholder">
-                                <i class="ph-fill ph-user-circle"></i>
-                            </div>
-                            <div class="profile-info">
-                                <h1>The Curator</h1>
-                                <p class="bio">Welcome to my public media archive. Explore my personal ratings, reviews, and current catalog of interactive and cinematic experiences.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="socials-container mt-2">
-                        <h2 class="section-title mb-1"><i class="ph-duotone ph-users-three"></i> Connect With Me</h2>
-                        <div class="socials-grid">
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-youtube-logo" style="color: #FF0000;"></i>
-                                <div class="social-text"><h3>YouTube</h3><p>Video Content</p></div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-discord-logo" style="color: #5865F2;"></i>
-                                <div class="social-text"><h3>Discord</h3><p>Community</p></div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-github-logo" style="color: #ffffff;"></i>
-                                <div class="social-text"><h3>GitHub</h3><p>Open Source</p></div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-steam-logo" style="color: #1b2838;"></i>
-                                <div class="social-text"><h3>Steam</h3><p>Gaming Profile</p></div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-twitch-logo" style="color: #9146FF;"></i>
-                                <div class="social-text"><h3>Twitch</h3><p>Live Streams</p></div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-tiktok-logo" style="color: #00f2fe;"></i>
-                                <div class="social-text"><h3>TikTok</h3><p>Shorts</p></div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-twitter-logo" style="color: #1DA1F2;"></i>
-                                <div class="social-text"><h3>X / Twitter</h3><p>Updates</p></div>
-                            </a>
-                        </div>
-                    </div>
-                </section>
+            <!-- Desktop search inside sidebar -->
+            <div class="sidebar-search">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="sidebar-search-input" placeholder="Search…" autocomplete="off" spellcheck="false" aria-label="Search library">
+                <button class="search-clear-btn hidden" id="sidebar-search-clear" aria-label="Clear search"><i class="ph ph-x-circle"></i></button>
             </div>
+
+            <div class="sidebar-footer">
+                <p>Read-Only Archive</p>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-area" id="main-area" role="main">
+
+            <!-- ============================================================
+                 DASHBOARD VIEW
+            ============================================================ -->
+            <section class="view" id="view-dashboard" data-view="dashboard">
+
+                <!-- Hero Spotlight -->
+                <div class="hero-zone" id="hero-zone"></div>
+
+                <!-- Quick Stats -->
+                <div class="stats-row" id="stats-row"></div>
+
+                <!-- Recently Added -->
+                <div class="section-head">
+                    <h2 class="section-title">Recently Added</h2>
+                    <button class="browse-all-btn" data-target="games">
+                        Full Library <i class="ph ph-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="media-grid" id="recent-grid"></div>
+
+            </section>
+
+            <!-- ============================================================
+                 LIBRARY VIEW (games / movies / anime / tv)
+            ============================================================ -->
+            <section class="view hidden" id="view-library" data-view="library">
+
+                <div class="library-header">
+                    <div class="library-title-block">
+                        <h1 class="library-title" id="lib-title">Library</h1>
+                        <p class="library-sub" id="lib-sub">Browsing collection.</p>
+                    </div>
+                    <div class="library-sort-wrap">
+                        <div class="sort-select-box">
+                            <i class="ph ph-funnel-simple"></i>
+                            <select id="sort-select" aria-label="Sort library">
+                                <option value="default">Default Order</option>
+                                <option value="rating-high">Highest Rated</option>
+                                <option value="rating-low">Lowest Rated</option>
+                                <option value="title-asc">Title A–Z</option>
+                                <option value="title-desc">Title Z–A</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter pills -->
+                <div class="filter-row" id="filter-row" role="group" aria-label="Filter by status">
+                    <button class="filter-pill active" data-status="all">All</button>
+                    <button class="filter-pill" data-status="playing">Active</button>
+                    <button class="filter-pill" data-status="completed">Completed</button>
+                    <button class="filter-pill" data-status="planned">Planned</button>
+                    <button class="filter-pill" data-status="dropped">Dropped</button>
+                </div>
+
+                <!-- Count badge -->
+                <p class="result-count" id="result-count"></p>
+
+                <!-- Grid -->
+                <div class="media-grid" id="library-grid"></div>
+
+                <!-- Empty state -->
+                <div class="empty-state hidden" id="empty-state">
+                    <i class="ph-duotone ph-ghost"></i>
+                    <h3>Nothing here</h3>
+                    <p>Try a different filter or clear the search.</p>
+                </div>
+
+            </section>
+
+            <!-- ============================================================
+                 SOCIALS VIEW
+            ============================================================ -->
+            <section class="view hidden" id="view-socials" data-view="socials">
+
+                <div class="profile-banner">
+                    <div class="profile-banner-glow"></div>
+                    <div class="profile-card-inner">
+                        <div class="profile-avatar">
+                            <i class="ph-fill ph-user-circle"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h1 class="profile-name">The Curator</h1>
+                            <p class="profile-bio">Welcome to my personal media archive — a curated record of every game played, film watched, and show experienced. All ratings and reviews are mine alone.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="socials-section">
+                    <h2 class="section-title">Connect</h2>
+                    <div class="socials-grid">
+
+                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                            <span class="social-icon" style="--scolor:#FF0000;"><i class="ph-fill ph-youtube-logo"></i></span>
+                            <div class="social-info"><strong>YouTube</strong><span>Video Content</span></div>
+                            <i class="ph ph-arrow-up-right social-arrow"></i>
+                        </a>
+
+                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="Discord">
+                            <span class="social-icon" style="--scolor:#5865F2;"><i class="ph-fill ph-discord-logo"></i></span>
+                            <div class="social-info"><strong>Discord</strong><span>Community Server</span></div>
+                            <i class="ph ph-arrow-up-right social-arrow"></i>
+                        </a>
+
+                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                            <span class="social-icon" style="--scolor:#e6edf3;"><i class="ph-fill ph-github-logo"></i></span>
+                            <div class="social-info"><strong>GitHub</strong><span>Open Source</span></div>
+                            <i class="ph ph-arrow-up-right social-arrow"></i>
+                        </a>
+
+                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="Steam">
+                            <span class="social-icon" style="--scolor:#66c0f4;"><i class="ph-fill ph-steam-logo"></i></span>
+                            <div class="social-info"><strong>Steam</strong><span>Gaming Profile</span></div>
+                            <i class="ph ph-arrow-up-right social-arrow"></i>
+                        </a>
+
+                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="Twitch">
+                            <span class="social-icon" style="--scolor:#9146FF;"><i class="ph-fill ph-twitch-logo"></i></span>
+                            <div class="social-info"><strong>Twitch</strong><span>Live Streams</span></div>
+                            <i class="ph ph-arrow-up-right social-arrow"></i>
+                        </a>
+
+                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                            <span class="social-icon" style="--scolor:#69C9D0;"><i class="ph-fill ph-tiktok-logo"></i></span>
+                            <div class="social-info"><strong>TikTok</strong><span>Short Videos</span></div>
+                            <i class="ph ph-arrow-up-right social-arrow"></i>
+                        </a>
+
+                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="Twitter / X">
+                            <span class="social-icon" style="--scolor:#1D9BF0;"><i class="ph-fill ph-twitter-logo"></i></span>
+                            <div class="social-info"><strong>X / Twitter</strong><span>Updates &amp; Posts</span></div>
+                            <i class="ph ph-arrow-up-right social-arrow"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+            </section>
+
         </main>
     </div>
 
-    <div id="media-modal" class="modal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-content glass-panel">
-            <button class="close-modal"><i class="ph ph-x"></i></button>
-            <div class="modal-hero">
-                <div class="modal-hero-overlay"></div>
-                <img id="modal-banner" src="" alt="Banner">
-                <div class="modal-hero-content">
-                    <div class="tags" id="modal-tags"></div>
-                    <h2 id="modal-title">Title</h2>
-                    <div class="modal-meta">
-                        <span id="modal-status" class="status-badge"></span>
-                        <span class="rating-display"><i class="ph-fill ph-star"></i> <span id="modal-rating"></span></span>
-                        <span id="modal-year" class="meta-tag hidden"><i class="ph ph-calendar"></i> <span></span></span>
+    <!-- ============================================================
+         DETAIL MODAL
+    ============================================================ -->
+    <div class="modal-wrap" id="modal-wrap" role="dialog" aria-modal="true" aria-label="Media detail" hidden>
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-panel" id="modal-panel">
+
+            <button class="modal-close" id="modal-close" aria-label="Close">
+                <i class="ph ph-x"></i>
+            </button>
+
+            <!-- Modal hero banner -->
+            <div class="modal-banner-zone">
+                <img class="modal-banner-img" id="modal-banner-img" src="" alt="" loading="lazy">
+                <div class="modal-banner-fade"></div>
+                <div class="modal-banner-content">
+                    <div class="modal-tags" id="modal-tags"></div>
+                    <h2 class="modal-title" id="modal-title"></h2>
+                    <div class="modal-meta-row">
+                        <span class="modal-status-badge" id="modal-status-badge"></span>
+                        <span class="modal-rating-display" id="modal-rating-display">
+                            <i class="ph-fill ph-star"></i>
+                            <span id="modal-rating-val"></span>
+                        </span>
+                        <span class="modal-year-chip" id="modal-year-chip"></span>
                     </div>
                 </div>
             </div>
+
+            <!-- Modal body -->
             <div class="modal-body">
-                <div class="modal-sidebar">
-                    <div class="cover-wrapper">
-                        <img id="modal-cover" src="" alt="Cover" class="modal-cover-img">
+                <div class="modal-sidebar-col">
+                    <div class="modal-cover-wrap">
+                        <img class="modal-cover-img" id="modal-cover-img" src="" alt="" loading="lazy">
                     </div>
-                    <div id="modal-action-zone" class="modal-action-zone"></div>
+                    <div class="modal-actions" id="modal-actions"></div>
                 </div>
-                <div class="modal-details">
-                    <div class="review-section">
-                        <h3><i class="ph-duotone ph-notebook"></i> Curator's Review</h3>
-                        <div id="modal-notes" class="prose"></div>
+                <div class="modal-detail-col">
+                    <div class="modal-review-block">
+                        <h3 class="modal-review-heading">
+                            <i class="ph-duotone ph-quotes"></i>
+                            Curator's Take
+                        </h3>
+                        <div class="modal-review-text" id="modal-review-text"></div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
+    <!-- ============================================================
+         BOTTOM NAV (mobile only)
+    ============================================================ -->
+    <nav class="bottom-nav" id="bottom-nav" role="navigation" aria-label="Mobile navigation">
+        <button class="bnav-item active" data-view="dashboard" aria-label="Home">
+            <i class="ph ph-house-simple"></i>
+            <span>Home</span>
+        </button>
+        <button class="bnav-item" data-view="games" aria-label="Games">
+            <i class="ph ph-game-controller"></i>
+            <span>Games</span>
+        </button>
+        <button class="bnav-item" data-view="movies" aria-label="Movies">
+            <i class="ph ph-film-strip"></i>
+            <span>Movies</span>
+        </button>
+        <button class="bnav-item" data-view="anime" aria-label="Anime">
+            <i class="ph ph-star-four"></i>
+            <span>Anime</span>
+        </button>
+        <button class="bnav-item" data-view="tv" aria-label="TV">
+            <i class="ph ph-monitor-play"></i>
+            <span>TV</span>
+        </button>
+        <button class="bnav-item" data-view="socials" aria-label="Socials">
+            <i class="ph ph-link-simple"></i>
+            <span>Socials</span>
+        </button>
+    </nav>
+
+    <!-- Service Worker Registration -->
     <script>
-        const appScript = document.createElement('script');
-        appScript.src = `app.js?t=${window.APP_FRESH_CACHE_STAMP}`;
-        document.body.appendChild(appScript);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js?v=' + Date.now())
+                .then(function (reg) {
+                    // Force update on every load
+                    reg.update();
+                })
+                .catch(function (err) {
+                    console.warn('SW registration failed:', err);
+                });
+        }
     </script>
+
+    <!-- Main app script with cache-busting stamp -->
+    <script>
+        (function () {
+            var s = document.createElement('script');
+            s.src = 'app.js?v=' + (window.__CACHE_STAMP || Date.now());
+            s.defer = false;
+            document.body.appendChild(s);
+        })();
+    </script>
+
 </body>
 </html>
