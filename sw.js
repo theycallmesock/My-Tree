@@ -1,9 +1,10 @@
 /**
- * THE CURATOR — Service Worker v3
- * Offline caching + PWA support for GitHub Pages
+ * THE CURATOR — Dynamic Service Worker
+ * Always fetches the latest version from the network first.
+ * No manual version bumping required.
  */
 
-const CACHE_NAME = 'curator-v3';
+const CACHE_NAME = 'curator-dynamic-cache';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -43,39 +44,27 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   if (url.protocol === 'chrome-extension:') return;
 
-  // For external images (CDN): network first, cache fallback
-  if (url.origin !== location.origin) {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
-    return;
-  }
-
-  // For local assets: cache first, network fallback
+  // NETWORK FIRST, CACHE FALLBACK STRATEGY
   event.respondWith(
-    caches.match(request)
-      .then(cached => {
-        if (cached) return cached;
-        return fetch(request).then(response => {
-          if (!response || response.status !== 200) return response;
+    fetch(request)
+      .then(response => {
+        // Network succeeded: silently update the cache with the newest version
+        if (response && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
-          return response;
-        });
+        }
+        return response;
       })
       .catch(() => {
-        // Offline fallback: return index.html for navigation requests
-        if (request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
+        // Network failed (user is offline): serve from cache
+        return caches.match(request)
+          .then(cached => {
+            if (cached) return cached;
+            // Offline fallback: return index.html for navigation requests
+            if (request.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+          });
       })
   );
 });
