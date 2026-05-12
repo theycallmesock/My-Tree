@@ -678,3 +678,28 @@ class MediaApp {
 
 // Bootstrap Application
 const app = new MediaApp();
+
+// ============================================================================
+// 5. PWA SERVICE WORKER REGISTRATION
+// ============================================================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registered with scope:', registration.scope);
+                
+                // Detect if a new service worker is waiting to be activated (update available)
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // A new version is available!
+                            Toast.show('Update available! Refreshing...', 'info');
+                            setTimeout(() => window.location.reload(), 1500);
+                        }
+                    });
+                });
+            })
+            .catch(err => console.error('ServiceWorker registration failed:', err));
+    });
+}
