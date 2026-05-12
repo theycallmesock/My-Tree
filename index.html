@@ -23,9 +23,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- Phosphor Icons -->
-  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <script src="app.js?v={{BUILD_ID}}" defer></script>
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v={{BUILD_ID}}" />
 </head>
 <body>
 
@@ -306,10 +306,28 @@
 
   <!-- Service Worker -->
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(r => r.update())
-        .catch(e => console.warn('SW error:', e));
+    // 1. Force clear old caches for returning users automatically
+    const APP_VERSION = '1.0'; // Change this number to force a hard reset for all visitors
+    
+    if (localStorage.getItem('curator_version') !== APP_VERSION) {
+      // Wipe all local caches
+      if ('caches' in window) {
+        caches.keys().then(names => Promise.all(names.map(name => caches.delete(name))));
+      }
+      // Unregister the old sticky Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(reg => reg.unregister()));
+      }
+      // Save new version and instantly reload from the live server
+      localStorage.setItem('curator_version', APP_VERSION);
+      window.location.reload(true); 
+    } else {
+      // 2. Normal Service Worker Registration (Network-first)
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+          .then(r => r.update())
+          .catch(e => console.warn('SW error:', e));
+      }
     }
   </script>
 
