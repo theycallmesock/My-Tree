@@ -137,8 +137,10 @@ function ratingStars(rating) {
 }
 
 function fallbackSvg(title='') {
-  const t = encodeURIComponent(title || 'No Image');
-  return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900"><rect fill="%2312121f" width="600" height="900"/><text fill="%234a4a6a" font-family="sans-serif" font-size="16" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">${t}</text></svg>`;
+  // Uses your existing esc() function instead of ruining spaces with %20
+  const t = esc(title || 'No Image'); 
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900"><rect fill="#12121f" width="600" height="900"/><text fill="#4a4a6a" font-family="sans-serif" font-size="16" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">${t}</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
 function imgWithFallback(src, title, el) {
@@ -523,7 +525,7 @@ class CuratorApp {
     const dropped   = this.data.filter(d => d.status === 'dropped').length;
     const rated     = this.data.filter(d => d.rating > 0);
     const avgRating = rated.length ? (rated.reduce((a,d)=>a+d.rating,0)/rated.length).toFixed(2) : '—';
-    const maxRating = Math.max(...rated.map(d=>d.rating));
+    const maxRating = rated.length ? Math.max(...rated.map(d=>d.rating)) : 0; // Added safe-guard here
     const topRated  = rated.filter(d => d.rating === maxRating);
     const reviewed  = this.data.filter(d => d.notes).length;
     const perfect   = this.data.filter(d => d.rating === 10).length;
@@ -880,15 +882,22 @@ class CuratorApp {
     document.getElementById('search-close-btn')?.addEventListener('click', () => this._closeSearch());
     document.getElementById('search-overlay-scrim')?.addEventListener('click', () => this._closeSearch());
 
-    // Sidebar quick search → filter library
+    // Sidebar quick search → Triggers Global Search across ALL libraries
     document.getElementById('sidebar-search-input')?.addEventListener('input', e => {
-      clearTimeout(this._searchDebounce);
-      this._searchDebounce = setTimeout(() => {
-        const q = e.target.value.trim();
-        const isLibView = ['games','movies','anime','tv'].includes(this.state.view);
-        if (!isLibView && q) this._navigateTo('games');
-        else if (isLibView) this._renderLibraryGrid();
-      }, 250);
+      const q = e.target.value.trim();
+      if (q) {
+        this._openSearch(); // Open the global search overlay
+        
+        // Pass the query to the global search and execute
+        const globalInput = document.getElementById('global-search-input');
+        if (globalInput) {
+          globalInput.value = q;
+          this._handleSearch(q);
+        }
+        
+        // Clear sidebar input so it acts like a clean launcher button
+        e.target.value = ''; 
+      }
     });
 
     // Modal close
