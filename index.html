@@ -2,15 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Media Showcase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Media Showcase | Premium Library</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="style.css">
+    
+    <script>
+        // Emergency cache buster for HTML caching
+        const APP_VERSION = "2.1.0";
+        const localVer = localStorage.getItem('app_version');
+        if (localVer !== APP_VERSION) {
+            localStorage.setItem('app_version', APP_VERSION);
+            if (!window.location.search.includes('v=')) {
+                window.location.replace(window.location.pathname + '?v=' + APP_VERSION);
+            }
+        }
+    </script>
 </head>
 <body class="dark-mode theme-transition">
+    <div id="toast-container"></div>
+
     <div id="app-loader" class="app-loader">
         <div class="loader-spinner"></div>
     </div>
@@ -34,7 +53,7 @@
             <div class="nav-section">
                 <span class="nav-label">System</span>
                 <ul class="nav-links">
-                    <li data-view="profile"><i class="ph ph-user"></i> About Me</li>
+                    <li data-view="profile"><i class="ph ph-user"></i> About & Data</li>
                 </ul>
             </div>
 
@@ -87,7 +106,7 @@
 
                     <div class="section-header">
                         <h2 class="section-title">Recently Updated</h2>
-                        <button class="view-all-btn" onclick="app.switchView('games')">View Library <i class="ph ph-arrow-right"></i></button>
+                        <button class="view-all-btn" data-target="games">View Library <i class="ph ph-arrow-right"></i></button>
                     </div>
                     <div id="recent-grid" class="media-grid"></div>
                 </section>
@@ -100,7 +119,7 @@
                         </div>
                         
                         <div class="library-controls">
-                            <div class="custom-select">
+                            <div class="custom-select glass-panel">
                                 <i class="ph ph-sort-ascending"></i>
                                 <select id="sort-select">
                                     <option value="newest">Recently Added</option>
@@ -114,8 +133,7 @@
 
                     <div class="filters glass-panel" id="library-filters">
                         <button class="filter-btn active" data-status="all">All</button>
-                        <button class="filter-btn" data-status="playing">Playing</button>
-                        <button class="filter-btn" data-status="watching">Watching</button>
+                        <button class="filter-btn" data-status="active">Active</button>
                         <button class="filter-btn" data-status="completed">Completed</button>
                         <button class="filter-btn" data-status="planned">Planned</button>
                         <button class="filter-btn" data-status="dropped">Dropped</button>
@@ -145,6 +163,16 @@
                         </div>
                     </div>
                     
+                    <div class="data-management glass-panel" style="margin-top: 2rem; padding: 2rem; border-radius: var(--radius-md);">
+                        <h2 class="section-title"><i class="ph ph-database"></i> Data Management</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Safely backup or restore your local ratings and statuses to prevent data loss.</p>
+                        <div style="display: flex; gap: 1rem;">
+                            <button id="btn-export-data" class="action-btn primary" style="width: auto;"><i class="ph ph-download-simple"></i> Export Backup (JSON)</button>
+                            <label for="import-data-upload" class="action-btn" style="width: auto; background: var(--bg-surface-hover); color: var(--text-main); cursor: pointer;"><i class="ph ph-upload-simple"></i> Import Backup</label>
+                            <input type="file" id="import-data-upload" accept=".json" class="hidden">
+                        </div>
+                    </div>
+
                     <h2 class="section-title" style="margin-top: 3rem;">Currently Active</h2>
                     <div id="active-grid" class="media-grid"></div>
                 </section>
@@ -184,6 +212,10 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        const script = document.createElement('script');
+        script.src = `app.js?v=${APP_VERSION}`;
+        document.body.appendChild(script);
+    </script>
 </body>
 </html>
