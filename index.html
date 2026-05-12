@@ -23,7 +23,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- Phosphor Icons -->
-  <script src="app.js?v={{BUILD_ID}}" defer></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="style.css?v={{BUILD_ID}}" />
 </head>
@@ -307,7 +307,7 @@
   <!-- Service Worker -->
   <script>
     // 1. Force clear old caches for returning users automatically
-    const APP_VERSION = '1.0'; // Change this number to force a hard reset for all visitors
+    const APP_VERSION = '{{BUILD_ID}}';
     
     if (localStorage.getItem('curator_version') !== APP_VERSION) {
       // Wipe all local caches
