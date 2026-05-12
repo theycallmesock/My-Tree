@@ -985,12 +985,17 @@ select { appearance: none; cursor: pointer; }
 /* ─── DETAIL MODAL ───────────────────────────────────────────────────────── */
 .modal-wrap {
   position: fixed; inset: 0; z-index: 500;
-  display: flex; align-items: center; justify-content: center;
+  /* Removed 'display: flex' so the HTML 'hidden' attribute works properly */
+  align-items: center; justify-content: center;
   opacity: 0;
+  pointer-events: none; /* Allows clicks to pass through when hidden */
   transition: opacity var(--transition);
 }
 .modal-wrap:not([hidden]) { display: flex; }
-.modal-wrap.active { opacity: 1; }
+.modal-wrap.active { 
+  opacity: 1; 
+  pointer-events: auto; /* Re-enables clicks when the modal is open */
+}
 .modal-backdrop {
   position: absolute; inset: 0;
   background: rgba(0,0,0,0.8);
