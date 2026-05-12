@@ -16,16 +16,13 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <script>
+        // Bulletproof dynamic cache busting for current session
         (function() {
-            // Generate a unique timestamp for this specific visit
-            const sessionTimestamp = Date.now();
-            window.APP_FRESH_CACHE_STAMP = sessionTimestamp;
-
-            // Dynamically load stylesheet to bypass CDN/Browser caching
+            window.APP_FRESH_CACHE_STAMP = new Date().getTime();
             const head = document.getElementsByTagName('head')[0];
             const css = document.createElement('link');
             css.rel = 'stylesheet';
-            css.href = 'style.css?t=' + sessionTimestamp;
+            css.href = 'style.css?t=' + window.APP_FRESH_CACHE_STAMP;
             head.appendChild(css);
         })();
     </script>
@@ -34,7 +31,7 @@
     <div id="app-loader" class="app-loader">
         <div class="loader-content">
             <div class="loader-spinner"></div>
-            <p>Loading Showcase...</p>
+            <p>Syncing Library...</p>
         </div>
     </div>
 
@@ -48,17 +45,18 @@
             <div class="nav-section">
                 <span class="nav-label">Library</span>
                 <ul class="nav-links">
-                    <li class="active" data-view="dashboard"><i class="ph ph-squares-four"></i> Overview</li>
-                    <li data-view="games"><i class="ph ph-game-controller"></i> Games</li>
-                    <li data-view="anime"><i class="ph ph-television-simple"></i> Anime & TV</li>
-                    <li data-view="movies"><i class="ph ph-film-strip"></i> Movies</li>
+                    <li class="active" data-view="dashboard"><i class="ph ph-squares-four"></i> <span class="nav-text">Home</span></li>
+                    <li data-view="games"><i class="ph ph-game-controller"></i> <span class="nav-text">Games</span></li>
+                    <li data-view="movies"><i class="ph ph-film-strip"></i> <span class="nav-text">Movies</span></li>
+                    <li data-view="anime"><i class="ph ph-television-simple"></i> <span class="nav-text">Anime</span></li>
+                    <li data-view="tv"><i class="ph ph-monitor-play"></i> <span class="nav-text">TV Shows</span></li>
                 </ul>
             </div>
 
             <div class="nav-section">
                 <span class="nav-label">Connect</span>
                 <ul class="nav-links">
-                    <li data-view="socials"><i class="ph ph-link"></i> Socials & Links</li>
+                    <li data-view="socials"><i class="ph ph-link"></i> <span class="nav-text">Socials</span></li>
                 </ul>
             </div>
 
@@ -74,7 +72,7 @@
             <header class="top-bar glass-panel">
                 <div class="search-bar">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" id="global-search" placeholder="Search titles, genres, or platforms..." autocomplete="off">
+                    <input type="text" id="global-search" placeholder="Search titles, genres, or years..." autocomplete="off">
                     <button id="clear-search" class="hidden"><i class="ph ph-x-circle"></i></button>
                 </div>
             </header>
@@ -83,8 +81,7 @@
                 <section id="view-dashboard" class="view active fade-in">
                     <div id="hero-spotlight"></div>
 
-                    <div class="stats-grid" id="dashboard-stats">
-                        </div>
+                    <div class="stats-grid" id="dashboard-stats"></div>
 
                     <div class="section-header">
                         <h2 class="section-title">Recently Added</h2>
@@ -125,6 +122,7 @@
                     </div>
 
                     <div id="library-grid" class="media-grid"></div>
+                    
                     <div id="empty-state" class="empty-state hidden">
                         <i class="ph-duotone ph-ghost"></i>
                         <h3>No entries found</h3>
@@ -141,7 +139,7 @@
                             </div>
                             <div class="profile-info">
                                 <h1>The Curator</h1>
-                                <p class="bio">Welcome to my public media archive. Explore my ratings, reviews, and current catalog of interactive and cinematic experiences.</p>
+                                <p class="bio">Welcome to my public media archive. Explore my personal ratings, reviews, and current catalog of interactive and cinematic experiences.</p>
                             </div>
                         </div>
                     </div>
@@ -150,60 +148,32 @@
                         <h2 class="section-title mb-1"><i class="ph-duotone ph-users-three"></i> Connect With Me</h2>
                         <div class="socials-grid">
                             <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-youtube-logo" style="color: #FF0000;"></i>
+                                <div class="social-text"><h3>YouTube</h3><p>Video Content</p></div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
                                 <i class="ph-fill ph-discord-logo" style="color: #5865F2;"></i>
-                                <div class="social-text">
-                                    <h3>Discord</h3>
-                                    <p>Join the community</p>
-                                </div>
+                                <div class="social-text"><h3>Discord</h3><p>Community</p></div>
                             </a>
                             <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
                                 <i class="ph-fill ph-github-logo" style="color: #ffffff;"></i>
-                                <div class="social-text">
-                                    <h3>GitHub</h3>
-                                    <p>View my repositories</p>
-                                </div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-youtube-logo" style="color: #FF0000;"></i>
-                                <div class="social-text">
-                                    <h3>YouTube</h3>
-                                    <p>Watch my content</p>
-                                </div>
+                                <div class="social-text"><h3>GitHub</h3><p>Open Source</p></div>
                             </a>
                             <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
                                 <i class="ph-fill ph-steam-logo" style="color: #1b2838;"></i>
-                                <div class="social-text">
-                                    <h3>Steam</h3>
-                                    <p>View my gaming profile</p>
-                                </div>
+                                <div class="social-text"><h3>Steam</h3><p>Gaming Profile</p></div>
                             </a>
                             <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
                                 <i class="ph-fill ph-twitch-logo" style="color: #9146FF;"></i>
-                                <div class="social-text">
-                                    <h3>Twitch</h3>
-                                    <p>Catch me live</p>
-                                </div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-twitter-logo" style="color: #1DA1F2;"></i>
-                                <div class="social-text">
-                                    <h3>Twitter / X</h3>
-                                    <p>Follow my updates</p>
-                                </div>
-                            </a>
-                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
-                                <i class="ph-fill ph-instagram-logo" style="color: #E1306C;"></i>
-                                <div class="social-text">
-                                    <h3>Instagram</h3>
-                                    <p>Photos and moments</p>
-                                </div>
+                                <div class="social-text"><h3>Twitch</h3><p>Live Streams</p></div>
                             </a>
                             <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
                                 <i class="ph-fill ph-tiktok-logo" style="color: #00f2fe;"></i>
-                                <div class="social-text">
-                                    <h3>TikTok</h3>
-                                    <p>Short-form videos</p>
-                                </div>
+                                <div class="social-text"><h3>TikTok</h3><p>Shorts</p></div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-twitter-logo" style="color: #1DA1F2;"></i>
+                                <div class="social-text"><h3>X / Twitter</h3><p>Updates</p></div>
                             </a>
                         </div>
                     </div>
@@ -234,9 +204,7 @@
                     <div class="cover-wrapper">
                         <img id="modal-cover" src="" alt="Cover" class="modal-cover-img">
                     </div>
-                    
-                    <div id="modal-action-zone" class="modal-action-zone">
-                        </div>
+                    <div id="modal-action-zone" class="modal-action-zone"></div>
                 </div>
                 <div class="modal-details">
                     <div class="review-section">
