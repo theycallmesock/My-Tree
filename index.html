@@ -1,394 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Curator | Personal Media Archive</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>The Curator — Personal Media Archive</title>
 
-    <!-- Aggressive no-cache headers -->
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Surrogate-Control" content="no-store">
+  <!-- SEO & OpenGraph -->
+  <meta name="description" content="A curated personal media archive of games, films, anime, and TV shows — with honest ratings and reviews." />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta property="og:title" content="The Curator — Personal Media Archive" />
+  <meta property="og:description" content="Games, films, anime, and TV — rated, reviewed, and curated." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
-    <!-- Distinctive font pairing: Syne (display) + DM Sans (body) -->
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
 
-    <!-- Dynamic cache-busting CSS injection -->
-    <script>
-        (function () {
-            var stamp = Date.now();
-            window.__CACHE_STAMP = stamp;
-            var link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'style.css?v=' + stamp;
-            document.head.appendChild(link);
-        })();
-    </script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-    <!-- ============================================================
-         APP LOADER
-    ============================================================ -->
-    <div id="app-loader" class="app-loader" aria-hidden="true">
-        <div class="loader-inner">
-            <div class="loader-ring"></div>
-            <p class="loader-text">Loading Archive</p>
-        </div>
+  <!-- ═══════════════════════════════════════════════════════════
+       APP LOADER
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="app-loader" class="app-loader" aria-hidden="true">
+    <div class="loader-inner">
+      <div class="loader-ring"></div>
+      <p class="loader-label">Loading Archive</p>
     </div>
+  </div>
 
-    <!-- ============================================================
-         MOBILE TOP BAR (search, visible on mobile)
-    ============================================================ -->
-    <header class="mobile-topbar" id="mobile-topbar">
-        <div class="mobile-brand">
-            <i class="ph-fill ph-film-strip"></i>
-            <span>Curator</span>
-        </div>
-        <div class="mobile-search-wrap">
-            <button class="mobile-search-toggle" id="mobile-search-toggle" aria-label="Search">
-                <i class="ph ph-magnifying-glass"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- ============================================================
-         SEARCH OVERLAY (mobile)
-    ============================================================ -->
-    <div class="search-overlay" id="search-overlay">
-        <div class="search-overlay-inner">
-            <div class="search-overlay-bar">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="text" id="overlay-search-input" placeholder="Search titles, genres, years…" autocomplete="off" spellcheck="false">
-                <button id="overlay-search-close" aria-label="Close search"><i class="ph ph-x"></i></button>
-            </div>
-        </div>
+  <!-- ═══════════════════════════════════════════════════════════
+       MOBILE TOPBAR
+  ═══════════════════════════════════════════════════════════ -->
+  <header class="mobile-topbar" id="mobile-topbar">
+    <div class="mobile-brand">
+      <span class="brand-glyph">⬡</span>
+      <span class="brand-wordmark">CURATOR</span>
     </div>
-
-    <!-- ============================================================
-         MAIN APP CONTAINER
-    ============================================================ -->
-    <div class="app-shell">
-
-        <!-- SIDEBAR NAV -->
-        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
-            <div class="sidebar-brand">
-                <div class="brand-icon-wrap">
-                    <i class="ph-fill ph-film-strip"></i>
-                </div>
-                <div class="brand-text">
-                    <span class="brand-name">Curator</span>
-                    <span class="brand-sub">Personal Archive</span>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <div class="nav-group">
-                    <span class="nav-group-label">Browse</span>
-                    <ul class="nav-list" role="list">
-                        <li class="nav-item active" data-view="dashboard" role="listitem" tabindex="0" aria-label="Home">
-                            <i class="ph ph-house-simple"></i>
-                            <span class="nav-label">Home</span>
-                        </li>
-                        <li class="nav-item" data-view="games" role="listitem" tabindex="0" aria-label="Games">
-                            <i class="ph ph-game-controller"></i>
-                            <span class="nav-label">Games</span>
-                        </li>
-                        <li class="nav-item" data-view="movies" role="listitem" tabindex="0" aria-label="Movies">
-                            <i class="ph ph-film-strip"></i>
-                            <span class="nav-label">Movies</span>
-                        </li>
-                        <li class="nav-item" data-view="anime" role="listitem" tabindex="0" aria-label="Anime">
-                            <i class="ph ph-star-four"></i>
-                            <span class="nav-label">Anime</span>
-                        </li>
-                        <li class="nav-item" data-view="tv" role="listitem" tabindex="0" aria-label="TV Shows">
-                            <i class="ph ph-monitor-play"></i>
-                            <span class="nav-label">TV Shows</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="nav-group">
-                    <span class="nav-group-label">More</span>
-                    <ul class="nav-list" role="list">
-                        <li class="nav-item" data-view="socials" role="listitem" tabindex="0" aria-label="Socials">
-                            <i class="ph ph-link-simple"></i>
-                            <span class="nav-label">Socials</span>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- Desktop search inside sidebar -->
-            <div class="sidebar-search">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="text" id="sidebar-search-input" placeholder="Search…" autocomplete="off" spellcheck="false" aria-label="Search library">
-                <button class="search-clear-btn hidden" id="sidebar-search-clear" aria-label="Clear search"><i class="ph ph-x-circle"></i></button>
-            </div>
-
-            <div class="sidebar-footer">
-                <p>Read-Only Archive</p>
-            </div>
-        </aside>
-
-        <!-- MAIN CONTENT AREA -->
-        <main class="main-area" id="main-area" role="main">
-
-            <!-- ============================================================
-                 DASHBOARD VIEW
-            ============================================================ -->
-            <section class="view" id="view-dashboard" data-view="dashboard">
-
-                <!-- Hero Spotlight -->
-                <div class="hero-zone" id="hero-zone"></div>
-
-                <!-- Quick Stats -->
-                <div class="stats-row" id="stats-row"></div>
-
-                <!-- Recently Added -->
-                <div class="section-head">
-                    <h2 class="section-title">Recently Added</h2>
-                    <button class="browse-all-btn" data-target="games">
-                        Full Library <i class="ph ph-arrow-right"></i>
-                    </button>
-                </div>
-                <div class="media-grid" id="recent-grid"></div>
-
-            </section>
-
-            <!-- ============================================================
-                 LIBRARY VIEW (games / movies / anime / tv)
-            ============================================================ -->
-            <section class="view hidden" id="view-library" data-view="library">
-
-                <div class="library-header">
-                    <div class="library-title-block">
-                        <h1 class="library-title" id="lib-title">Library</h1>
-                        <p class="library-sub" id="lib-sub">Browsing collection.</p>
-                    </div>
-                    <div class="library-sort-wrap">
-                        <div class="sort-select-box">
-                            <i class="ph ph-funnel-simple"></i>
-                            <select id="sort-select" aria-label="Sort library">
-                                <option value="default">Default Order</option>
-                                <option value="rating-high">Highest Rated</option>
-                                <option value="rating-low">Lowest Rated</option>
-                                <option value="title-asc">Title A–Z</option>
-                                <option value="title-desc">Title Z–A</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filter pills -->
-                <div class="filter-row" id="filter-row" role="group" aria-label="Filter by status">
-                    <button class="filter-pill active" data-status="all">All</button>
-                    <button class="filter-pill" data-status="playing">Active</button>
-                    <button class="filter-pill" data-status="completed">Completed</button>
-                    <button class="filter-pill" data-status="planned">Planned</button>
-                    <button class="filter-pill" data-status="dropped">Dropped</button>
-                </div>
-
-                <!-- Count badge -->
-                <p class="result-count" id="result-count"></p>
-
-                <!-- Grid -->
-                <div class="media-grid" id="library-grid"></div>
-
-                <!-- Empty state -->
-                <div class="empty-state hidden" id="empty-state">
-                    <i class="ph-duotone ph-ghost"></i>
-                    <h3>Nothing here</h3>
-                    <p>Try a different filter or clear the search.</p>
-                </div>
-
-            </section>
-
-            <!-- ============================================================
-                 SOCIALS VIEW
-            ============================================================ -->
-            <section class="view hidden" id="view-socials" data-view="socials">
-
-                <div class="profile-banner">
-                    <div class="profile-banner-glow"></div>
-                    <div class="profile-card-inner">
-                        <div class="profile-avatar">
-                            <i class="ph-fill ph-user-circle"></i>
-                        </div>
-                        <div class="profile-info">
-                            <h1 class="profile-name">The Curator</h1>
-                            <p class="profile-bio">Welcome to my personal media archive — a curated record of every game played, film watched, and show experienced. All ratings and reviews are mine alone.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="socials-section">
-                    <h2 class="section-title">Connect</h2>
-                    <div class="socials-grid">
-
-                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-                            <span class="social-icon" style="--scolor:#FF0000;"><i class="ph-fill ph-youtube-logo"></i></span>
-                            <div class="social-info"><strong>YouTube</strong><span>Video Content</span></div>
-                            <i class="ph ph-arrow-up-right social-arrow"></i>
-                        </a>
-
-                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="Discord">
-                            <span class="social-icon" style="--scolor:#5865F2;"><i class="ph-fill ph-discord-logo"></i></span>
-                            <div class="social-info"><strong>Discord</strong><span>Community Server</span></div>
-                            <i class="ph ph-arrow-up-right social-arrow"></i>
-                        </a>
-
-                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                            <span class="social-icon" style="--scolor:#e6edf3;"><i class="ph-fill ph-github-logo"></i></span>
-                            <div class="social-info"><strong>GitHub</strong><span>Open Source</span></div>
-                            <i class="ph ph-arrow-up-right social-arrow"></i>
-                        </a>
-
-                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="Steam">
-                            <span class="social-icon" style="--scolor:#66c0f4;"><i class="ph-fill ph-steam-logo"></i></span>
-                            <div class="social-info"><strong>Steam</strong><span>Gaming Profile</span></div>
-                            <i class="ph ph-arrow-up-right social-arrow"></i>
-                        </a>
-
-                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="Twitch">
-                            <span class="social-icon" style="--scolor:#9146FF;"><i class="ph-fill ph-twitch-logo"></i></span>
-                            <div class="social-info"><strong>Twitch</strong><span>Live Streams</span></div>
-                            <i class="ph ph-arrow-up-right social-arrow"></i>
-                        </a>
-
-                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-                            <span class="social-icon" style="--scolor:#69C9D0;"><i class="ph-fill ph-tiktok-logo"></i></span>
-                            <div class="social-info"><strong>TikTok</strong><span>Short Videos</span></div>
-                            <i class="ph ph-arrow-up-right social-arrow"></i>
-                        </a>
-
-                        <a href="#" class="social-tile" target="_blank" rel="noopener noreferrer" aria-label="Twitter / X">
-                            <span class="social-icon" style="--scolor:#1D9BF0;"><i class="ph-fill ph-twitter-logo"></i></span>
-                            <div class="social-info"><strong>X / Twitter</strong><span>Updates &amp; Posts</span></div>
-                            <i class="ph ph-arrow-up-right social-arrow"></i>
-                        </a>
-
-                    </div>
-                </div>
-
-            </section>
-
-        </main>
+    <div class="mobile-actions">
+      <button id="mobile-search-btn" class="topbar-icon-btn" aria-label="Search">
+        <i class="ph ph-magnifying-glass"></i>
+      </button>
+      <button id="mobile-menu-btn" class="topbar-icon-btn" aria-label="Menu">
+        <i class="ph ph-list"></i>
+      </button>
     </div>
+  </header>
 
-    <!-- ============================================================
-         DETAIL MODAL
-    ============================================================ -->
-    <div class="modal-wrap" id="modal-wrap" role="dialog" aria-modal="true" aria-label="Media detail" hidden>
-        <div class="modal-backdrop" id="modal-backdrop"></div>
-        <div class="modal-panel" id="modal-panel">
-
-            <button class="modal-close" id="modal-close" aria-label="Close">
-                <i class="ph ph-x"></i>
-            </button>
-
-            <!-- Modal hero banner -->
-            <div class="modal-banner-zone">
-                <img class="modal-banner-img" id="modal-banner-img" src="" alt="" loading="lazy">
-                <div class="modal-banner-fade"></div>
-                <div class="modal-banner-content">
-                    <div class="modal-tags" id="modal-tags"></div>
-                    <h2 class="modal-title" id="modal-title"></h2>
-                    <div class="modal-meta-row">
-                        <span class="modal-status-badge" id="modal-status-badge"></span>
-                        <span class="modal-rating-display" id="modal-rating-display">
-                            <i class="ph-fill ph-star"></i>
-                            <span id="modal-rating-val"></span>
-                        </span>
-                        <span class="modal-year-chip" id="modal-year-chip"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal body -->
-            <div class="modal-body">
-                <div class="modal-sidebar-col">
-                    <div class="modal-cover-wrap">
-                        <img class="modal-cover-img" id="modal-cover-img" src="" alt="" loading="lazy">
-                    </div>
-                    <div class="modal-actions" id="modal-actions"></div>
-                </div>
-                <div class="modal-detail-col">
-                    <div class="modal-review-block">
-                        <h3 class="modal-review-heading">
-                            <i class="ph-duotone ph-quotes"></i>
-                            Curator's Take
-                        </h3>
-                        <div class="modal-review-text" id="modal-review-text"></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ============================================================
-         BOTTOM NAV (mobile only)
-    ============================================================ -->
-    <nav class="bottom-nav" id="bottom-nav" role="navigation" aria-label="Mobile navigation">
-        <button class="bnav-item active" data-view="dashboard" aria-label="Home">
-            <i class="ph ph-house-simple"></i>
-            <span>Home</span>
+  <!-- Mobile Nav Drawer -->
+  <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+    <nav class="drawer-panel" id="drawer-panel">
+      <div class="drawer-header">
+        <span class="brand-glyph">⬡</span>
+        <span class="brand-wordmark">CURATOR</span>
+        <button id="drawer-close" class="drawer-close-btn" aria-label="Close menu">
+          <i class="ph ph-x"></i>
         </button>
-        <button class="bnav-item" data-view="games" aria-label="Games">
-            <i class="ph ph-game-controller"></i>
-            <span>Games</span>
-        </button>
-        <button class="bnav-item" data-view="movies" aria-label="Movies">
-            <i class="ph ph-film-strip"></i>
-            <span>Movies</span>
-        </button>
-        <button class="bnav-item" data-view="anime" aria-label="Anime">
-            <i class="ph ph-star-four"></i>
-            <span>Anime</span>
-        </button>
-        <button class="bnav-item" data-view="tv" aria-label="TV">
-            <i class="ph ph-monitor-play"></i>
-            <span>TV</span>
-        </button>
-        <button class="bnav-item" data-view="socials" aria-label="Socials">
-            <i class="ph ph-link-simple"></i>
-            <span>Socials</span>
-        </button>
+      </div>
+      <ul class="drawer-nav-list" id="drawer-nav-list"></ul>
     </nav>
+  </div>
 
-    <!-- Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js?v=' + Date.now())
-                .then(function (reg) {
-                    // Force update on every load
-                    reg.update();
-                })
-                .catch(function (err) {
-                    console.warn('SW registration failed:', err);
-                });
-        }
-    </script>
+  <!-- ═══════════════════════════════════════════════════════════
+       SEARCH OVERLAY
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="search-overlay" id="search-overlay" aria-hidden="true">
+    <div class="search-overlay-scrim" id="search-overlay-scrim"></div>
+    <div class="search-overlay-box">
+      <div class="search-input-row">
+        <i class="ph ph-magnifying-glass search-icon"></i>
+        <input type="text" id="global-search-input" placeholder="Search titles, genres, years…" autocomplete="off" spellcheck="false" />
+        <button id="search-clear-btn" class="search-clear-btn hidden" aria-label="Clear">
+          <i class="ph ph-x-circle"></i>
+        </button>
+        <button id="search-close-btn" class="search-close-btn" aria-label="Close">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div id="search-results" class="search-results"></div>
+    </div>
+  </div>
 
-    <!-- Main app script with cache-busting stamp -->
-    <script>
-        (function () {
-            var s = document.createElement('script');
-            s.src = 'app.js?v=' + (window.__CACHE_STAMP || Date.now());
-            s.defer = false;
-            document.body.appendChild(s);
-        })();
-    </script>
+  <!-- ═══════════════════════════════════════════════════════════
+       APP SHELL
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="app-shell">
 
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Primary navigation">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">⬡</div>
+        <div>
+          <div class="sidebar-brand-name">CURATOR</div>
+          <div class="sidebar-brand-sub">Personal Archive</div>
+        </div>
+      </div>
+
+      <!-- Desktop search -->
+      <div class="sidebar-search-wrap">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" id="sidebar-search-input" placeholder="Quick search…" autocomplete="off" aria-label="Search library" />
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">BROWSE</div>
+        <ul id="sidebar-nav-list" class="sidebar-nav-list" role="list"></ul>
+
+        <div class="nav-section-label" style="margin-top:1.5rem">DISCOVER</div>
+        <ul class="sidebar-nav-list" role="list">
+          <li class="sidebar-nav-item" data-view="stats" role="listitem" tabindex="0">
+            <i class="ph ph-chart-bar"></i><span>Stats</span>
+          </li>
+          <li class="sidebar-nav-item" data-view="favorites" role="listitem" tabindex="0">
+            <i class="ph ph-heart"></i><span>Favorites</span>
+          </li>
+          <li class="sidebar-nav-item" data-view="socials" role="listitem" tabindex="0">
+            <i class="ph ph-link-simple"></i><span>Socials</span>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="read-only-badge">
+          <i class="ph ph-lock-simple"></i> Read-Only Archive
+        </span>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="main-content" role="main">
+
+      <!-- HOME VIEW -->
+      <section class="view" id="view-home" data-view="home">
+        <div id="hero-zone" class="hero-zone"></div>
+        <div id="stats-ticker" class="stats-ticker"></div>
+        <div class="section-header">
+          <h2 class="section-title">Recently Added</h2>
+          <button class="section-more-btn" data-target="games">View All <i class="ph ph-arrow-right"></i></button>
+        </div>
+        <div id="recent-grid" class="media-grid"></div>
+
+        <div class="section-header" style="margin-top:3rem">
+          <h2 class="section-title">Top Rated</h2>
+          <button class="section-more-btn" data-target="games">All Ratings <i class="ph ph-arrow-right"></i></button>
+        </div>
+        <div id="toprated-grid" class="media-grid"></div>
+      </section>
+
+      <!-- LIBRARY VIEW (shared for all categories) -->
+      <section class="view hidden" id="view-library" data-view="library">
+        <div class="library-hero" id="library-hero">
+          <div class="library-hero-text">
+            <div class="library-hero-eyebrow" id="library-eyebrow">COLLECTION</div>
+            <h1 class="library-hero-title" id="library-title">Library</h1>
+            <p class="library-hero-sub" id="library-sub">Browsing all entries</p>
+          </div>
+          <div class="library-hero-count" id="library-count-display"></div>
+        </div>
+
+        <!-- Controls bar -->
+        <div class="controls-bar">
+          <div class="filter-pills-wrap" id="filter-pills" role="group" aria-label="Filter by status"></div>
+          <div class="controls-right">
+            <div class="sort-wrap">
+              <i class="ph ph-funnel-simple"></i>
+              <select id="sort-select" aria-label="Sort by">
+                <option value="default">Default</option>
+                <option value="rating-high">Top Rated</option>
+                <option value="rating-low">Lowest Rated</option>
+                <option value="title-asc">A → Z</option>
+                <option value="title-desc">Z → A</option>
+                <option value="year-new">Newest</option>
+                <option value="year-old">Oldest</option>
+              </select>
+            </div>
+            <div class="view-toggle">
+              <button class="view-toggle-btn active" data-layout="grid" aria-label="Grid view"><i class="ph ph-squares-four"></i></button>
+              <button class="view-toggle-btn" data-layout="list" aria-label="List view"><i class="ph ph-list-bullets"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <p class="result-count" id="result-count"></p>
+        <div class="media-grid" id="library-grid"></div>
+        <div class="empty-state hidden" id="empty-state">
+          <i class="ph-duotone ph-ghost"></i>
+          <h3>Nothing found</h3>
+          <p>Try a different filter or clear your search.</p>
+        </div>
+      </section>
+
+      <!-- STATS VIEW -->
+      <section class="view hidden" id="view-stats" data-view="stats">
+        <div class="page-header">
+          <div class="page-eyebrow">ANALYTICS</div>
+          <h1 class="page-title">Your Stats</h1>
+          <p class="page-sub">A data portrait of your media consumption.</p>
+        </div>
+        <div id="stats-content" class="stats-content"></div>
+      </section>
+
+      <!-- FAVORITES VIEW -->
+      <section class="view hidden" id="view-favorites" data-view="favorites">
+        <div class="page-header">
+          <div class="page-eyebrow">CURATED</div>
+          <h1 class="page-title">Favorites</h1>
+          <p class="page-sub">The entries rated 9.0 and above.</p>
+        </div>
+        <div id="favorites-grid" class="media-grid"></div>
+      </section>
+
+      <!-- SOCIALS VIEW -->
+      <section class="view hidden" id="view-socials" data-view="socials">
+        <div class="profile-section">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar"><i class="ph-fill ph-user-circle"></i></div>
+          </div>
+          <div class="profile-details">
+            <h1 class="profile-name">The Curator</h1>
+            <p class="profile-bio">A curated personal archive of every game played, film watched, and series experienced. All ratings and reviews are mine alone — honest takes, no algorithmic influence.</p>
+          </div>
+        </div>
+        <div class="section-header">
+          <h2 class="section-title">Connect</h2>
+        </div>
+        <div class="socials-grid" id="socials-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       DETAIL MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="modal-wrap" id="modal-wrap" hidden role="dialog" aria-modal="true" aria-label="Media details">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-panel" id="modal-panel">
+
+      <button class="modal-close-btn" id="modal-close" aria-label="Close details">
+        <i class="ph ph-x"></i>
+      </button>
+
+      <!-- Banner -->
+      <div class="modal-banner" id="modal-banner">
+        <img id="modal-banner-img" src="" alt="" loading="lazy" />
+        <div class="modal-banner-overlay"></div>
+        <div class="modal-banner-content">
+          <div class="modal-type-badge" id="modal-type-badge"></div>
+          <h2 class="modal-title" id="modal-title"></h2>
+          <div class="modal-meta-row">
+            <span class="modal-status-chip" id="modal-status-chip"></span>
+            <span class="modal-year" id="modal-year"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body-layout">
+        <!-- Left col: cover + actions -->
+        <div class="modal-left-col">
+          <div class="modal-cover-frame">
+            <img id="modal-cover-img" src="" alt="" loading="lazy" />
+          </div>
+          <div class="modal-rating-block" id="modal-rating-block">
+            <div class="rating-score" id="modal-rating-score"></div>
+            <div class="rating-stars" id="modal-rating-stars"></div>
+          </div>
+          <div class="modal-action-list" id="modal-actions"></div>
+        </div>
+
+        <!-- Right col: details -->
+        <div class="modal-right-col">
+          <div class="modal-genres" id="modal-genres"></div>
+
+          <div class="modal-review-section" id="modal-review-section">
+            <div class="review-label">
+              <i class="ph-duotone ph-quotes"></i>
+              Curator's Take
+            </div>
+            <div class="review-body" id="modal-review-body"></div>
+          </div>
+
+          <div class="modal-meta-table" id="modal-meta-table"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       BOTTOM NAV (mobile)
+  ═══════════════════════════════════════════════════════════ -->
+  <nav class="bottom-nav" id="bottom-nav" role="navigation" aria-label="Mobile navigation"></nav>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(r => r.update())
+        .catch(e => console.warn('SW error:', e));
+    }
+  </script>
+
+  <script src="app.js" defer></script>
 </body>
 </html>
