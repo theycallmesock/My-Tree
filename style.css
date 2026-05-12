@@ -1273,49 +1273,97 @@ select { appearance: none; cursor: pointer; }
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .sidebar { display: none; }
-  .mobile-topbar { display: flex; }
+  .mobile-topbar { display: flex; background: rgba(8,8,16,0.85); border-bottom: none; }
   .mobile-drawer { display: block; }
   .bottom-nav { display: flex; }
+
   .main-content {
     margin-left: 0;
     padding-top: var(--topbar-h);
-    /* Ensures you can scroll past the bottom nav */
     padding-bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom) + 1.5rem);
   }
-  .hero-content { left: 1.5rem; bottom: 1.5rem; max-width: calc(100vw - 3rem); }
-  .hero-title { font-size: 2rem; }
-  .hero-notes { display: none; }
-  .section-header { padding: 1.5rem 1rem 0.75rem; }
-  .media-grid { padding: 0 1rem 1rem; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-  .library-hero { padding: 2rem 1rem 1.5rem; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
-  .library-hero-count { display: none; }
-  .controls-bar { padding: 0.75rem 1rem; }
-  .result-count { padding: 0.5rem 1rem; }
-  .media-grid.list-layout .media-card.list-card { padding: 10px 1rem; }
-  .stats-ticker-item { padding: 0.75rem 1rem; }
-  .modal-body-layout { grid-template-columns: 1fr; gap: 1.2rem; }
-  /* Creates a clean grid so the poster sits nicely next to ratings & actions */
-  .modal-left-col { display: grid; grid-template-columns: 110px 1fr; gap: 0.75rem; align-items: start; }
-  .modal-cover-frame { width: 100%; aspect-ratio: 2/3; grid-row: span 2; margin: 0; }
-  .modal-rating-block { margin-top: 0; padding: 10px; }
-  .modal-action-list { flex-direction: row; flex-wrap: wrap; margin-top: 0; gap: 6px; }
-  .profile-section { flex-direction: column; gap: 1rem; padding: 2rem 1rem 1.5rem; }
-  .socials-grid { padding: 1.5rem 1rem; grid-template-columns: 1fr; }
-  .stats-content { padding: 1.5rem 1rem; }
-  .page-header { padding: 2rem 1rem 1.5rem; }
+
+  /* App-like Hero Section */
+  .hero-zone {
+    height: auto; min-height: 60vh;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+  }
+  .hero-content { left: 1.5rem; bottom: 2rem; max-width: calc(100vw - 3rem); }
+  .hero-title { font-size: 2.2rem; text-shadow: 0 2px 16px rgba(0,0,0,0.9); }
+  .hero-notes { display: -webkit-box; -webkit-line-clamp: 3; font-size: 0.85rem; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+
+  /* Native Horizontal Scrolling for Home Page Rows (Netflix style) */
+  #view-home .media-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 0 1.5rem 1rem;
+    gap: 1rem;
+    -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+  }
+  #view-home .media-grid::-webkit-scrollbar { display: none; }
+  #view-home .media-card {
+    flex: 0 0 calc(40vw); /* Shows 2.5 cards to naturally hint at scrolling */
+    max-width: 160px;
+    scroll-snap-align: start;
+    transform: none !important; /* Disable hover jumps on mobile */
+  }
+
+  /* Library Headers - Clean and Compact */
+  .library-hero { padding: 1.5rem 1.5rem 1rem; flex-direction: column; align-items: flex-start; gap: 0; border-bottom: none; }
+  .library-hero-title { font-size: 2rem; }
+  .library-hero-sub, .library-hero-count { display: none; } /* Hide extra text to save space */
+
+  /* Sticky Controls Bar (Stays on screen while scrolling library) */
+  .controls-bar {
+    position: sticky; top: var(--topbar-h); z-index: 40;
+    background: rgba(8,8,16,0.95);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  .section-header { padding: 1.5rem 1.5rem 0.75rem; }
+  .result-count { padding: 0.25rem 1.5rem 1rem; }
+
+  /* Stats Ticker natively scrollable */
+  .stats-ticker-item { padding: 1rem; min-width: 100px; }
+  .stats-ticker-value { font-size: 1.5rem; }
+
+  /* Slide-Up Fullscreen Modal Rework */
+  .modal-panel { 
+    width: 100%; height: 100vh; max-height: 100vh; 
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0; 
+    transform: translateY(100%); /* Slides up from bottom */
+  }
+  .modal-wrap.active .modal-panel { transform: translateY(0); }
+  .modal-banner { height: 35vh; }
+  .modal-title { font-size: 2rem; }
+  .modal-close-btn { top: env(safe-area-inset-top, 1rem); right: 1rem; background: rgba(0,0,0,0.5); }
+  .modal-body-layout { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem; }
+  .modal-left-col { display: flex; flex-direction: column; gap: 1rem; }
+  
+  /* Hide poster in modal on mobile, the banner is enough */
+  .modal-cover-frame { display: none; } 
+  .modal-rating-block { background: transparent; border: none; padding: 0; text-align: left; display: flex; align-items: center; gap: 10px; margin-top: 0; }
+  .rating-score { font-size: 1.5rem; }
+  .rating-stars { margin-top: 0; font-size: 0.8rem; }
 }
 
 @media (max-width: 480px) {
-  /* Changed from 3 columns to 2 columns so posters are actually visible */
-  .media-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; padding: 0 1rem 1rem; }
-  .hero-zone { height: min(85vw, 400px); } /* Better aspect ratio for phone screens */
-  .stats-ticker { flex-wrap: nowrap; }
-  .filter-pill { font-size: 0.72rem; padding: 4px 10px; }
-  
-  /* Shrink the giant modal banner so users don't have to scroll to see content */
-  .modal-banner { height: 180px; }
-  .modal-title { font-size: 1.8rem; }
-  .modal-banner-content { bottom: 1rem; left: 1rem; }
+  /* Keep standard 2-column Grid for Library & Favorites */
+  #view-library .media-grid, #view-favorites .media-grid {
+    grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 0 1.5rem 1.5rem;
+  }
+  .filter-pill { font-size: 0.85rem; padding: 6px 16px; } /* Larger touch targets */
+  .view-toggle { display: none; } /* Force grid view on mobile to keep it clean */
+  .sort-wrap select { font-size: 0.85rem; }
 }
 
 /* ─── FOCUS VISIBLE ──────────────────────────────────────────────────────── */
