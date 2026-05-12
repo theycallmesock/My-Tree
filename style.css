@@ -1295,10 +1295,16 @@ select { appearance: none; cursor: pointer; }
 }
 
 @media (max-width: 480px) {
-  .media-grid { grid-template-columns: repeat(3, 1fr); gap: 0.6rem; padding: 0 0.75rem 1rem; }
-  .hero-zone { height: min(70vw, 360px); }
+  /* Changed from 3 columns to 2 columns so posters are actually visible */
+  .media-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; padding: 0 1rem 1rem; }
+  .hero-zone { height: min(85vw, 400px); } /* Better aspect ratio for phone screens */
   .stats-ticker { flex-wrap: nowrap; }
   .filter-pill { font-size: 0.72rem; padding: 4px 10px; }
+  
+  /* Shrink the giant modal banner so users don't have to scroll to see content */
+  .modal-banner { height: 180px; }
+  .modal-title { font-size: 1.8rem; }
+  .modal-banner-content { bottom: 1rem; left: 1rem; }
 }
 
 /* ─── FOCUS VISIBLE ──────────────────────────────────────────────────────── */
