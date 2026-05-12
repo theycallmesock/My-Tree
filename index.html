@@ -3,50 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Showcase | Premium Media Tracker</title>
+    <title>The Curator | Premium Media Showcase</title>
     
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <script>
         (function() {
-            const APP_VERSION = "3.0.0"; // Increment this on every deployment
-            const localVer = localStorage.getItem('showcase_app_version');
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            if (localVer !== APP_VERSION && !urlParams.has('v')) {
-                localStorage.setItem('showcase_app_version', APP_VERSION);
-                // Force hard reload with version parameter to bypass GH Pages Cache
-                window.location.replace(window.location.pathname + '?v=' + APP_VERSION);
-            } else if (urlParams.has('v') && urlParams.get('v') !== APP_VERSION) {
-                // Cleanup URL if version matches but param is old
-                 window.history.replaceState(null, null, window.location.pathname);
-            }
+            // Generate a unique timestamp for this specific visit
+            const sessionTimestamp = Date.now();
+            window.APP_FRESH_CACHE_STAMP = sessionTimestamp;
 
-            // Dynamically load assets to guarantee fresh fetch
+            // Dynamically load stylesheet to bypass CDN/Browser caching
             const head = document.getElementsByTagName('head')[0];
             const css = document.createElement('link');
             css.rel = 'stylesheet';
-            css.href = 'style.css?v=' + APP_VERSION;
+            css.href = 'style.css?t=' + sessionTimestamp;
             head.appendChild(css);
-
-            window.APP_VERSION_READY = APP_VERSION;
         })();
     </script>
 </head>
 <body class="dark-mode theme-transition">
-    <div id="toast-container" aria-live="polite"></div>
-
     <div id="app-loader" class="app-loader">
         <div class="loader-content">
             <div class="loader-spinner"></div>
-            <p>Syncing Library...</p>
+            <p>Loading Showcase...</p>
         </div>
     </div>
 
@@ -68,16 +56,17 @@
             </div>
 
             <div class="nav-section">
-                <span class="nav-label">System</span>
+                <span class="nav-label">Connect</span>
                 <ul class="nav-links">
-                    <li data-view="profile"><i class="ph ph-user-circle"></i> Profile & Data</li>
+                    <li data-view="socials"><i class="ph ph-link"></i> Socials & Links</li>
                 </ul>
             </div>
 
             <div class="sidebar-bottom">
-                <button id="theme-toggle" class="btn-icon">
-                    <i class="ph ph-sun"></i> <span>Light Mode</span>
-                </button>
+                <div class="sidebar-footer-info">
+                    <p>Curated Collection</p>
+                    <span>Read-Only Archive</span>
+                </div>
             </div>
         </nav>
 
@@ -87,9 +76,6 @@
                     <i class="ph ph-magnifying-glass"></i>
                     <input type="text" id="global-search" placeholder="Search titles, genres, or platforms..." autocomplete="off">
                     <button id="clear-search" class="hidden"><i class="ph ph-x-circle"></i></button>
-                </div>
-                <div class="user-profile-mini">
-                    <img src="https://images.unsplash.com/photo-1560233026-ad254fa8dba4?w=100&q=80" alt="Avatar">
                 </div>
             </header>
 
@@ -103,7 +89,7 @@
                     <div class="section-header">
                         <h2 class="section-title">Recently Added</h2>
                         <div class="controls-group">
-                            <button class="view-all-btn" data-target="games">Games <i class="ph ph-arrow-right"></i></button>
+                            <button class="view-all-btn" data-target="games">Browse Full Library <i class="ph ph-arrow-right"></i></button>
                         </div>
                     </div>
                     <div id="recent-grid" class="media-grid"></div>
@@ -113,7 +99,7 @@
                     <div class="view-header">
                         <div class="header-titles">
                             <h1 class="page-title" id="library-title">Library</h1>
-                            <p class="page-subtitle" id="library-subtitle">Manage your collection.</p>
+                            <p class="page-subtitle" id="library-subtitle">Browsing collection.</p>
                         </div>
                         
                         <div class="library-controls">
@@ -142,35 +128,83 @@
                     <div id="empty-state" class="empty-state hidden">
                         <i class="ph-duotone ph-ghost"></i>
                         <h3>No entries found</h3>
-                        <p>Adjust your search or filters to see results.</p>
+                        <p>Adjust the search or filters to see results.</p>
                     </div>
                 </section>
 
-                <section id="view-profile" class="view fade-in">
+                <section id="view-socials" class="view fade-in">
                     <div class="profile-hero glass-panel">
                         <div class="profile-hero-bg"></div>
                         <div class="profile-content">
-                            <img src="https://images.unsplash.com/photo-1560233026-ad254fa8dba4?w=400&q=80" alt="Avatar" class="profile-avatar">
+                            <div class="profile-avatar-placeholder">
+                                <i class="ph-fill ph-user-circle"></i>
+                            </div>
                             <div class="profile-info">
                                 <h1>The Curator</h1>
-                                <p class="bio">Digital archivist documenting interactive and cinematic experiences.</p>
-                                <div class="social-links">
-                                    <a href="#" class="glass-btn"><i class="ph-fill ph-github-logo"></i> Repository</a>
-                                </div>
+                                <p class="bio">Welcome to my public media archive. Explore my ratings, reviews, and current catalog of interactive and cinematic experiences.</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="data-management glass-panel">
-                        <div class="data-header">
-                            <h2 class="section-title"><i class="ph-duotone ph-database"></i> Database Management</h2>
-                            <p>Safely backup, restore, or migrate your local ratings and statuses.</p>
-                        </div>
-                        <div class="data-actions">
-                            <button id="btn-export-data" class="action-btn primary"><i class="ph ph-download-simple"></i> Export Backup (.json)</button>
-                            <label for="import-data-upload" class="action-btn secondary"><i class="ph ph-upload-simple"></i> Import Backup</label>
-                            <input type="file" id="import-data-upload" accept=".json" class="hidden">
-                            <button id="btn-nuke-data" class="action-btn danger"><i class="ph ph-trash"></i> Reset Data</button>
+                    <div class="socials-container mt-2">
+                        <h2 class="section-title mb-1"><i class="ph-duotone ph-users-three"></i> Connect With Me</h2>
+                        <div class="socials-grid">
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-discord-logo" style="color: #5865F2;"></i>
+                                <div class="social-text">
+                                    <h3>Discord</h3>
+                                    <p>Join the community</p>
+                                </div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-github-logo" style="color: #ffffff;"></i>
+                                <div class="social-text">
+                                    <h3>GitHub</h3>
+                                    <p>View my repositories</p>
+                                </div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-youtube-logo" style="color: #FF0000;"></i>
+                                <div class="social-text">
+                                    <h3>YouTube</h3>
+                                    <p>Watch my content</p>
+                                </div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-steam-logo" style="color: #1b2838;"></i>
+                                <div class="social-text">
+                                    <h3>Steam</h3>
+                                    <p>View my gaming profile</p>
+                                </div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-twitch-logo" style="color: #9146FF;"></i>
+                                <div class="social-text">
+                                    <h3>Twitch</h3>
+                                    <p>Catch me live</p>
+                                </div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-twitter-logo" style="color: #1DA1F2;"></i>
+                                <div class="social-text">
+                                    <h3>Twitter / X</h3>
+                                    <p>Follow my updates</p>
+                                </div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-instagram-logo" style="color: #E1306C;"></i>
+                                <div class="social-text">
+                                    <h3>Instagram</h3>
+                                    <p>Photos and moments</p>
+                                </div>
+                            </a>
+                            <a href="#" class="social-card glass-panel" target="_blank" rel="noopener noreferrer">
+                                <i class="ph-fill ph-tiktok-logo" style="color: #00f2fe;"></i>
+                                <div class="social-text">
+                                    <h3>TikTok</h3>
+                                    <p>Short-form videos</p>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </section>
@@ -197,49 +231,17 @@
             </div>
             <div class="modal-body">
                 <div class="modal-sidebar">
-                    <img id="modal-cover" src="" alt="Cover" class="modal-cover-img">
-                    
-                    <div class="quick-edit-zone glass-panel">
-                        <h4 class="edit-label">Your Rating</h4>
-                        <select id="edit-rating" class="modal-select">
-                            <option value="0">Unrated</option>
-                            <option value="10">10 - Masterpiece</option>
-                            <option value="9">9 - Amazing</option>
-                            <option value="8">8 - Great</option>
-                            <option value="7">7 - Good</option>
-                            <option value="6">6 - Okay</option>
-                            <option value="5">5 - Average</option>
-                            <option value="4">4 - Mediocre</option>
-                            <option value="3">3 - Bad</option>
-                            <option value="2">2 - Terrible</option>
-                            <option value="1">1 - Appalling</option>
-                        </select>
-                        
-                        <h4 class="edit-label">Status</h4>
-                        <select id="edit-status" class="modal-select">
-                            <option value="playing">Playing / Watching</option>
-                            <option value="completed">Completed</option>
-                            <option value="planned">Planned</option>
-                            <option value="dropped">Dropped</option>
-                        </select>
-                        
-                        <button id="save-edits-btn" class="action-btn primary small-btn mt-1">Save Changes</button>
+                    <div class="cover-wrapper">
+                        <img id="modal-cover" src="" alt="Cover" class="modal-cover-img">
                     </div>
-
-                    <a href="#" target="_blank" rel="noopener noreferrer" class="action-btn outline mt-1 hidden" id="modal-link"><i class="ph ph-link"></i> Official Link</a>
+                    
+                    <div id="modal-action-zone" class="modal-action-zone">
+                        </div>
                 </div>
                 <div class="modal-details">
                     <div class="review-section">
-                        <h3><i class="ph-duotone ph-notebook"></i> Personal Notes & Review</h3>
+                        <h3><i class="ph-duotone ph-notebook"></i> Curator's Review</h3>
                         <div id="modal-notes" class="prose"></div>
-                        <div class="notes-edit-container hidden" id="notes-editor-container">
-                            <textarea id="edit-notes-input" placeholder="Write your review here..."></textarea>
-                            <div class="editor-actions">
-                                <button id="cancel-notes-btn" class="text-btn">Cancel</button>
-                                <button id="save-notes-btn" class="action-btn primary small-btn">Save Notes</button>
-                            </div>
-                        </div>
-                        <button id="toggle-notes-edit" class="text-btn mt-1"><i class="ph ph-pencil-simple"></i> Edit Notes</button>
                     </div>
                 </div>
             </div>
@@ -247,9 +249,9 @@
     </div>
 
     <script>
-        const script = document.createElement('script');
-        script.src = `app.js?v=${window.APP_VERSION_READY}`;
-        document.body.appendChild(script);
+        const appScript = document.createElement('script');
+        appScript.src = `app.js?t=${window.APP_FRESH_CACHE_STAMP}`;
+        document.body.appendChild(appScript);
     </script>
 </body>
 </html>
