@@ -1,143 +1,81 @@
 /**
- * THE CURATOR — ZERO-CACHE SERVICE WORKER
- * Strategy: Never cache HTML/CSS/JS. Cache external images only.
- * Auto-invalidation: version derived from build timestamp, no manual edits needed.
+ * THE CURATOR — Service Worker v3
+ * Offline caching + PWA support for GitHub Pages
  */
 
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-// Cache name for media assets only. Core files are never cached.
-const MEDIA_CACHE = 'curator-media-v1';
-
-// Domains whose responses are safe to cache (images, fonts, icons)
-const CACHEABLE_ORIGINS = [
-    'shared.akamai.steamstatic.com',
-    'upload.wikimedia.org',
-    'images.unsplash.com',
-    'cdn.cloudflare.steamstatic.com',
-    'fonts.googleapis.com',
-    'fonts.gstatic.com',
-    'unpkg.com'
-];
-
-// File extensions that are safe to cache
-const CACHEABLE_EXTENSIONS = /\.(png|jpe?g|gif|svg|webp|woff2?|ttf|eot|ico)(\?.*)?$/i;
-
-// Core app files — NEVER cache, always fetch fresh
-const NOCACHE_PATTERNS = [
-    /\.html(\?.*)?$/i,
-    /\.js(\?.*)?$/i,
-    /\.css(\?.*)?$/i,
-    /\/$/,                // root path
-    /\/\?/,               // root with query
+const CACHE_NAME = 'curator-v3';
+const STATIC_ASSETS = [
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
 ];
 
 // ─── INSTALL ──────────────────────────────────────────────────────────────────
-self.addEventListener('install', () => {
-    // Take over immediately — no waiting for old SW to die
-    self.skipWaiting();
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
+  );
 });
 
-// ─── ACTIVATE ─────────────────────────────────────────────────────────────────
+// ─── ACTIVATE ────────────────────────────────────────────────────────────────
 self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(names =>
-            Promise.all(
-                names
-                    .filter(name => name !== MEDIA_CACHE)
-                    .map(name => {
-                        console.log('[SW] Deleting old cache:', name);
-                        return caches.delete(name);
-                    })
-            )
-        ).then(() => self.clients.claim())
-    );
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(k => k !== CACHE_NAME)
+          .map(k => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
+  );
 });
 
-// ─── FETCH ────────────────────────────────────────────────────────────────────
+// ─── FETCH ───────────────────────────────────────────────────────────────────
 self.addEventListener('fetch', event => {
-    const req = event.request;
+  const { request } = event;
+  const url = new URL(request.url);
 
-    // Only handle GET requests
-    if (req.method !== 'GET') return;
+  // Skip non-GET, chrome-extension, and external API requests
+  if (request.method !== 'GET') return;
+  if (url.protocol === 'chrome-extension:') return;
 
-    let url;
-    try {
-        url = new URL(req.url);
-    } catch {
-        return; // Malformed URL — let it pass through
-    }
+  // For external images (CDN): network first, cache fallback
+  if (url.origin !== location.origin) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
 
-    // ── CORE APP FILES: always bypass cache ──────────────────────────────────
-    const isCoreFile = NOCACHE_PATTERNS.some(p => p.test(url.pathname));
-    if (isCoreFile && url.origin === self.location.origin) {
-        event.respondWith(
-            fetch(req, {
-                cache: 'no-store',
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache'
-                }
-            }).catch(() =>
-                new Response(
-                    '<!DOCTYPE html><html><body><p>You are offline. Please reconnect to load The Curator.</p></body></html>',
-                    {
-                        status: 503,
-                        statusText: 'Service Unavailable',
-                        headers: { 'Content-Type': 'text/html; charset=utf-8' }
-                    }
-                )
-            )
-        );
-        return;
-    }
-
-    // ── MEDIA / FONT ASSETS: cache-first strategy ─────────────────────────────
-    const isCacheableOrigin = CACHEABLE_ORIGINS.some(o => url.hostname === o || url.hostname.endsWith('.' + o));
-    const isCacheableExt = CACHEABLE_EXTENSIONS.test(url.pathname);
-
-    if (isCacheableOrigin || isCacheableExt) {
-        event.respondWith(
-            caches.open(MEDIA_CACHE).then(async cache => {
-                // Check cache first
-                const cached = await cache.match(req);
-                if (cached) return cached;
-
-                // Not cached — fetch from network and store
-                try {
-                    const networkRes = await fetch(req);
-                    if (networkRes && networkRes.status === 200 && networkRes.type !== 'opaque') {
-                        // Only cache successful, non-opaque responses to avoid poisoning the cache
-                        cache.put(req, networkRes.clone()).catch(() => {/* silent */});
-                    }
-                    return networkRes;
-                } catch {
-                    // Asset unavailable — return an empty 404 to prevent layout breaks
-                    return new Response('', {
-                        status: 404,
-                        statusText: 'Asset Unavailable'
-                    });
-                }
-            })
-        );
-        return;
-    }
-
-    // ── EVERYTHING ELSE: network only, no caching ─────────────────────────────
-    // This covers same-origin API calls, third-party scripts, etc.
-    // No respondWith() call here = browser handles it natively.
-});
-
-// ─── MESSAGE HANDLER ─────────────────────────────────────────────────────────
-// Allows the main app to send control messages to the SW if needed
-self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-    if (event.data && event.data.type === 'CLEAR_MEDIA_CACHE') {
-        caches.delete(MEDIA_CACHE).then(() => {
-            if (event.ports && event.ports[0]) {
-                event.ports[0].postMessage({ cleared: true });
-            }
+  // For local assets: cache first, network fallback
+  event.respondWith(
+    caches.match(request)
+      .then(cached => {
+        if (cached) return cached;
+        return fetch(request).then(response => {
+          if (!response || response.status !== 200) return response;
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          return response;
         });
-    }
+      })
+      .catch(() => {
+        // Offline fallback: return index.html for navigation requests
+        if (request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      })
+  );
 });
