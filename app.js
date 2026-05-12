@@ -1,674 +1,942 @@
 /**
- * THE CURATOR — COMPLETE REWRITE
- * Fixes: navigation, rendering, image handling, filtering, routing, mobile bugs.
- * All original entries preserved. Read-only. No persistence.
+ * THE CURATOR — Rebuilt SPA
+ * GitHub Pages static deployment
+ * Dark cinematic media archive with full navigation, search, filtering, and detail modals
  */
 
-// ─── FALLBACK IMAGE ───────────────────────────────────────────────────────────
-const getFallbackImage = (title = '') => {
-    const encoded = encodeURIComponent(title || 'Missing Art');
-    return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900"><rect fill="%2313131a" width="600" height="900"/><rect fill="%231e1e2a" x="40" y="40" width="520" height="820" rx="12"/><text fill="%234a4a6a" font-family="sans-serif" font-size="18" font-weight="600" x="50%" y="48%" dominant-baseline="middle" text-anchor="middle">${encoded}</text><text fill="%2332324a" font-family="sans-serif" font-size="13" x="50%" y="54%" dominant-baseline="middle" text-anchor="middle">No Image</text></svg>`;
-};
+'use strict';
 
-// ─── MASTER DATA ──────────────────────────────────────────────────────────────
-const rawMediaData = [
-    // GAMES
-    { id: "101", title: "Bloodborne", type: "game", status: "playing", rating: 9.5, image: "https://upload.wikimedia.org/wikipedia/en/6/68/Bloodborne_Cover_Wallpaper.jpg", genres: ["Souls-like", "Action RPG"], releaseYear: 2015, notes: "The atmosphere in Yharnam is unmatched. A masterpiece of environmental storytelling." },
-    { id: "102", title: "God of War (2018)", type: "game", status: "completed", rating: 8.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/library_600x900.jpg", releaseYear: 2018, notes: "Incredible soft reboot. The Leviathan axe mechanics feel weighty and satisfying.", genres: ["Action", "Adventure"] },
-    { id: "103", title: "The Last of Us Part I", type: "game", status: "playing", rating: 9.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/library_600x900.jpg", genres: ["Narrative", "Survival"], releaseYear: 2022 },
-    { id: "104", title: "Ghost of Tsushima", type: "game", status: "dropped", rating: 6.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/library_600x900.jpg", genres: ["Action", "Open World"], releaseYear: 2021 },
-    { id: "105", title: "Horizon Zero Dawn", type: "game", status: "dropped", rating: 5.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1151640/library_600x900.jpg", genres: ["RPG", "Open World"], releaseYear: 2020 },
-    { id: "106", title: "Forza Horizon 5", type: "game", status: "completed", rating: 6.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551360/library_600x900.jpg", genres: ["Racing", "Open World"], releaseYear: 2021 },
-    { id: "107", title: "The Witcher 3: Wild Hunt", type: "game", status: "completed", rating: 7.8, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/292030/library_600x900.jpg", genres: ["RPG", "Open World"], releaseYear: 2015 },
-    { id: "108", title: "Red Dead Redemption 2", type: "game", status: "completed", rating: 9.3, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/library_600x900.jpg", genres: ["Open World", "Narrative"], releaseYear: 2018, notes: "Arthur Morgan's journey is a masterpiece of storytelling. The open world feels remarkably alive." },
-    { id: "109", title: "Grand Theft Auto V", type: "game", status: "completed", rating: 7.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/library_600x900.jpg", genres: ["Open World", "Action"], releaseYear: 2013 },
-    { id: "110", title: "Cyberpunk 2077", type: "game", status: "completed", rating: 9.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900.jpg", genres: ["RPG", "Cyberpunk"], releaseYear: 2020 },
-    { id: "111", title: "The Elder Scrolls V: Skyrim", type: "game", status: "dropped", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/489830/library_600x900.jpg", genres: ["RPG", "Open World"], releaseYear: 2011 },
-    { id: "112", title: "Half-Life 2", type: "game", status: "completed", rating: 9.6, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220/library_600x900.jpg", genres: ["FPS", "Sci-Fi"], releaseYear: 2004 },
-    { id: "113", title: "Portal 2", type: "game", status: "completed", rating: 8.8, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/620/library_600x900.jpg", genres: ["Puzzle", "Sci-Fi"], releaseYear: 2011 },
-    { id: "114", title: "Dishonored", type: "game", status: "completed", rating: 8.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/205100/library_600x900.jpg", genres: ["Stealth", "Action"], releaseYear: 2012 },
-    { id: "115", title: "Dark Souls", type: "game", status: "completed", rating: 10.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/570940/library_600x900.jpg", genres: ["Action RPG", "Dark Fantasy"], releaseYear: 2018 },
-    { id: "116", title: "Dark Souls III", type: "game", status: "completed", rating: 9.8, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/374320/library_600x900.jpg", genres: ["Action RPG", "Dark Fantasy"], releaseYear: 2016 },
-    { id: "117", title: "Elden Ring", type: "game", status: "completed", rating: 9.9, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg", genres: ["Open World", "Action RPG"], releaseYear: 2022 },
-    { id: "118", title: "Sekiro: Shadows Die Twice", type: "game", status: "completed", rating: 10.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/814380/library_600x900.jpg", genres: ["Action", "Souls-like"], releaseYear: 2019 },
-    { id: "119", title: "Baldur's Gate 3", type: "game", status: "dropped", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1086940/library_600x900.jpg", genres: ["RPG", "Turn-Based"], releaseYear: 2023 },
-    { id: "120", title: "World of Warcraft: Wotlk", type: "game", status: "completed", rating: 9.5, image: "https://upload.wikimedia.org/wikipedia/en/e/e5/World_of_Warcraft_Wrath_of_the_Lich_King_box_art.jpg", genres: ["MMORPG"], releaseYear: 2008 },
-    { id: "121", title: "Genshin Impact", type: "game", status: "dropped", rating: 0, image: "https://upload.wikimedia.org/wikipedia/en/5/5d/Genshin_Impact_logo.png", genres: ["RPG", "Open World"], releaseYear: 2020 },
-    { id: "122", title: "Terraria", type: "game", status: "completed", rating: 7.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/105600/library_600x900.jpg", genres: ["Sandbox", "Survival"], releaseYear: 2011 },
-    { id: "123", title: "Minecraft", type: "game", status: "completed", rating: 8.5, image: "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png", genres: ["Sandbox", "Survival"], releaseYear: 2011 },
-    { id: "124", title: "Outer Wilds", type: "game", status: "completed", rating: 10.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/753640/library_600x900.jpg", genres: ["Exploration", "Puzzle"], releaseYear: 2019, notes: "A philosophical masterpiece about curiosity and the end of everything. Changed how I think about games." },
-    { id: "125", title: "StarCraft II", type: "game", status: "completed", rating: 8.0, image: "https://upload.wikimedia.org/wikipedia/en/2/20/StarCraft_II_-_Box_Art.jpg", genres: ["RTS", "Sci-Fi"], releaseYear: 2010 },
-    { id: "126", title: "Counter-Strike 2", type: "game", status: "playing", rating: 8.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/library_600x900.jpg", genres: ["FPS", "Competitive"], releaseYear: 2023 },
-    { id: "127", title: "Valorant", type: "game", status: "playing", rating: 8.4, image: "https://upload.wikimedia.org/wikipedia/en/a/ab/Valorant_cover_art.jpg", genres: ["FPS", "Tactical"], releaseYear: 2020 },
-    { id: "128", title: "League of Legends", type: "game", status: "playing", rating: 0, image: "https://upload.wikimedia.org/wikipedia/en/7/77/League_of_Legends_logo.png", genres: ["MOBA", "Competitive"], releaseYear: 2009 },
-    { id: "129", title: "Fortnite", type: "game", status: "playing", rating: 9.9, image: "https://upload.wikimedia.org/wikipedia/en/a/a8/FortniteCoverArt.jpg", genres: ["Battle Royale"], releaseYear: 2017 },
-    { id: "130", title: "Overwatch 2", type: "game", status: "dropped", rating: 1.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2357570/library_600x900.jpg", genres: ["FPS", "Hero Shooter"], releaseYear: 2022 },
-    { id: "131", title: "Rocket League", type: "game", status: "dropped", rating: 4.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252950/library_600x900.jpg", genres: ["Sports", "Competitive"], releaseYear: 2015 },
-    { id: "132", title: "Tom Clancy's Rainbow Six Siege", type: "game", status: "dropped", rating: 6.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/library_600x900.jpg", genres: ["FPS", "Tactical"], releaseYear: 2015 },
-    { id: "133", title: "Call of Duty: Warzone", type: "game", status: "dropped", rating: 6.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962660/library_600x900.jpg", genres: ["Battle Royale", "FPS"], releaseYear: 2020 },
-    { id: "134", title: "Super Mario 64", type: "game", status: "completed", rating: 8.0, image: "https://upload.wikimedia.org/wikipedia/en/6/6a/Super_Mario_64_box_cover.jpg", genres: ["Platformer", "Classic"], releaseYear: 1996 },
-    { id: "135", title: "Dark Souls II: Scholar of the First Sin", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/335300/library_600x900.jpg", genres: ["Action RPG", "Souls-like"], releaseYear: 2015 },
-    { id: "136", title: "Lies of P", type: "game", status: "playing", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1627720/library_600x900.jpg", genres: ["Souls-like", "Action"], releaseYear: 2023 },
-    { id: "137", title: "Nioh", type: "game", status: "dropped", rating: 3.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/485510/library_600x900.jpg", genres: ["Action RPG", "Souls-like"], releaseYear: 2017 },
-    { id: "138", title: "Sifu", type: "game", status: "completed", rating: 7.8, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2138710/library_600x900.jpg", genres: ["Action", "Martial Arts"], releaseYear: 2022 },
-    { id: "139", title: "Cyberpunk 2077: Phantom Liberty", type: "game", status: "completed", rating: 9.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2138330/library_600x900.jpg", genres: ["RPG", "Cyberpunk"], releaseYear: 2023 },
-    { id: "140", title: "Hell Let Loose", type: "game", status: "dropped", rating: 5.6, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/686810/library_600x900.jpg", genres: ["FPS", "Tactical"], releaseYear: 2021 },
-    { id: "141", title: "Far Cry 3", type: "game", status: "completed", rating: 9.7, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220240/library_600x900.jpg", genres: ["FPS", "Open World"], releaseYear: 2012 },
-    { id: "142", title: "Deep Rock Galactic", type: "game", status: "dropped", rating: 6.7, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/548430/library_600x900.jpg", genres: ["Co-op", "FPS"], releaseYear: 2020 },
-    { id: "143", title: "Alien: Isolation", type: "game", status: "completed", rating: 8.7, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/214490/library_600x900.jpg", genres: ["Horror", "Survival"], releaseYear: 2014 },
-    { id: "144", title: "Outlast", type: "game", status: "completed", rating: 9.3, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/238320/library_600x900.jpg", genres: ["Horror"], releaseYear: 2013 },
-    { id: "145", title: "Phasmophobia", type: "game", status: "dropped", rating: 3.2, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/739630/library_600x900.jpg", genres: ["Horror", "Co-op"], releaseYear: 2020 },
-    { id: "146", title: "Valheim", type: "game", status: "dropped", rating: 6.9, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/892970/library_600x900.jpg", genres: ["Survival", "Open World"], releaseYear: 2021 },
-    { id: "147", title: "The Forest", type: "game", status: "completed", rating: 7.8, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/242760/library_600x900.jpg", genres: ["Survival", "Horror"], releaseYear: 2018 },
-    { id: "148", title: "Sons of the Forest", type: "game", status: "dropped", rating: 6.2, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1326470/library_600x900.jpg", genres: ["Survival", "Horror"], releaseYear: 2023 },
-    { id: "149", title: "Hearts of Iron IV", type: "game", status: "playing", rating: 5.8, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/394360/library_600x900.jpg", genres: ["Strategy", "Historical"], releaseYear: 2016 },
-    { id: "150", title: "Black Myth: Wukong", type: "game", status: "playing", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/library_600x900.jpg", genres: ["Action RPG", "Mythology"], releaseYear: 2024 },
-    { id: "151", title: "Nioh 2", type: "game", status: "dropped", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1301210/library_600x900.jpg", genres: ["Action RPG", "Souls-like"], releaseYear: 2021 },
-    { id: "152", title: "Batman: Arkham Knight", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/208650/library_600x900.jpg", genres: ["Action", "Superhero"], releaseYear: 2015 },
-    { id: "153", title: "God of War Ragnarök", type: "game", status: "completed", rating: 8.3, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2322010/library_600x900.jpg", genres: ["Action", "Adventure"], releaseYear: 2022 },
-    { id: "154", title: "Hogwarts Legacy", type: "game", status: "dropped", rating: 4.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/library_600x900.jpg", genres: ["RPG", "Open World"], releaseYear: 2023 },
-    { id: "155", title: "Rise of the Tomb Raider", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/391220/library_600x900.jpg", genres: ["Action", "Adventure"], releaseYear: 2016 },
-    { id: "156", title: "Shadow of the Tomb Raider", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/750920/library_600x900.jpg", genres: ["Action", "Adventure"], releaseYear: 2018 },
-    { id: "157", title: "Tomb Raider (2013)", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/203160/library_600x900.jpg", genres: ["Action", "Adventure"], releaseYear: 2013 },
-    { id: "158", title: "Red Dead Redemption", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2668510/library_600x900.jpg", genres: ["Open World", "Western"], releaseYear: 2010 },
-    { id: "159", title: "Infamous Second Son", type: "game", status: "planned", rating: 0, image: "https://upload.wikimedia.org/wikipedia/en/b/b6/Infamous_Second_Son_cover.jpg", genres: ["Action", "Open World"], releaseYear: 2014 },
-    { id: "160", title: "Half-Life", type: "game", status: "completed", rating: 10.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/70/library_600x900.jpg", genres: ["FPS", "Sci-Fi"], releaseYear: 1998 },
-    { id: "161", title: "Black Mesa", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/362890/library_600x900.jpg", genres: ["FPS", "Sci-Fi"], releaseYear: 2020 },
-    { id: "162", title: "Call of Duty: Modern Warfare (2019)", type: "game", status: "dropped", rating: 3.5, image: "https://upload.wikimedia.org/wikipedia/en/e/e9/CallofDutyModernWarfare%282019%29.jpg", genres: ["FPS", "Military"], releaseYear: 2019 },
-    { id: "163", title: "Call of Duty: Black Ops Cold War", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1985810/library_600x900.jpg", genres: ["FPS", "Military"], releaseYear: 2020 },
-    { id: "164", title: "Green Hell", type: "game", status: "completed", rating: 4.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/815370/library_600x900.jpg", genres: ["Survival"], releaseYear: 2019 },
-    { id: "165", title: "Raft", type: "game", status: "dropped", rating: 5.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/648800/library_600x900.jpg", genres: ["Survival", "Co-op"], releaseYear: 2022 },
-    { id: "166", title: "Don't Starve Together", type: "game", status: "dropped", rating: 3.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/322330/library_600x900.jpg", genres: ["Survival", "Co-op"], releaseYear: 2016 },
-    { id: "167", title: "Hollow Knight", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/367520/library_600x900.jpg", genres: ["Metroidvania", "Platformer"], releaseYear: 2017 },
-    { id: "168", title: "Firewatch", type: "game", status: "completed", rating: 9.1, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/383870/library_600x900.jpg", genres: ["Narrative", "Walking Sim"], releaseYear: 2016 },
-    { id: "169", title: "SOMA", type: "game", status: "completed", rating: 9.6, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/282140/library_600x900.jpg", genres: ["Horror", "Sci-Fi"], releaseYear: 2015, notes: "A haunting meditation on consciousness and identity. The ending is unforgettable." },
-    { id: "170", title: "It Takes Two", type: "game", status: "completed", rating: 8.8, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/library_600x900.jpg", genres: ["Co-op", "Platformer"], releaseYear: 2021 },
-    { id: "171", title: "A Way Out", type: "game", status: "completed", rating: 9.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1222700/library_600x900.jpg", genres: ["Co-op", "Action"], releaseYear: 2018 },
-    { id: "172", title: "Little Nightmares", type: "game", status: "completed", rating: 8.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/424840/library_600x900.jpg", genres: ["Horror", "Puzzle"], releaseYear: 2017 },
-    { id: "173", title: "Little Nightmares II", type: "game", status: "completed", rating: 8.2, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/860510/library_600x900.jpg", genres: ["Horror", "Puzzle"], releaseYear: 2021 },
-    { id: "174", title: "Elden Ring: Shadow of the Erdtree", type: "game", status: "completed", rating: 10.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2778580/library_600x900.jpg", genres: ["Action RPG", "Dark Fantasy"], releaseYear: 2024 },
-    { id: "175", title: "Assassin's Creed I", type: "game", status: "completed", rating: 7.8, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/15100/library_600x900.jpg", genres: ["Action", "Stealth"], releaseYear: 2007 },
-    { id: "176", title: "Assassin's Creed II", type: "game", status: "completed", rating: 9.0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/33230/library_600x900.jpg", genres: ["Action", "Stealth"], releaseYear: 2009 },
-    { id: "177", title: "Assassin's Creed Brotherhood", type: "game", status: "playing", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/48190/library_600x900.jpg", genres: ["Action", "Stealth"], releaseYear: 2010 },
-    { id: "178", title: "Assassin's Creed III", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/208480/library_600x900.jpg", genres: ["Action", "Stealth"], releaseYear: 2012 },
-    { id: "179", title: "Assassin's Creed Revelations", type: "game", status: "planned", rating: 0, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/201870/library_600x900.jpg", genres: ["Action", "Stealth"], releaseYear: 2011 },
-    { id: "180", title: "Lethal Company", type: "game", status: "playing", rating: 6.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1966720/library_600x900.jpg", genres: ["Horror", "Co-op"], releaseYear: 2023 },
-    { id: "181", title: "Brawlhalla", type: "game", status: "dropped", rating: 4.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/329860/library_600x900.jpg", genres: ["Fighting"], releaseYear: 2017 },
-    { id: "182", title: "Goat Simulator 3", type: "game", status: "completed", rating: 5.5, image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2144740/library_600x900.jpg", genres: ["Comedy", "Sandbox"], releaseYear: 2022 },
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════════
 
-    // ANIME
-    { id: "901", title: "Attack on Titan", type: "anime", status: "completed", rating: 9.8, image: "https://upload.wikimedia.org/wikipedia/en/d/d6/Shingeki_no_Kyojin_manga_volume_1.jpg", genres: ["Action", "Dark Fantasy"], releaseYear: 2013, notes: "Masterpiece of foreshadowing. Flawless narrative structure with one of the best endings in anime." },
-    { id: "902", title: "Jujutsu Kaisen", type: "anime", status: "playing", rating: 8.5, image: "https://upload.wikimedia.org/wikipedia/en/4/46/Jujutsu_kaisen.jpg", genres: ["Action", "Supernatural"], releaseYear: 2020 },
-    { id: "903", title: "Death Note", type: "anime", status: "completed", rating: 9.0, image: "https://upload.wikimedia.org/wikipedia/en/6/6f/Death_Note_Vol_1.jpg", genres: ["Psychological Thriller", "Mystery"], releaseYear: 2006, notes: "A psychological cat-and-mouse thriller that defines the genre. Light vs L is unmatched." },
+const MEDIA_DATA = [
+  // ── GAMES ────────────────────────────────────────────────────────────────
+  { id:"101", title:"Bloodborne",                  type:"game",   status:"playing",   rating:9.5, image:"https://upload.wikimedia.org/wikipedia/en/6/68/Bloodborne_Cover_Wallpaper.jpg",              genres:["Souls-like","Action RPG"],    year:2015, notes:"The atmosphere in Yharnam is unmatched. A masterpiece of environmental storytelling." },
+  { id:"102", title:"God of War (2018)",            type:"game",   status:"completed", rating:8.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/library_600x900.jpg", genres:["Action","Adventure"],         year:2018, notes:"Incredible soft reboot. The Leviathan axe mechanics feel weighty and satisfying." },
+  { id:"103", title:"The Last of Us Part I",        type:"game",   status:"playing",   rating:9.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/library_600x900.jpg", genres:["Narrative","Survival"],       year:2022 },
+  { id:"104", title:"Ghost of Tsushima",            type:"game",   status:"dropped",   rating:6.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/library_600x900.jpg", genres:["Action","Open World"],        year:2021 },
+  { id:"105", title:"Horizon Zero Dawn",            type:"game",   status:"dropped",   rating:5.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1151640/library_600x900.jpg", genres:["RPG","Open World"],           year:2020 },
+  { id:"106", title:"Forza Horizon 5",              type:"game",   status:"completed", rating:6.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551360/library_600x900.jpg", genres:["Racing","Open World"],        year:2021 },
+  { id:"107", title:"The Witcher 3: Wild Hunt",     type:"game",   status:"completed", rating:7.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/292030/library_600x900.jpg",  genres:["RPG","Open World"],           year:2015 },
+  { id:"108", title:"Red Dead Redemption 2",        type:"game",   status:"completed", rating:9.3, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/library_600x900.jpg", genres:["Open World","Narrative"],     year:2018, notes:"Arthur Morgan's journey is a masterpiece of storytelling. The open world feels remarkably alive." },
+  { id:"109", title:"Grand Theft Auto V",           type:"game",   status:"completed", rating:7.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/library_600x900.jpg",  genres:["Open World","Action"],        year:2013 },
+  { id:"110", title:"Cyberpunk 2077",               type:"game",   status:"completed", rating:9.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900.jpg", genres:["RPG","Cyberpunk"],            year:2020 },
+  { id:"111", title:"Skyrim",                       type:"game",   status:"dropped",   rating:0,   image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/489830/library_600x900.jpg",  genres:["RPG","Open World"],           year:2011 },
+  { id:"112", title:"Half-Life 2",                  type:"game",   status:"completed", rating:9.6, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220/library_600x900.jpg",     genres:["FPS","Sci-Fi"],               year:2004 },
+  { id:"113", title:"Portal 2",                     type:"game",   status:"completed", rating:8.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/620/library_600x900.jpg",     genres:["Puzzle","Sci-Fi"],            year:2011 },
+  { id:"114", title:"Dishonored",                   type:"game",   status:"completed", rating:8.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/205100/library_600x900.jpg",  genres:["Stealth","Action"],           year:2012 },
+  { id:"115", title:"Dark Souls",                   type:"game",   status:"completed", rating:10,  image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/570940/library_600x900.jpg",  genres:["Action RPG","Dark Fantasy"],  year:2018 },
+  { id:"116", title:"Dark Souls III",               type:"game",   status:"completed", rating:9.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/374320/library_600x900.jpg",  genres:["Action RPG","Dark Fantasy"],  year:2016 },
+  { id:"117", title:"Elden Ring",                   type:"game",   status:"completed", rating:9.9, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg", genres:["Open World","Action RPG"],    year:2022 },
+  { id:"118", title:"Sekiro: Shadows Die Twice",    type:"game",   status:"completed", rating:10,  image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/814380/library_600x900.jpg",  genres:["Action","Souls-like"],        year:2019 },
+  { id:"119", title:"Baldur's Gate 3",              type:"game",   status:"dropped",   rating:0,   image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1086940/library_600x900.jpg", genres:["RPG","Turn-Based"],           year:2023 },
+  { id:"120", title:"World of Warcraft: WotLK",     type:"game",   status:"completed", rating:9.5, image:"https://upload.wikimedia.org/wikipedia/en/e/e5/World_of_Warcraft_Wrath_of_the_Lich_King_box_art.jpg", genres:["MMORPG"],              year:2008 },
+  { id:"122", title:"Terraria",                     type:"game",   status:"completed", rating:7.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/105600/library_600x900.jpg",  genres:["Sandbox","Survival"],         year:2011 },
+  { id:"123", title:"Minecraft",                    type:"game",   status:"completed", rating:8.5, image:"https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",                            genres:["Sandbox","Survival"],         year:2011 },
+  { id:"124", title:"Outer Wilds",                  type:"game",   status:"completed", rating:10,  image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/753640/library_600x900.jpg",  genres:["Exploration","Puzzle"],       year:2019, notes:"A philosophical masterpiece about curiosity and the end of everything. Changed how I think about games." },
+  { id:"125", title:"StarCraft II",                 type:"game",   status:"completed", rating:8.0, image:"https://upload.wikimedia.org/wikipedia/en/2/20/StarCraft_II_-_Box_Art.jpg",                      genres:["RTS","Sci-Fi"],               year:2010 },
+  { id:"126", title:"Counter-Strike 2",             type:"game",   status:"playing",   rating:8.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/library_600x900.jpg",     genres:["FPS","Competitive"],          year:2023 },
+  { id:"127", title:"Valorant",                     type:"game",   status:"playing",   rating:8.4, image:"https://upload.wikimedia.org/wikipedia/en/a/ab/Valorant_cover_art.jpg",                         genres:["FPS","Tactical"],             year:2020 },
+  { id:"129", title:"Fortnite",                     type:"game",   status:"playing",   rating:9.9, image:"https://upload.wikimedia.org/wikipedia/en/a/a8/FortniteCoverArt.jpg",                           genres:["Battle Royale"],              year:2017 },
+  { id:"130", title:"Overwatch 2",                  type:"game",   status:"dropped",   rating:1.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2357570/library_600x900.jpg", genres:["FPS","Hero Shooter"],         year:2022 },
+  { id:"131", title:"Rocket League",                type:"game",   status:"dropped",   rating:4.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252950/library_600x900.jpg",  genres:["Sports","Competitive"],       year:2015 },
+  { id:"134", title:"Super Mario 64",               type:"game",   status:"completed", rating:8.0, image:"https://upload.wikimedia.org/wikipedia/en/6/6a/Super_Mario_64_box_cover.jpg",                    genres:["Platformer","Classic"],       year:1996 },
+  { id:"138", title:"Sifu",                         type:"game",   status:"completed", rating:7.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2138710/library_600x900.jpg", genres:["Action","Martial Arts"],      year:2022 },
+  { id:"139", title:"Cyberpunk 2077: Phantom Liberty",type:"game", status:"completed", rating:9.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2138330/library_600x900.jpg", genres:["RPG","Cyberpunk"],            year:2023 },
+  { id:"141", title:"Far Cry 3",                    type:"game",   status:"completed", rating:9.7, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220240/library_600x900.jpg",  genres:["FPS","Open World"],           year:2012 },
+  { id:"143", title:"Alien: Isolation",             type:"game",   status:"completed", rating:8.7, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/214490/library_600x900.jpg",  genres:["Horror","Survival"],          year:2014 },
+  { id:"144", title:"Outlast",                      type:"game",   status:"completed", rating:9.3, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/238320/library_600x900.jpg",  genres:["Horror"],                     year:2013 },
+  { id:"147", title:"The Forest",                   type:"game",   status:"completed", rating:7.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/242760/library_600x900.jpg",  genres:["Survival","Horror"],          year:2018 },
+  { id:"150", title:"Black Myth: Wukong",           type:"game",   status:"playing",   rating:0,   image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/library_600x900.jpg", genres:["Action RPG","Mythology"],     year:2024 },
+  { id:"153", title:"God of War Ragnarök",          type:"game",   status:"completed", rating:8.3, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2322010/library_600x900.jpg", genres:["Action","Adventure"],         year:2022 },
+  { id:"160", title:"Half-Life",                    type:"game",   status:"completed", rating:10,  image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/70/library_600x900.jpg",      genres:["FPS","Sci-Fi"],               year:1998 },
+  { id:"167", title:"Hollow Knight",                type:"game",   status:"planned",   rating:0,   image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/367520/library_600x900.jpg",  genres:["Metroidvania","Platformer"],  year:2017 },
+  { id:"168", title:"Firewatch",                    type:"game",   status:"completed", rating:9.1, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/383870/library_600x900.jpg",  genres:["Narrative","Walking Sim"],    year:2016 },
+  { id:"169", title:"SOMA",                         type:"game",   status:"completed", rating:9.6, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/282140/library_600x900.jpg",  genres:["Horror","Sci-Fi"],            year:2015, notes:"A haunting meditation on consciousness and identity. The ending is unforgettable." },
+  { id:"170", title:"It Takes Two",                 type:"game",   status:"completed", rating:8.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/library_600x900.jpg", genres:["Co-op","Platformer"],         year:2021 },
+  { id:"172", title:"Little Nightmares",            type:"game",   status:"completed", rating:8.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/424840/library_600x900.jpg",  genres:["Horror","Puzzle"],            year:2017 },
+  { id:"174", title:"Elden Ring: Shadow of the Erdtree",type:"game",status:"completed",rating:10, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2778580/library_600x900.jpg", genres:["Action RPG","Dark Fantasy"],  year:2024 },
+  { id:"175", title:"Assassin's Creed I",           type:"game",   status:"completed", rating:7.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/15100/library_600x900.jpg",   genres:["Action","Stealth"],           year:2007 },
+  { id:"176", title:"Assassin's Creed II",          type:"game",   status:"completed", rating:9.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/33230/library_600x900.jpg",   genres:["Action","Stealth"],           year:2009 },
+  { id:"180", title:"Lethal Company",               type:"game",   status:"playing",   rating:6.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1966720/library_600x900.jpg", genres:["Horror","Co-op"],             year:2023 },
 
-    // TV SHOWS
-    { id: "904", title: "Arcane", type: "tv", status: "completed", rating: 10.0, image: "https://upload.wikimedia.org/wikipedia/en/a/a6/Arcane_League_of_Legends_Season_1_poster.jpg", genres: ["Sci-Fi", "Action", "Animation"], releaseYear: 2021, notes: "The gold standard for video game adaptations. Animation is groundbreaking. Every frame is a painting." },
+  // ── ANIME ────────────────────────────────────────────────────────────────
+  { id:"901", title:"Attack on Titan",  type:"anime", status:"completed", rating:9.8, image:"https://upload.wikimedia.org/wikipedia/en/d/d6/Shingeki_no_Kyojin_manga_volume_1.jpg", genres:["Action","Dark Fantasy"],             year:2013, notes:"Masterpiece of foreshadowing. Flawless narrative structure with one of the best endings in anime." },
+  { id:"902", title:"Jujutsu Kaisen",   type:"anime", status:"playing",   rating:8.5, image:"https://upload.wikimedia.org/wikipedia/en/4/46/Jujutsu_kaisen.jpg",                   genres:["Action","Supernatural"],            year:2020 },
+  { id:"903", title:"Death Note",       type:"anime", status:"completed", rating:9.0, image:"https://upload.wikimedia.org/wikipedia/en/6/6f/Death_Note_Vol_1.jpg",                  genres:["Psychological Thriller","Mystery"], year:2006, notes:"A psychological cat-and-mouse thriller that defines the genre. Light vs L is unmatched." },
 
-    // MOVIES
-    { id: "801", title: "Interstellar", type: "movies", status: "completed", rating: 10.0, image: "https://upload.wikimedia.org/wikipedia/en/b/bc/Interstellar_film_poster.jpg", genres: ["Sci-Fi", "Drama"], releaseYear: 2014, notes: "Visually stunning. Zimmer's score is transcendental. The docking scene is cinema perfection." },
-    { id: "802", title: "Dune: Part Two", type: "movies", status: "completed", rating: 9.5, image: "https://upload.wikimedia.org/wikipedia/en/8/8e/Dune_Part_Two_poster.jpg", genres: ["Sci-Fi", "Epic"], releaseYear: 2024, notes: "Denis Villeneuve cements himself as the greatest living sci-fi director. Every frame is immaculate." }
+  // ── TV SHOWS ─────────────────────────────────────────────────────────────
+  { id:"904", title:"Arcane",           type:"tv",    status:"completed", rating:10,  image:"https://upload.wikimedia.org/wikipedia/en/a/a6/Arcane_League_of_Legends_Season_1_poster.jpg", genres:["Sci-Fi","Action","Animation"], year:2021, notes:"The gold standard for video game adaptations. Animation is groundbreaking. Every frame is a painting." },
+
+  // ── MOVIES ───────────────────────────────────────────────────────────────
+  { id:"801", title:"Interstellar",     type:"movie", status:"completed", rating:10,  image:"https://upload.wikimedia.org/wikipedia/en/b/bc/Interstellar_film_poster.jpg",           genres:["Sci-Fi","Drama"],               year:2014, notes:"Visually stunning. Zimmer's score is transcendental. The docking scene is cinema perfection." },
+  { id:"802", title:"Dune: Part Two",   type:"movie", status:"completed", rating:9.5, image:"https://upload.wikimedia.org/wikipedia/en/8/8e/Dune_Part_Two_poster.jpg",              genres:["Sci-Fi","Epic"],                year:2024, notes:"Denis Villeneuve cements himself as the greatest living sci-fi director. Every frame is immaculate." },
 ];
 
-// ─── DATA NORMALIZER ──────────────────────────────────────────────────────────
-class DataNormalizer {
-    static parse(arr) {
-        return arr.map(item => ({
-            id: String(item.id || Math.random().toString(36).substr(2, 9)),
-            title: item.title || 'Unknown Title',
-            type: String(item.type || 'game').toLowerCase(),
-            status: this.normalizeStatus(item.status),
-            rating: parseFloat(item.rating) || 0,
-            image: item.image || getFallbackImage(item.title),
-            genres: Array.isArray(item.genres) ? item.genres : [],
-            releaseYear: item.releaseYear || '',
-            notes: item.notes || ''
-        }));
-    }
-    static normalizeStatus(s) {
-        const v = String(s || '').toLowerCase();
-        if (v === 'watching') return 'playing';
-        if (['playing', 'completed', 'planned', 'dropped'].includes(v)) return v;
-        return 'planned';
-    }
-}
+// ─── NAV CONFIG ───────────────────────────────────────────────────────────────
+const NAV_ITEMS = [
+  { view: 'home',     icon: 'ph-house-simple',  label: 'Home',     mobile: true },
+  { view: 'games',    icon: 'ph-game-controller',label: 'Games',   mobile: true },
+  { view: 'movies',   icon: 'ph-film-strip',     label: 'Movies',  mobile: true },
+  { view: 'anime',    icon: 'ph-star-four',      label: 'Anime',   mobile: true },
+  { view: 'tv',       icon: 'ph-monitor-play',   label: 'TV',      mobile: true },
+  { view: 'stats',    icon: 'ph-chart-bar',      label: 'Stats',   mobile: false },
+  { view: 'favorites',icon: 'ph-heart',          label: 'Favs',    mobile: false },
+  { view: 'socials',  icon: 'ph-link-simple',    label: 'Socials', mobile: true },
+];
 
-// ─── TYPE → SECTION MAPPING ───────────────────────────────────────────────────
-// HTML uses: view-dashboard, view-library (shared), view-socials
-// Nav views: dashboard, games, movies, anime, tv, socials
-// Library views map: games→game, movies→movies, anime→anime, tv→tv
+// Sidebar browse items
+const SIDEBAR_BROWSE = [
+  { view: 'home',   icon: 'ph-house-simple',   label: 'Home' },
+  { view: 'games',  icon: 'ph-game-controller',label: 'Games' },
+  { view: 'movies', icon: 'ph-film-strip',      label: 'Movies' },
+  { view: 'anime',  icon: 'ph-star-four',       label: 'Anime' },
+  { view: 'tv',     icon: 'ph-monitor-play',    label: 'TV Shows' },
+];
 
-const SECTION_CONFIG = {
-    games:  { type: 'game',   title: 'Game Archive',    sub: 'Every game played, rated, and reviewed.' },
-    movies: { type: 'movies', title: 'Film Library',     sub: 'Cinematic reviews and personal ratings.' },
-    anime:  { type: 'anime',  title: 'Anime Series',     sub: 'Episodic animated narratives and reviews.' },
-    tv:     { type: 'tv',     title: 'TV Shows',         sub: 'Live-action episodic content.' }
+const LIBRARY_CONFIG = {
+  games:  { type: 'game',  title: 'Game Archive',    sub: 'Every game played, rated, and reviewed.', eyebrow: 'GAMING' },
+  movies: { type: 'movie', title: 'Film Library',    sub: 'Cinematic reviews and personal ratings.', eyebrow: 'CINEMA' },
+  anime:  { type: 'anime', title: 'Anime Series',    sub: 'Episodic animated narratives.',           eyebrow: 'ANIME' },
+  tv:     { type: 'tv',    title: 'TV Shows',        sub: 'Live-action episodic content.',            eyebrow: 'TELEVISION' },
 };
 
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
-class MediaApp {
-    constructor() {
-        this.allData = DataNormalizer.parse(rawMediaData);
+const SOCIALS = [
+  { name:'YouTube',  sub:'Video Content',   icon:'ph-fill ph-youtube-logo', color:'#FF0000', url:'#' },
+  { name:'Discord',  sub:'Community Server',icon:'ph-fill ph-discord-logo', color:'#5865F2', url:'#' },
+  { name:'GitHub',   sub:'Open Source',     icon:'ph-fill ph-github-logo',  color:'#e6edf3', url:'#' },
+  { name:'Steam',    sub:'Gaming Profile',  icon:'ph-fill ph-steam-logo',   color:'#66c0f4', url:'#' },
+  { name:'Twitch',   sub:'Live Streams',    icon:'ph-fill ph-twitch-logo',  color:'#9146FF', url:'#' },
+  { name:'X / Twitter',sub:'Updates',       icon:'ph-fill ph-twitter-logo', color:'#1D9BF0', url:'#' },
+];
 
-        this.state = {
-            view: 'dashboard',           // current view key
-            librarySection: 'games',     // which library we're browsing
-            filterStatus: 'all',
-            sortBy: 'default',
-            searchQuery: ''
-        };
+// ═══════════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════
 
-        this._searchTimeout = null;
-        this._modalOpen = false;
-
-        this._initDOM();
-        this._bindEvents();
-        this._boot();
-    }
-
-    // ── DOM REFS ──────────────────────────────────────────────────────────────
-    _initDOM() {
-        this.dom = {
-            loader:           document.getElementById('app-loader'),
-            // Views
-            viewDashboard:    document.getElementById('view-dashboard'),
-            viewLibrary:      document.getElementById('view-library'),
-            viewSocials:      document.getElementById('view-socials'),
-            // Dashboard slots
-            heroZone:         document.getElementById('hero-zone'),
-            statsRow:         document.getElementById('stats-row'),
-            recentGrid:       document.getElementById('recent-grid'),
-            browseAllBtn:     document.querySelector('.browse-all-btn'),
-            // Library slots
-            libTitle:         document.getElementById('lib-title'),
-            libSub:           document.getElementById('lib-sub'),
-            libraryGrid:      document.getElementById('library-grid'),
-            emptyState:       document.getElementById('empty-state'),
-            resultCount:      document.getElementById('result-count'),
-            sortSelect:       document.getElementById('sort-select'),
-            filterPills:      document.querySelectorAll('.filter-pill'),
-            // Search
-            sidebarSearchInput: document.getElementById('sidebar-search-input'),
-            sidebarSearchClear: document.getElementById('sidebar-search-clear'),
-            overlaySearchInput: document.getElementById('overlay-search-input'),
-            mobileSearchToggle: document.getElementById('mobile-search-toggle'),
-            overlaySearchClose: document.getElementById('overlay-search-close'),
-            searchOverlay:      document.getElementById('search-overlay'),
-            // Sidebar nav items
-            navItems:           document.querySelectorAll('.nav-item'),
-            // Bottom nav items
-            bnavItems:          document.querySelectorAll('.bnav-item'),
-            // Modal
-            modalWrap:          document.getElementById('modal-wrap'),
-            modalBackdrop:      document.getElementById('modal-backdrop'),
-            modalClose:         document.getElementById('modal-close'),
-            modalBannerImg:     document.getElementById('modal-banner-img'),
-            modalCoverImg:      document.getElementById('modal-cover-img'),
-            modalTitle:         document.getElementById('modal-title'),
-            modalStatusBadge:   document.getElementById('modal-status-badge'),
-            modalRatingDisplay: document.getElementById('modal-rating-display'),
-            modalRatingVal:     document.getElementById('modal-rating-val'),
-            modalYearChip:      document.getElementById('modal-year-chip'),
-            modalTags:          document.getElementById('modal-tags'),
-            modalReviewText:    document.getElementById('modal-review-text'),
-            modalActions:       document.getElementById('modal-actions'),
-        };
-    }
-
-    // ── BOOT ──────────────────────────────────────────────────────────────────
-    _boot() {
-        const loader = this.dom.loader;
-        if (loader) {
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                loader.style.pointerEvents = 'none';
-                setTimeout(() => loader.classList.add('hidden'), 500);
-            }, 280);
-        }
-        this._navigateTo('dashboard');
-    }
-
-    // ── NAVIGATION ────────────────────────────────────────────────────────────
-    _navigateTo(viewKey) {
-        this.state.view = viewKey;
-
-        // Update sidebar active states
-        this.dom.navItems.forEach(el => {
-            el.classList.toggle('active', el.dataset.view === viewKey);
-        });
-
-        // Update bottom nav active states
-        this.dom.bnavItems.forEach(el => {
-            el.classList.toggle('active', el.dataset.view === viewKey);
-        });
-
-        // Hide all views
-        [this.dom.viewDashboard, this.dom.viewLibrary, this.dom.viewSocials].forEach(v => {
-            if (v) {
-                v.classList.add('hidden');
-                v.style.display = 'none';
-            }
-        });
-
-        if (viewKey === 'dashboard') {
-            this._showView(this.dom.viewDashboard);
-            this._renderDashboard();
-        } else if (viewKey === 'socials') {
-            this._showView(this.dom.viewSocials);
-        } else if (SECTION_CONFIG[viewKey]) {
-            this.state.librarySection = viewKey;
-            // Reset filters/search when switching sections
-            this.state.filterStatus = 'all';
-            this.state.searchQuery = '';
-            this.state.sortBy = 'default';
-            if (this.dom.sidebarSearchInput) this.dom.sidebarSearchInput.value = '';
-            if (this.dom.sidebarSearchClear) this.dom.sidebarSearchClear.classList.add('hidden');
-            if (this.dom.sortSelect) this.dom.sortSelect.value = 'default';
-            this.dom.filterPills.forEach(p => p.classList.toggle('active', p.dataset.status === 'all'));
-            this._showView(this.dom.viewLibrary);
-            this._renderLibrary();
-        }
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    _showView(el) {
-        if (!el) return;
-        el.classList.remove('hidden');
-        el.style.display = '';
-    }
-
-    // ── DASHBOARD ─────────────────────────────────────────────────────────────
-    _renderDashboard() {
-        this._renderStats();
-        this._renderHero();
-        this._renderRecentGrid();
-    }
-
-    _renderStats() {
-        if (!this.dom.statsRow) return;
-        const counts = { game: 0, anime: 0, movies: 0, tv: 0 };
-        let totalRating = 0, ratedCount = 0;
-
-        this.allData.forEach(item => {
-            if (counts[item.type] !== undefined) counts[item.type]++;
-            if (item.rating > 0) { totalRating += item.rating; ratedCount++; }
-        });
-
-        const avg = ratedCount > 0 ? (totalRating / ratedCount).toFixed(1) : '0.0';
-        const shows = counts.anime + counts.movies + counts.tv;
-
-        this.dom.statsRow.innerHTML = `
-            <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(124,109,250,0.12);color:#7c6dfa">
-                    <i class="ph-fill ph-game-controller"></i>
-                </div>
-                <div class="stat-details">
-                    <span class="stat-label">Games</span>
-                    <span class="stat-value">${counts.game}</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(34,217,122,0.12);color:#22d97a">
-                    <i class="ph-fill ph-television-simple"></i>
-                </div>
-                <div class="stat-details">
-                    <span class="stat-label">Shows &amp; Films</span>
-                    <span class="stat-value">${shows}</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(251,191,36,0.12);color:#fbbf24">
-                    <i class="ph-fill ph-star"></i>
-                </div>
-                <div class="stat-details">
-                    <span class="stat-label">Avg Rating</span>
-                    <span class="stat-value">${avg}</span>
-                </div>
-            </div>
-        `;
-    }
-
-    _renderHero() {
-        if (!this.dom.heroZone) return;
-        const candidates = this.allData.filter(d => d.status === 'completed' && d.rating >= 9.5);
-        const item = candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : this.allData[0];
-        if (!item) return;
-
-        const fallback = getFallbackImage(item.title);
-        this.dom.heroZone.innerHTML = `
-            <img class="hero-bg-img" src="${this._esc(item.image)}" alt=""
-                 onerror="this.src='${fallback}'" loading="eager">
-            <div class="hero-gradient"></div>
-            <div class="hero-content" role="button" tabindex="0"
-                 onclick="app.openModal('${item.id}')"
-                 onkeydown="if(event.key==='Enter')app.openModal('${item.id}')">
-                <span class="hero-chip">
-                    <i class="ph-fill ph-star"></i> Curator's Choice
-                </span>
-                <h1 class="hero-title">${this._esc(item.title)}</h1>
-                <p class="hero-desc">${this._esc(item.notes || 'A defining experience in the archive.')}</p>
-                ${item.rating > 0 ? `<div class="hero-meta"><span class="hero-rating"><i class="ph-fill ph-star"></i> ${item.rating.toFixed(1)}</span></div>` : ''}
-            </div>
-        `;
-    }
-
-    _renderRecentGrid() {
-        if (!this.dom.recentGrid) return;
-        const recent = [...this.allData].reverse().slice(0, 12);
-        this._buildGrid(recent, this.dom.recentGrid);
-    }
-
-    // ── LIBRARY ───────────────────────────────────────────────────────────────
-    _renderLibrary() {
-        const cfg = SECTION_CONFIG[this.state.librarySection];
-        if (!cfg) return;
-
-        if (this.dom.libTitle) this.dom.libTitle.textContent = cfg.title;
-        if (this.dom.libSub)   this.dom.libSub.textContent   = cfg.sub;
-
-        let items = this.allData.filter(d => d.type === cfg.type);
-
-        // Status filter
-        if (this.state.filterStatus !== 'all') {
-            const f = this.state.filterStatus;
-            items = items.filter(d => d.status === (f === 'active' ? 'playing' : f));
-        }
-
-        // Search filter
-        if (this.state.searchQuery) {
-            const q = this.state.searchQuery.toLowerCase();
-            items = items.filter(d =>
-                d.title.toLowerCase().includes(q) ||
-                d.genres.some(g => g.toLowerCase().includes(q)) ||
-                String(d.releaseYear).includes(q)
-            );
-        }
-
-        // Sort
-        switch (this.state.sortBy) {
-            case 'rating-high':  items.sort((a,b) => b.rating - a.rating); break;
-            case 'rating-low':   items.sort((a,b) => (a.rating||99) - (b.rating||99)); break;
-            case 'title-asc':    items.sort((a,b) => a.title.localeCompare(b.title)); break;
-            case 'title-desc':   items.sort((a,b) => b.title.localeCompare(a.title)); break;
-            default: break;
-        }
-
-        if (this.dom.resultCount) {
-            this.dom.resultCount.textContent = `${items.length} ${items.length === 1 ? 'entry' : 'entries'}`;
-        }
-
-        if (this.dom.libraryGrid) this.dom.libraryGrid.innerHTML = '';
-        if (this.dom.emptyState) {
-            this.dom.emptyState.classList.toggle('hidden', items.length > 0);
-        }
-
-        if (items.length > 0 && this.dom.libraryGrid) {
-            this._buildGrid(items, this.dom.libraryGrid);
-        }
-    }
-
-    // ── CARD BUILDER ─────────────────────────────────────────────────────────
-    _buildGrid(items, container) {
-        if (!container) return;
-        const frag = document.createDocumentFragment();
-
-        items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'media-card';
-            card.setAttribute('tabindex', '0');
-            card.setAttribute('role', 'button');
-            card.setAttribute('aria-label', `View details for ${item.title}`);
-
-            const fallback = getFallbackImage(item.title);
-            const statusLabel = this._statusLabel(item);
-            const badgeClass = `badge-${item.status}`;
-            const genreChip = item.genres.length ? `<span class="card-genre-chip">${this._esc(item.genres[0])}</span>` : '';
-            const ratingHTML = item.rating > 0
-                ? `<span class="card-rating"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</span>`
-                : `<span class="card-rating unrated">Unrated</span>`;
-
-            card.innerHTML = `
-                <div class="card-img-zone">
-                    <img src="${this._esc(item.image)}" alt="${this._esc(item.title)}"
-                         loading="lazy"
-                         onerror="this.onerror=null;this.src='${fallback}'">
-                    <span class="card-status-badge ${badgeClass}">${statusLabel}</span>
-                    <div class="card-img-overlay">${genreChip}</div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="${this._esc(item.title)}">${this._esc(item.title)}</h3>
-                    <div class="card-foot">
-                        <span class="card-year">${item.releaseYear || ''}</span>
-                        ${ratingHTML}
-                    </div>
-                </div>
-            `;
-
-            const open = () => this.openModal(item.id);
-            card.addEventListener('click', open);
-            card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
-
-            frag.appendChild(card);
-        });
-
-        container.appendChild(frag);
-    }
-
-    // ── MODAL ─────────────────────────────────────────────────────────────────
-    openModal(id) {
-        const item = this.allData.find(d => d.id === String(id));
-        if (!item || !this.dom.modalWrap) return;
-
-        const fallback = getFallbackImage(item.title);
-
-        // Images
-        this.dom.modalBannerImg.src = item.image;
-        this.dom.modalBannerImg.onerror = () => { this.dom.modalBannerImg.src = fallback; };
-        this.dom.modalCoverImg.src = item.image;
-        this.dom.modalCoverImg.onerror = () => { this.dom.modalCoverImg.src = fallback; };
-
-        // Title
-        this.dom.modalTitle.textContent = item.title;
-
-        // Status badge
-        const badge = this.dom.modalStatusBadge;
-        badge.textContent = this._statusLabel(item);
-        badge.className = `modal-status-badge badge-${item.status}`;
-
-        // Rating
-        const rd = this.dom.modalRatingDisplay;
-        if (item.rating > 0) {
-            rd.classList.remove('unrated');
-            this.dom.modalRatingVal.textContent = `${item.rating.toFixed(1)} / 10`;
-        } else {
-            rd.classList.add('unrated');
-            this.dom.modalRatingVal.textContent = 'Unrated';
-        }
-
-        // Year
-        const yc = this.dom.modalYearChip;
-        yc.textContent = item.releaseYear ? String(item.releaseYear) : '';
-
-        // Tags
-        const tagsEl = this.dom.modalTags;
-        tagsEl.innerHTML = `<span class="modal-tag tag-type">${item.type.toUpperCase()}</span>`;
-        item.genres.forEach(g => {
-            const span = document.createElement('span');
-            span.className = 'modal-tag';
-            span.textContent = g;
-            tagsEl.appendChild(span);
-        });
-
-        // Review
-        const rt = this.dom.modalReviewText;
-        if (item.notes) {
-            rt.classList.remove('no-review');
-            rt.innerHTML = `<p>${this._esc(item.notes)}</p>`;
-        } else {
-            rt.classList.add('no-review');
-            rt.innerHTML = '<p>No detailed review provided for this entry yet.</p>';
-        }
-
-        // Action buttons
-        const ac = this.dom.modalActions;
-        if (item.type === 'movies' || item.type === 'anime' || item.type === 'tv') {
-            ac.innerHTML = `
-                <a href="https://MOVIE-PLACEHOLDER.COM" target="_blank" rel="noopener noreferrer" class="modal-btn modal-btn-watch">
-                    <i class="ph-fill ph-play-circle"></i> Watch
-                </a>
-            `;
-        } else if (item.type === 'game') {
-            ac.innerHTML = `
-                <a href="https://GAME-DOWNLOAD-PLACEHOLDER.COM" target="_blank" rel="noopener noreferrer" class="modal-btn modal-btn-magnet">
-                    <i class="ph-fill ph-magnet"></i> Magnet Download
-                </a>
-                <p class="modal-btn-note">Requires Free Download Manager</p>
-            `;
-        } else {
-            ac.innerHTML = '';
-        }
-
-        // Show modal
-        this.dom.modalWrap.removeAttribute('hidden');
-        this.dom.modalWrap.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        this._modalOpen = true;
-    }
-
-    _closeModal() {
-        if (!this._modalOpen) return;
-        this.dom.modalWrap.classList.remove('active');
-        document.body.style.overflow = '';
-        this._modalOpen = false;
-        setTimeout(() => {
-            this.dom.modalWrap.setAttribute('hidden', '');
-            if (this.dom.modalBannerImg) this.dom.modalBannerImg.src = '';
-            if (this.dom.modalCoverImg)  this.dom.modalCoverImg.src  = '';
-        }, 320);
-    }
-
-    // ── SEARCH ────────────────────────────────────────────────────────────────
-    _handleSearch(q) {
-        this.state.searchQuery = q;
-
-        if (this.dom.sidebarSearchClear) {
-            this.dom.sidebarSearchClear.classList.toggle('hidden', !q);
-        }
-
-        clearTimeout(this._searchTimeout);
-        this._searchTimeout = setTimeout(() => {
-            // If we're on dashboard or socials, switch to appropriate library view
-            if (this.state.view === 'dashboard' || this.state.view === 'socials') {
-                this._navigateTo('games');
-            } else {
-                this._renderLibrary();
-            }
-        }, 280);
-    }
-
-    // ── EVENTS ────────────────────────────────────────────────────────────────
-    _bindEvents() {
-        // Sidebar nav
-        this.dom.navItems.forEach(item => {
-            item.addEventListener('click', () => this._navigateTo(item.dataset.view));
-            item.addEventListener('keydown', e => {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._navigateTo(item.dataset.view); }
-            });
-        });
-
-        // Bottom nav
-        this.dom.bnavItems.forEach(item => {
-            item.addEventListener('click', () => this._navigateTo(item.dataset.view));
-        });
-
-        // Browse all button (dashboard)
-        if (this.dom.browseAllBtn) {
-            this.dom.browseAllBtn.addEventListener('click', () => this._navigateTo(this.dom.browseAllBtn.dataset.target || 'games'));
-        }
-
-        // Sidebar search
-        if (this.dom.sidebarSearchInput) {
-            this.dom.sidebarSearchInput.addEventListener('input', e => this._handleSearch(e.target.value.trim()));
-        }
-        if (this.dom.sidebarSearchClear) {
-            this.dom.sidebarSearchClear.addEventListener('click', () => {
-                if (this.dom.sidebarSearchInput) this.dom.sidebarSearchInput.value = '';
-                this._handleSearch('');
-            });
-        }
-
-        // Mobile search overlay
-        if (this.dom.mobileSearchToggle) {
-            this.dom.mobileSearchToggle.addEventListener('click', () => {
-                if (this.dom.searchOverlay) {
-                    this.dom.searchOverlay.classList.add('open');
-                    setTimeout(() => { if (this.dom.overlaySearchInput) this.dom.overlaySearchInput.focus(); }, 80);
-                }
-            });
-        }
-        if (this.dom.overlaySearchClose) {
-            this.dom.overlaySearchClose.addEventListener('click', () => {
-                if (this.dom.searchOverlay) this.dom.searchOverlay.classList.remove('open');
-            });
-        }
-        if (this.dom.overlaySearchInput) {
-            this.dom.overlaySearchInput.addEventListener('input', e => {
-                const q = e.target.value.trim();
-                if (this.dom.sidebarSearchInput) this.dom.sidebarSearchInput.value = q;
-                this._handleSearch(q);
-                if (q) {
-                    setTimeout(() => {
-                        if (this.dom.searchOverlay) this.dom.searchOverlay.classList.remove('open');
-                    }, 320);
-                }
-            });
-        }
-
-        // Filter pills
-        this.dom.filterPills.forEach(pill => {
-            pill.addEventListener('click', () => {
-                this.dom.filterPills.forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-                this.state.filterStatus = pill.dataset.status;
-                this._renderLibrary();
-            });
-        });
-
-        // Sort select
-        if (this.dom.sortSelect) {
-            this.dom.sortSelect.addEventListener('change', e => {
-                this.state.sortBy = e.target.value;
-                this._renderLibrary();
-            });
-        }
-
-        // Modal close
-        if (this.dom.modalClose) {
-            this.dom.modalClose.addEventListener('click', () => this._closeModal());
-        }
-        if (this.dom.modalBackdrop) {
-            this.dom.modalBackdrop.addEventListener('click', () => this._closeModal());
-        }
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && this._modalOpen) this._closeModal();
-        });
-    }
-
-    // ── HELPERS ───────────────────────────────────────────────────────────────
-    _statusLabel(item) {
-        if (item.status === 'playing') return item.type === 'game' ? 'Playing' : 'Watching';
-        return item.status.charAt(0).toUpperCase() + item.status.slice(1);
-    }
-
-    _esc(str) {
-        return String(str || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// ─── BOOT ─────────────────────────────────────────────────────────────────────
-const app = new MediaApp();
+function statusLabel(item) {
+  const map = { playing: item.type === 'game' ? 'Playing' : 'Watching', completed:'Completed', planned:'Planned', dropped:'Dropped' };
+  return map[item.status] || 'Unknown';
+}
+
+function typeLabel(type) {
+  const map = { game:'Game', movie:'Movie', anime:'Anime', tv:'TV Show' };
+  return map[type] || type;
+}
+
+function ratingStars(rating) {
+  const filled = Math.round(rating / 2);
+  return Array.from({length:5}, (_,i) =>
+    `<i class="ph${i < filled ? '-fill' : ''} ph-star"></i>`
+  ).join('');
+}
+
+function fallbackSvg(title='') {
+  const t = encodeURIComponent(title || 'No Image');
+  return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900"><rect fill="%2312121f" width="600" height="900"/><text fill="%234a4a6a" font-family="sans-serif" font-size="16" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">${t}</text></svg>`;
+}
+
+function imgWithFallback(src, title, el) {
+  if (!src) { el.src = fallbackSvg(title); return; }
+  el.onerror = () => { el.src = fallbackSvg(title); };
+  el.src = src;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// APP CLASS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+class CuratorApp {
+  constructor() {
+    this.data = this._normalizeData(MEDIA_DATA);
+    this.state = {
+      view: 'home',
+      librarySection: 'games',
+      filterStatus: 'all',
+      sortBy: 'default',
+      layout: 'grid',
+    };
+    this._heroIndex = 0;
+    this._heroTimer = null;
+    this._modalOpen = false;
+    this._heroItems = [];
+    this._searchDebounce = null;
+
+    this._buildNav();
+    this._bindGlobalEvents();
+    this._boot();
+  }
+
+  // ─── NORMALIZE ────────────────────────────────────────────────────────────
+  _normalizeData(arr) {
+    return arr.map(d => ({
+      id: String(d.id),
+      title: d.title || 'Unknown',
+      type: String(d.type || 'game'),
+      status: this._normStatus(d.status),
+      rating: parseFloat(d.rating) || 0,
+      image: d.image || '',
+      genres: Array.isArray(d.genres) ? d.genres : [],
+      year: d.year || '',
+      notes: d.notes || '',
+    }));
+  }
+
+  _normStatus(s) {
+    s = String(s||'').toLowerCase();
+    if (s === 'watching') return 'playing';
+    return ['playing','completed','planned','dropped'].includes(s) ? s : 'planned';
+  }
+
+  // ─── NAV BUILD ────────────────────────────────────────────────────────────
+  _buildNav() {
+    // Sidebar browse list
+    const sidebarList = document.getElementById('sidebar-nav-list');
+    if (sidebarList) {
+      sidebarList.innerHTML = SIDEBAR_BROWSE.map(n => `
+        <li class="sidebar-nav-item" data-view="${n.view}" role="listitem" tabindex="0">
+          <i class="ph ${n.icon}"></i><span>${n.label}</span>
+        </li>
+      `).join('');
+    }
+
+    // Drawer (mobile)
+    const drawerList = document.getElementById('drawer-nav-list');
+    if (drawerList) {
+      drawerList.innerHTML = NAV_ITEMS.map(n => `
+        <li class="drawer-nav-item" data-view="${n.view}">
+          <i class="ph ${n.icon}"></i><span>${n.label}</span>
+        </li>
+      `).join('');
+    }
+
+    // Bottom nav (mobile)
+    const bnav = document.getElementById('bottom-nav');
+    if (bnav) {
+      bnav.innerHTML = NAV_ITEMS.filter(n => n.mobile).map(n => `
+        <button class="bnav-item" data-view="${n.view}" aria-label="${n.label}">
+          <i class="ph ${n.icon}"></i><span>${n.label}</span>
+        </button>
+      `).join('');
+    }
+
+    // Socials grid
+    const sg = document.getElementById('socials-grid');
+    if (sg) {
+      sg.innerHTML = SOCIALS.map(s => `
+        <a href="${s.url}" class="social-tile" target="_blank" rel="noopener noreferrer">
+          <span class="social-icon" style="--scolor:${s.color}"><i class="${s.icon}"></i></span>
+          <div class="social-info"><strong>${esc(s.name)}</strong><span>${esc(s.sub)}</span></div>
+          <i class="ph ph-arrow-up-right social-arrow"></i>
+        </a>
+      `).join('');
+    }
+  }
+
+  // ─── BOOT ─────────────────────────────────────────────────────────────────
+  _boot() {
+    const loader = document.getElementById('app-loader');
+    setTimeout(() => {
+      loader && loader.classList.add('fade-out');
+      setTimeout(() => loader && loader.classList.add('hidden'), 500);
+    }, 300);
+
+    // Hash routing
+    const hash = location.hash.replace('#','');
+    const validViews = ['home','games','movies','anime','tv','stats','favorites','socials'];
+    this._navigateTo(validViews.includes(hash) ? hash : 'home');
+  }
+
+  // ─── NAVIGATION ───────────────────────────────────────────────────────────
+  _navigateTo(viewKey) {
+    this.state.view = viewKey;
+    location.hash = viewKey === 'home' ? '' : viewKey;
+
+    // Update all nav highlights
+    document.querySelectorAll('[data-view]').forEach(el => {
+      el.classList.toggle('active', el.dataset.view === viewKey);
+    });
+
+    // Close mobile drawer
+    this._closeDrawer();
+
+    // Hide all views
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+
+    const isLibrary = ['games','movies','anime','tv'].includes(viewKey);
+    const viewId = isLibrary ? 'view-library' : `view-${viewKey}`;
+    const viewEl = document.getElementById(viewId);
+    if (viewEl) viewEl.classList.remove('hidden');
+
+    // Render
+    if (viewKey === 'home') {
+      this._renderHome();
+    } else if (isLibrary) {
+      this.state.librarySection = viewKey;
+      this.state.filterStatus = 'all';
+      this.state.sortBy = 'default';
+      this.state.layout = 'grid';
+      this._resetLibraryControls();
+      this._renderLibrary();
+    } else if (viewKey === 'stats') {
+      this._renderStats();
+    } else if (viewKey === 'favorites') {
+      this._renderFavorites();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  _resetLibraryControls() {
+    const sortSel = document.getElementById('sort-select');
+    if (sortSel) sortSel.value = 'default';
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.status === 'all'));
+    document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === 'grid'));
+    const grid = document.getElementById('library-grid');
+    if (grid) { grid.classList.remove('list-layout'); }
+  }
+
+  // ─── HOME ─────────────────────────────────────────────────────────────────
+  _renderHome() {
+    this._renderHero();
+    this._renderTicker();
+    this._renderRecentGrid();
+    this._renderTopRatedGrid();
+
+    document.querySelectorAll('.section-more-btn').forEach(btn => {
+      btn.onclick = () => this._navigateTo(btn.dataset.target || 'games');
+    });
+  }
+
+  _renderHero() {
+    const zone = document.getElementById('hero-zone');
+    if (!zone) return;
+
+    // Pick items with notes/reviews or high ratings for spotlight
+    this._heroItems = this.data
+      .filter(d => d.rating >= 9 || d.notes)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 5);
+
+    if (!this._heroItems.length) { zone.innerHTML = ''; return; }
+
+    const dotsHtml = this._heroItems.map((_,i) =>
+      `<span class="hero-dot${i===0?' active':''}" data-i="${i}"></span>`
+    ).join('');
+
+    zone.innerHTML = `
+      <div class="hero-bg" id="hero-bg"></div>
+      <div class="hero-gradient"></div>
+      <div class="hero-content" id="hero-text-content"></div>
+      <div class="hero-dots">${dotsHtml}</div>
+    `;
+
+    zone.querySelectorAll('.hero-dot').forEach(dot => {
+      dot.onclick = () => this._setHero(parseInt(dot.dataset.i));
+    });
+
+    this._setHero(0);
+  }
+
+  _setHero(idx) {
+    clearTimeout(this._heroTimer);
+    if (!this._heroItems.length) return;
+    idx = ((idx % this._heroItems.length) + this._heroItems.length) % this._heroItems.length;
+    this._heroIndex = idx;
+    const item = this._heroItems[idx];
+
+    const bg = document.getElementById('hero-bg');
+    const content = document.getElementById('hero-text-content');
+    if (!bg || !content) return;
+
+    bg.classList.remove('active');
+    bg.style.backgroundImage = `url('${item.image}')`;
+    requestAnimationFrame(() => bg.classList.add('active'));
+
+    const ratingHtml = item.rating > 0
+      ? `<div class="hero-rating-chip"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>`
+      : '';
+
+    content.innerHTML = `
+      <div class="hero-type-badge"><i class="ph ph-${item.type === 'game' ? 'game-controller' : item.type === 'movie' ? 'film-strip' : item.type === 'anime' ? 'star-four' : 'monitor-play'}"></i> ${typeLabel(item.type)}</div>
+      <h1 class="hero-title">${esc(item.title)}</h1>
+      <div class="hero-genres">${item.genres.slice(0,3).map(g=>`<span class="hero-genre-pill">${esc(g)}</span>`).join('')}</div>
+      ${item.notes ? `<p class="hero-notes">${esc(item.notes)}</p>` : ''}
+      <div class="hero-actions">
+        <button class="hero-btn hero-btn-primary" data-id="${item.id}">
+          <i class="ph ph-info"></i> View Details
+        </button>
+        ${ratingHtml}
+      </div>
+    `;
+
+    content.querySelector('.hero-btn-primary').onclick = () => this._openModal(item.id);
+
+    document.querySelectorAll('.hero-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
+
+    this._heroTimer = setTimeout(() => this._setHero(idx + 1), 6000);
+  }
+
+  _renderTicker() {
+    const ticker = document.getElementById('stats-ticker');
+    if (!ticker) return;
+    const total = this.data.length;
+    const completed = this.data.filter(d => d.status === 'completed').length;
+    const rated = this.data.filter(d => d.rating > 0);
+    const avgRating = rated.length ? (rated.reduce((a,d)=>a+d.rating,0)/rated.length).toFixed(1) : '—';
+    const games = this.data.filter(d => d.type === 'game').length;
+    const shows = this.data.filter(d => ['anime','tv','movie'].includes(d.type)).length;
+    const perfect = this.data.filter(d => d.rating === 10).length;
+
+    ticker.innerHTML = [
+      { val: total,      label: 'Total Entries' },
+      { val: completed,  label: 'Completed' },
+      { val: avgRating,  label: 'Avg Rating' },
+      { val: games,      label: 'Games' },
+      { val: shows,      label: 'Films & Shows' },
+      { val: perfect,    label: 'Perfect 10s' },
+    ].map(s => `
+      <div class="stats-ticker-item">
+        <div class="stats-ticker-value">${s.val}</div>
+        <div class="stats-ticker-label">${s.label}</div>
+      </div>
+    `).join('');
+  }
+
+  _renderRecentGrid() {
+    const grid = document.getElementById('recent-grid');
+    if (!grid) return;
+    const items = [...this.data].slice(0, 12);
+    grid.innerHTML = items.map(item => this._cardHtml(item)).join('');
+    this._bindCardClicks(grid);
+  }
+
+  _renderTopRatedGrid() {
+    const grid = document.getElementById('toprated-grid');
+    if (!grid) return;
+    const items = [...this.data]
+      .filter(d => d.rating >= 9)
+      .sort((a,b) => b.rating - a.rating)
+      .slice(0, 10);
+    grid.innerHTML = items.map(item => this._cardHtml(item)).join('');
+    this._bindCardClicks(grid);
+  }
+
+  // ─── LIBRARY ──────────────────────────────────────────────────────────────
+  _renderLibrary() {
+    const cfg = LIBRARY_CONFIG[this.state.librarySection];
+    if (!cfg) return;
+
+    document.getElementById('library-eyebrow').textContent = cfg.eyebrow;
+    document.getElementById('library-title').textContent   = cfg.title;
+    document.getElementById('library-sub').textContent     = cfg.sub;
+
+    // Build filter pills
+    const pillsWrap = document.getElementById('filter-pills');
+    if (pillsWrap) {
+      const statuses = ['all','playing','completed','planned','dropped'];
+      pillsWrap.innerHTML = statuses.map(s => `
+        <button class="filter-pill${s === this.state.filterStatus ? ' active' : ''}" data-status="${s}">
+          ${s === 'all' ? 'All' : s === 'playing' ? (cfg.type === 'game' ? 'Playing' : 'Watching') : s.charAt(0).toUpperCase()+s.slice(1)}
+        </button>
+      `).join('');
+      pillsWrap.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.onclick = () => {
+          this.state.filterStatus = pill.dataset.status;
+          pillsWrap.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p === pill));
+          this._renderLibraryGrid();
+        };
+      });
+    }
+
+    this._renderLibraryGrid();
+  }
+
+  _renderLibraryGrid() {
+    const cfg = LIBRARY_CONFIG[this.state.librarySection];
+    let items = this.data.filter(d => d.type === cfg.type);
+
+    // Status filter
+    if (this.state.filterStatus !== 'all') {
+      items = items.filter(d => d.status === this.state.filterStatus);
+    }
+
+    // Search filter (from sidebar input)
+    const q = (document.getElementById('sidebar-search-input')?.value || '').toLowerCase().trim();
+    if (q) {
+      items = items.filter(d =>
+        d.title.toLowerCase().includes(q) ||
+        d.genres.some(g => g.toLowerCase().includes(q)) ||
+        String(d.year).includes(q)
+      );
+    }
+
+    // Sort
+    switch (this.state.sortBy) {
+      case 'rating-high': items.sort((a,b) => b.rating - a.rating); break;
+      case 'rating-low':  items.sort((a,b) => a.rating - b.rating); break;
+      case 'title-asc':   items.sort((a,b) => a.title.localeCompare(b.title)); break;
+      case 'title-desc':  items.sort((a,b) => b.title.localeCompare(a.title)); break;
+      case 'year-new':    items.sort((a,b) => (b.year||0) - (a.year||0)); break;
+      case 'year-old':    items.sort((a,b) => (a.year||0) - (b.year||0)); break;
+    }
+
+    // Count display
+    document.getElementById('library-count-display').textContent = items.length;
+    const resultCount = document.getElementById('result-count');
+    if (resultCount) resultCount.innerHTML = `Showing <span>${items.length}</span> ${items.length === 1 ? 'entry' : 'entries'}`;
+
+    const grid  = document.getElementById('library-grid');
+    const empty = document.getElementById('empty-state');
+    if (!grid) return;
+
+    if (!items.length) {
+      grid.innerHTML = '';
+      empty?.classList.remove('hidden');
+      return;
+    }
+    empty?.classList.add('hidden');
+
+    const isListLayout = this.state.layout === 'list';
+    grid.classList.toggle('list-layout', isListLayout);
+    grid.innerHTML = isListLayout
+      ? items.map(item => this._listCardHtml(item)).join('')
+      : items.map(item => this._cardHtml(item)).join('');
+
+    this._bindCardClicks(grid);
+  }
+
+  // ─── STATS ────────────────────────────────────────────────────────────────
+  _renderStats() {
+    const container = document.getElementById('stats-content');
+    if (!container) return;
+
+    const total = this.data.length;
+    const completed = this.data.filter(d => d.status === 'completed').length;
+    const playing   = this.data.filter(d => d.status === 'playing').length;
+    const planned   = this.data.filter(d => d.status === 'planned').length;
+    const dropped   = this.data.filter(d => d.status === 'dropped').length;
+    const rated     = this.data.filter(d => d.rating > 0);
+    const avgRating = rated.length ? (rated.reduce((a,d)=>a+d.rating,0)/rated.length).toFixed(2) : '—';
+    const maxRating = Math.max(...rated.map(d=>d.rating));
+    const topRated  = rated.filter(d => d.rating === maxRating);
+    const reviewed  = this.data.filter(d => d.notes).length;
+    const perfect   = this.data.filter(d => d.rating === 10).length;
+
+    // Genre counts
+    const genreMap = {};
+    this.data.forEach(d => d.genres.forEach(g => { genreMap[g] = (genreMap[g]||0)+1; }));
+    const topGenres = Object.entries(genreMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const maxGenreCount = topGenres[0]?.[1] || 1;
+
+    // Rating distribution (1-10)
+    const ratingDist = Array.from({length:10},(_,i)=>({score:i+1,count:0}));
+    rated.forEach(d => {
+      const bucket = Math.min(Math.round(d.rating),10) - 1;
+      if (bucket >= 0) ratingDist[bucket].count++;
+    });
+    const maxDistCount = Math.max(...ratingDist.map(r=>r.count), 1);
+
+    // Type breakdown
+    const gameCount  = this.data.filter(d=>d.type==='game').length;
+    const movieCount = this.data.filter(d=>d.type==='movie').length;
+    const animeCount = this.data.filter(d=>d.type==='anime').length;
+    const tvCount    = this.data.filter(d=>d.type==='tv').length;
+
+    container.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-card-label">Total Entries</div>
+        <div class="stat-card-value">${total}</div>
+        <div class="stat-card-sub">${completed} completed · ${playing} active · ${planned} planned · ${dropped} dropped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Average Rating</div>
+        <div class="stat-card-value">${avgRating}</div>
+        <div class="stat-card-sub">${rated.length} rated entries · ${perfect} perfect 10s</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Reviews Written</div>
+        <div class="stat-card-value">${reviewed}</div>
+        <div class="stat-card-sub">${((reviewed/total)*100).toFixed(0)}% of entries have a review</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">By Type</div>
+        <div class="stat-card-value">${gameCount}</div>
+        <div class="stat-card-sub">Games · ${movieCount} Movies · ${animeCount} Anime · ${tvCount} TV Shows</div>
+      </div>
+      <div class="stat-card" style="grid-column: span 2;">
+        <div class="stat-card-label">Top Genres</div>
+        <div class="genre-bars">
+          ${topGenres.map(([g,c]) => `
+            <div class="genre-bar-row">
+              <div class="genre-bar-label"><span>${g}</span><span>${c}</span></div>
+              <div class="genre-bar-track"><div class="genre-bar-fill" style="width:${(c/maxGenreCount*100).toFixed(1)}%"></div></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="stat-card" style="grid-column: span 2;">
+        <div class="stat-card-label">Rating Distribution</div>
+        <div class="rating-dist">
+          ${ratingDist.map(r => `
+            <div class="rating-dist-bar" title="${r.score}: ${r.count} entries" style="height:${(r.count/maxDistCount*100).toFixed(1)}%"></div>
+          `).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.65rem;color:var(--text-muted);font-family:var(--font-mono);">
+          ${ratingDist.map(r=>`<span>${r.score}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // ─── FAVORITES ────────────────────────────────────────────────────────────
+  _renderFavorites() {
+    const grid = document.getElementById('favorites-grid');
+    if (!grid) return;
+    const favs = [...this.data].filter(d => d.rating >= 9).sort((a,b) => b.rating - a.rating);
+    grid.innerHTML = favs.map(item => this._cardHtml(item)).join('');
+    this._bindCardClicks(grid);
+  }
+
+  // ─── CARDS ────────────────────────────────────────────────────────────────
+  _cardHtml(item) {
+    const ratingHtml = item.rating > 0
+      ? `<span class="media-card-rating"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</span>`
+      : `<span class="media-card-rating unrated">—</span>`;
+    return `
+      <article class="media-card fade-in" data-id="${item.id}" role="button" tabindex="0" aria-label="${esc(item.title)}">
+        <div class="media-card-poster-wrap">
+          <img class="media-card-poster" src="${item.image || fallbackSvg(item.title)}" alt="${esc(item.title)}" loading="lazy" onerror="this.src='${fallbackSvg(item.title)}'">
+          <div class="media-card-status-dot dot-${item.status}"></div>
+          <div class="media-card-overlay">
+            <div class="media-card-quick"><i class="ph ph-info"></i> View Details</div>
+          </div>
+        </div>
+        <div class="media-card-info">
+          <div class="media-card-title">${esc(item.title)}</div>
+          <div class="media-card-meta">
+            <span class="media-card-year">${item.year || '—'}</span>
+            ${ratingHtml}
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  _listCardHtml(item) {
+    const statusClass = `chip-${item.status}`;
+    const ratingHtml = item.rating > 0
+      ? `<div class="list-card-rating"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>`
+      : `<div class="list-card-rating" style="color:var(--text-muted)">—</div>`;
+    return `
+      <article class="media-card list-card fade-in" data-id="${item.id}" role="button" tabindex="0" aria-label="${esc(item.title)}">
+        <div class="media-card-poster-wrap">
+          <img class="media-card-poster" src="${item.image || fallbackSvg(item.title)}" alt="${esc(item.title)}" loading="lazy" onerror="this.src='${fallbackSvg(item.title)}'">
+        </div>
+        <div class="list-card-body">
+          <div class="list-card-title">${esc(item.title)}</div>
+          <div class="list-card-sub">${item.genres.slice(0,2).join(' · ')} · ${item.year || '?'}</div>
+        </div>
+        <span class="modal-status-chip ${statusClass}">${statusLabel(item)}</span>
+        ${ratingHtml}
+      </article>
+    `;
+  }
+
+  _bindCardClicks(container) {
+    container.querySelectorAll('[data-id]').forEach(el => {
+      el.onclick = () => this._openModal(el.dataset.id);
+      el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._openModal(el.dataset.id); } };
+    });
+  }
+
+  // ─── MODAL ────────────────────────────────────────────────────────────────
+  _openModal(id) {
+    const item = this.data.find(d => d.id === id);
+    if (!item) return;
+
+    const wrap = document.getElementById('modal-wrap');
+    if (!wrap) return;
+
+    // Banner
+    const bannerImg = document.getElementById('modal-banner-img');
+    imgWithFallback(item.image, item.title, bannerImg);
+
+    // Cover
+    const coverImg = document.getElementById('modal-cover-img');
+    imgWithFallback(item.image, item.title, coverImg);
+
+    // Type badge
+    document.getElementById('modal-type-badge').textContent = typeLabel(item.type).toUpperCase();
+
+    // Title
+    document.getElementById('modal-title').textContent = item.title;
+
+    // Status chip
+    const statusEl = document.getElementById('modal-status-chip');
+    statusEl.textContent = statusLabel(item);
+    statusEl.className = `modal-status-chip chip-${item.status}`;
+
+    // Year
+    document.getElementById('modal-year').textContent = item.year ? String(item.year) : '';
+
+    // Rating
+    const ratingBlock = document.getElementById('modal-rating-block');
+    const ratingScore = document.getElementById('modal-rating-score');
+    const ratingStarsEl = document.getElementById('modal-rating-stars');
+    if (item.rating > 0) {
+      ratingBlock.style.display = '';
+      ratingScore.textContent = item.rating.toFixed(1);
+      ratingStarsEl.innerHTML = ratingStars(item.rating);
+    } else {
+      ratingScore.textContent = 'NR';
+      ratingStarsEl.innerHTML = '';
+    }
+
+    // Genres
+    const genresEl = document.getElementById('modal-genres');
+    genresEl.innerHTML = item.genres.map(g => `<span class="genre-tag">${esc(g)}</span>`).join('');
+
+    // Review
+    const reviewBody = document.getElementById('modal-review-body');
+    if (item.notes) {
+      reviewBody.classList.remove('no-review');
+      reviewBody.innerHTML = `<p>${esc(item.notes)}</p>`;
+    } else {
+      reviewBody.classList.add('no-review');
+      reviewBody.innerHTML = '<p>No review written yet for this entry.</p>';
+    }
+
+    // Meta table
+    const metaTable = document.getElementById('modal-meta-table');
+    const metaRows = [
+      ['Type', typeLabel(item.type)],
+      ['Year', item.year || '—'],
+      ['Status', statusLabel(item)],
+      ...(item.genres.length ? [['Genres', item.genres.join(', ')]] : []),
+    ];
+    metaTable.innerHTML = metaRows.map(([k,v]) => `
+      <span class="meta-key">${k}</span>
+      <span class="meta-val">${esc(String(v))}</span>
+    `).join('');
+
+    // Action buttons
+    const actions = document.getElementById('modal-actions');
+    if (item.type === 'movie' || item.type === 'anime' || item.type === 'tv') {
+      actions.innerHTML = `
+        <a href="#" class="modal-btn modal-btn-watch" target="_blank" rel="noopener noreferrer">
+          <i class="ph-fill ph-play-circle"></i> Watch Online
+        </a>
+      `;
+    } else if (item.type === 'game') {
+      actions.innerHTML = `
+        <a href="#" class="modal-btn modal-btn-download" target="_blank" rel="noopener noreferrer">
+          <i class="ph ph-download-simple"></i> Download
+        </a>
+        <p class="modal-btn-note">Link placeholder — update in data</p>
+      `;
+    } else {
+      actions.innerHTML = '';
+    }
+
+    // Show modal
+    wrap.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => wrap.classList.add('active'));
+    this._modalOpen = true;
+  }
+
+  _closeModal() {
+    if (!this._modalOpen) return;
+    const wrap = document.getElementById('modal-wrap');
+    if (!wrap) return;
+    wrap.classList.remove('active');
+    document.body.style.overflow = '';
+    this._modalOpen = false;
+    setTimeout(() => {
+      wrap.setAttribute('hidden', '');
+      const b = document.getElementById('modal-banner-img');
+      const c = document.getElementById('modal-cover-img');
+      if (b) b.src = '';
+      if (c) c.src = '';
+    }, 350);
+  }
+
+  // ─── SEARCH ───────────────────────────────────────────────────────────────
+  _handleSearch(query) {
+    const q = query.toLowerCase().trim();
+    const overlay = document.getElementById('search-overlay');
+    const results = document.getElementById('search-results');
+    const clearBtn = document.getElementById('search-clear-btn');
+    if (!results) return;
+
+    clearBtn?.classList.toggle('hidden', !q);
+
+    if (!q) {
+      results.innerHTML = '';
+      return;
+    }
+
+    const matches = this.data
+      .filter(d =>
+        d.title.toLowerCase().includes(q) ||
+        d.genres.some(g => g.toLowerCase().includes(q)) ||
+        String(d.year).includes(q) ||
+        typeLabel(d.type).toLowerCase().includes(q)
+      )
+      .slice(0, 10);
+
+    if (!matches.length) {
+      results.innerHTML = `<div class="search-empty">No results for "<strong>${esc(query)}</strong>"</div>`;
+      return;
+    }
+
+    results.innerHTML = matches.map(item => `
+      <div class="search-result-item" data-id="${item.id}">
+        <img class="search-result-thumb" src="${item.image || fallbackSvg(item.title)}" alt="${esc(item.title)}" loading="lazy" onerror="this.src='${fallbackSvg(item.title)}'">
+        <div class="search-result-info">
+          <div class="search-result-title">${esc(item.title)}</div>
+          <div class="search-result-meta">${typeLabel(item.type)} · ${item.year || '?'} · ${item.genres.slice(0,2).join(', ')}</div>
+        </div>
+        ${item.rating > 0 ? `<span class="search-result-rating">${item.rating.toFixed(1)}</span>` : ''}
+      </div>
+    `).join('');
+
+    results.querySelectorAll('[data-id]').forEach(el => {
+      el.onclick = () => {
+        this._closeSearch();
+        this._openModal(el.dataset.id);
+      };
+    });
+  }
+
+  _openSearch() {
+    const overlay = document.getElementById('search-overlay');
+    overlay?.classList.add('open');
+    overlay?.setAttribute('aria-hidden', 'false');
+    setTimeout(() => document.getElementById('global-search-input')?.focus(), 80);
+  }
+
+  _closeSearch() {
+    const overlay = document.getElementById('search-overlay');
+    overlay?.classList.remove('open');
+    overlay?.setAttribute('aria-hidden', 'true');
+    const input = document.getElementById('global-search-input');
+    if (input) input.value = '';
+    const results = document.getElementById('search-results');
+    if (results) results.innerHTML = '';
+    document.getElementById('search-clear-btn')?.classList.add('hidden');
+  }
+
+  // ─── DRAWER ───────────────────────────────────────────────────────────────
+  _openDrawer() {
+    const drawer = document.getElementById('mobile-drawer');
+    drawer?.classList.add('open');
+    drawer?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  _closeDrawer() {
+    const drawer = document.getElementById('mobile-drawer');
+    drawer?.classList.remove('open');
+    drawer?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  // ─── EVENTS ───────────────────────────────────────────────────────────────
+  _bindGlobalEvents() {
+    // Sidebar nav + drawer nav clicks (delegated)
+    document.addEventListener('click', e => {
+      const navItem = e.target.closest('[data-view]');
+      if (navItem && !navItem.closest('.modal-wrap')) {
+        this._navigateTo(navItem.dataset.view);
+      }
+    });
+
+    // Mobile menu
+    document.getElementById('mobile-menu-btn')?.addEventListener('click', () => this._openDrawer());
+    document.getElementById('drawer-close')?.addEventListener('click', () => this._closeDrawer());
+    document.getElementById('drawer-backdrop')?.addEventListener('click', () => this._closeDrawer());
+
+    // Mobile search
+    document.getElementById('mobile-search-btn')?.addEventListener('click', () => this._openSearch());
+
+    // Search overlay
+    document.getElementById('global-search-input')?.addEventListener('input', e => {
+      clearTimeout(this._searchDebounce);
+      this._searchDebounce = setTimeout(() => this._handleSearch(e.target.value), 200);
+    });
+    document.getElementById('search-clear-btn')?.addEventListener('click', () => {
+      const inp = document.getElementById('global-search-input');
+      if (inp) { inp.value = ''; inp.focus(); }
+      document.getElementById('search-results').innerHTML = '';
+      document.getElementById('search-clear-btn').classList.add('hidden');
+    });
+    document.getElementById('search-close-btn')?.addEventListener('click', () => this._closeSearch());
+    document.getElementById('search-overlay-scrim')?.addEventListener('click', () => this._closeSearch());
+
+    // Sidebar quick search → filter library
+    document.getElementById('sidebar-search-input')?.addEventListener('input', e => {
+      clearTimeout(this._searchDebounce);
+      this._searchDebounce = setTimeout(() => {
+        const q = e.target.value.trim();
+        const isLibView = ['games','movies','anime','tv'].includes(this.state.view);
+        if (!isLibView && q) this._navigateTo('games');
+        else if (isLibView) this._renderLibraryGrid();
+      }, 250);
+    });
+
+    // Modal close
+    document.getElementById('modal-close')?.addEventListener('click', () => this._closeModal());
+    document.getElementById('modal-backdrop')?.addEventListener('click', () => this._closeModal());
+
+    // Sort select
+    document.getElementById('sort-select')?.addEventListener('change', e => {
+      this.state.sortBy = e.target.value;
+      this._renderLibraryGrid();
+    });
+
+    // Layout toggle
+    document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.state.layout = btn.dataset.layout;
+        this._renderLibraryGrid();
+      });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (this._modalOpen) this._closeModal();
+        else this._closeSearch();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        this._openSearch();
+      }
+    });
+
+    // Hash change
+    window.addEventListener('hashchange', () => {
+      const hash = location.hash.replace('#','');
+      const valid = ['home','games','movies','anime','tv','stats','favorites','socials'];
+      if (hash && valid.includes(hash) && hash !== this.state.view) {
+        this._navigateTo(hash);
+      }
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  window.curator = new CuratorApp();
+});
