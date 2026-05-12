@@ -3,35 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Showcase | Premium Media Tracker</title>
+    
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Media Showcase | Premium Library</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="style.css">
-    
+
     <script>
-        // Emergency cache buster for HTML caching
-        const APP_VERSION = "2.1.0";
-        const localVer = localStorage.getItem('app_version');
-        if (localVer !== APP_VERSION) {
-            localStorage.setItem('app_version', APP_VERSION);
-            if (!window.location.search.includes('v=')) {
+        (function() {
+            const APP_VERSION = "3.0.0"; // Increment this on every deployment
+            const localVer = localStorage.getItem('showcase_app_version');
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (localVer !== APP_VERSION && !urlParams.has('v')) {
+                localStorage.setItem('showcase_app_version', APP_VERSION);
+                // Force hard reload with version parameter to bypass GH Pages Cache
                 window.location.replace(window.location.pathname + '?v=' + APP_VERSION);
+            } else if (urlParams.has('v') && urlParams.get('v') !== APP_VERSION) {
+                // Cleanup URL if version matches but param is old
+                 window.history.replaceState(null, null, window.location.pathname);
             }
-        }
+
+            // Dynamically load assets to guarantee fresh fetch
+            const head = document.getElementsByTagName('head')[0];
+            const css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = 'style.css?v=' + APP_VERSION;
+            head.appendChild(css);
+
+            window.APP_VERSION_READY = APP_VERSION;
+        })();
     </script>
 </head>
 <body class="dark-mode theme-transition">
-    <div id="toast-container"></div>
+    <div id="toast-container" aria-live="polite"></div>
 
     <div id="app-loader" class="app-loader">
-        <div class="loader-spinner"></div>
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p>Syncing Library...</p>
+        </div>
     </div>
 
     <div class="app-container">
@@ -42,24 +58,25 @@
             </div>
             
             <div class="nav-section">
-                <span class="nav-label">Menu</span>
+                <span class="nav-label">Library</span>
                 <ul class="nav-links">
                     <li class="active" data-view="dashboard"><i class="ph ph-squares-four"></i> Overview</li>
-                    <li data-view="anime"><i class="ph ph-television"></i> Anime</li>
                     <li data-view="games"><i class="ph ph-game-controller"></i> Games</li>
+                    <li data-view="anime"><i class="ph ph-television-simple"></i> Anime & TV</li>
+                    <li data-view="movies"><i class="ph ph-film-strip"></i> Movies</li>
                 </ul>
             </div>
 
             <div class="nav-section">
                 <span class="nav-label">System</span>
                 <ul class="nav-links">
-                    <li data-view="profile"><i class="ph ph-user"></i> About & Data</li>
+                    <li data-view="profile"><i class="ph ph-user-circle"></i> Profile & Data</li>
                 </ul>
             </div>
 
             <div class="sidebar-bottom">
                 <button id="theme-toggle" class="btn-icon">
-                    <i class="ph ph-sun"></i> <span>Toggle Theme</span>
+                    <i class="ph ph-sun"></i> <span>Light Mode</span>
                 </button>
             </div>
         </nav>
@@ -68,11 +85,11 @@
             <header class="top-bar glass-panel">
                 <div class="search-bar">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" id="global-search" placeholder="Search titles, genres, or status...">
+                    <input type="text" id="global-search" placeholder="Search titles, genres, or platforms..." autocomplete="off">
                     <button id="clear-search" class="hidden"><i class="ph ph-x-circle"></i></button>
                 </div>
                 <div class="user-profile-mini">
-                    <img src="https://images.unsplash.com/photo-1560233026-ad254fa8dba4?w=100&q=80" alt="Profile">
+                    <img src="https://images.unsplash.com/photo-1560233026-ad254fa8dba4?w=100&q=80" alt="Avatar">
                 </div>
             </header>
 
@@ -80,52 +97,34 @@
                 <section id="view-dashboard" class="view active fade-in">
                     <div id="hero-spotlight"></div>
 
-                    <div class="stats-grid">
-                        <div class="stat-card glass-panel">
-                            <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--accent);"><i class="ph-fill ph-television"></i></div>
-                            <div class="stat-details">
-                                <h3>Anime</h3>
-                                <p id="stat-anime" class="counter">0</p>
-                            </div>
+                    <div class="stats-grid" id="dashboard-stats">
                         </div>
-                        <div class="stat-card glass-panel">
-                            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--status-completed);"><i class="ph-fill ph-game-controller"></i></div>
-                            <div class="stat-details">
-                                <h3>Games</h3>
-                                <p id="stat-games" class="counter">0</p>
-                            </div>
-                        </div>
-                        <div class="stat-card glass-panel">
-                            <div class="stat-icon" style="background: rgba(251, 191, 36, 0.1); color: #fbbf24;"><i class="ph-fill ph-star"></i></div>
-                            <div class="stat-details">
-                                <h3>Avg Rating</h3>
-                                <p id="stat-rating" class="counter">0.0</p>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="section-header">
-                        <h2 class="section-title">Recently Updated</h2>
-                        <button class="view-all-btn" data-target="games">View Library <i class="ph ph-arrow-right"></i></button>
+                        <h2 class="section-title">Recently Added</h2>
+                        <div class="controls-group">
+                            <button class="view-all-btn" data-target="games">Games <i class="ph ph-arrow-right"></i></button>
+                        </div>
                     </div>
                     <div id="recent-grid" class="media-grid"></div>
                 </section>
 
                 <section id="view-library" class="view fade-in">
                     <div class="view-header">
-                        <div>
+                        <div class="header-titles">
                             <h1 class="page-title" id="library-title">Library</h1>
-                            <p class="page-subtitle" id="library-subtitle">Manage and browse your collection.</p>
+                            <p class="page-subtitle" id="library-subtitle">Manage your collection.</p>
                         </div>
                         
                         <div class="library-controls">
                             <div class="custom-select glass-panel">
                                 <i class="ph ph-sort-ascending"></i>
                                 <select id="sort-select">
-                                    <option value="newest">Recently Added</option>
+                                    <option value="newest">Date Added (Newest)</option>
                                     <option value="rating-high">Highest Rated</option>
                                     <option value="rating-low">Lowest Rated</option>
                                     <option value="title-asc">Title (A-Z)</option>
+                                    <option value="title-desc">Title (Z-A)</option>
                                 </select>
                             </div>
                         </div>
@@ -141,9 +140,9 @@
 
                     <div id="library-grid" class="media-grid"></div>
                     <div id="empty-state" class="empty-state hidden">
-                        <i class="ph-fill ph-ghost"></i>
-                        <h3>No results found</h3>
-                        <p>Try adjusting your search or filters.</p>
+                        <i class="ph-duotone ph-ghost"></i>
+                        <h3>No entries found</h3>
+                        <p>Adjust your search or filters to see results.</p>
                     </div>
                 </section>
 
@@ -154,27 +153,26 @@
                             <img src="https://images.unsplash.com/photo-1560233026-ad254fa8dba4?w=400&q=80" alt="Avatar" class="profile-avatar">
                             <div class="profile-info">
                                 <h1>The Curator</h1>
-                                <p class="bio">Digital archivist, gamer, and media enthusiast. Documenting interactive and cinematic experiences.</p>
+                                <p class="bio">Digital archivist documenting interactive and cinematic experiences.</p>
                                 <div class="social-links">
-                                    <a href="#" class="glass-btn"><i class="ph-fill ph-discord-logo"></i> Discord</a>
-                                    <a href="#" class="glass-btn"><i class="ph-fill ph-github-logo"></i> GitHub</a>
+                                    <a href="#" class="glass-btn"><i class="ph-fill ph-github-logo"></i> Repository</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="data-management glass-panel" style="margin-top: 2rem; padding: 2rem; border-radius: var(--radius-md);">
-                        <h2 class="section-title"><i class="ph ph-database"></i> Data Management</h2>
-                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Safely backup or restore your local ratings and statuses to prevent data loss.</p>
-                        <div style="display: flex; gap: 1rem;">
-                            <button id="btn-export-data" class="action-btn primary" style="width: auto;"><i class="ph ph-download-simple"></i> Export Backup (JSON)</button>
-                            <label for="import-data-upload" class="action-btn" style="width: auto; background: var(--bg-surface-hover); color: var(--text-main); cursor: pointer;"><i class="ph ph-upload-simple"></i> Import Backup</label>
+                    <div class="data-management glass-panel">
+                        <div class="data-header">
+                            <h2 class="section-title"><i class="ph-duotone ph-database"></i> Database Management</h2>
+                            <p>Safely backup, restore, or migrate your local ratings and statuses.</p>
+                        </div>
+                        <div class="data-actions">
+                            <button id="btn-export-data" class="action-btn primary"><i class="ph ph-download-simple"></i> Export Backup (.json)</button>
+                            <label for="import-data-upload" class="action-btn secondary"><i class="ph ph-upload-simple"></i> Import Backup</label>
                             <input type="file" id="import-data-upload" accept=".json" class="hidden">
+                            <button id="btn-nuke-data" class="action-btn danger"><i class="ph ph-trash"></i> Reset Data</button>
                         </div>
                     </div>
-
-                    <h2 class="section-title" style="margin-top: 3rem;">Currently Active</h2>
-                    <div id="active-grid" class="media-grid"></div>
                 </section>
             </div>
         </main>
@@ -200,12 +198,48 @@
             <div class="modal-body">
                 <div class="modal-sidebar">
                     <img id="modal-cover" src="" alt="Cover" class="modal-cover-img">
-                    <button class="action-btn primary hidden" id="modal-link"><i class="ph ph-link"></i> Official Source</button>
+                    
+                    <div class="quick-edit-zone glass-panel">
+                        <h4 class="edit-label">Your Rating</h4>
+                        <select id="edit-rating" class="modal-select">
+                            <option value="0">Unrated</option>
+                            <option value="10">10 - Masterpiece</option>
+                            <option value="9">9 - Amazing</option>
+                            <option value="8">8 - Great</option>
+                            <option value="7">7 - Good</option>
+                            <option value="6">6 - Okay</option>
+                            <option value="5">5 - Average</option>
+                            <option value="4">4 - Mediocre</option>
+                            <option value="3">3 - Bad</option>
+                            <option value="2">2 - Terrible</option>
+                            <option value="1">1 - Appalling</option>
+                        </select>
+                        
+                        <h4 class="edit-label">Status</h4>
+                        <select id="edit-status" class="modal-select">
+                            <option value="playing">Playing / Watching</option>
+                            <option value="completed">Completed</option>
+                            <option value="planned">Planned</option>
+                            <option value="dropped">Dropped</option>
+                        </select>
+                        
+                        <button id="save-edits-btn" class="action-btn primary small-btn mt-1">Save Changes</button>
+                    </div>
+
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="action-btn outline mt-1 hidden" id="modal-link"><i class="ph ph-link"></i> Official Link</a>
                 </div>
                 <div class="modal-details">
                     <div class="review-section">
-                        <h3><i class="ph ph-notebook"></i> Personal Notes & Review</h3>
+                        <h3><i class="ph-duotone ph-notebook"></i> Personal Notes & Review</h3>
                         <div id="modal-notes" class="prose"></div>
+                        <div class="notes-edit-container hidden" id="notes-editor-container">
+                            <textarea id="edit-notes-input" placeholder="Write your review here..."></textarea>
+                            <div class="editor-actions">
+                                <button id="cancel-notes-btn" class="text-btn">Cancel</button>
+                                <button id="save-notes-btn" class="action-btn primary small-btn">Save Notes</button>
+                            </div>
+                        </div>
+                        <button id="toggle-notes-edit" class="text-btn mt-1"><i class="ph ph-pencil-simple"></i> Edit Notes</button>
                     </div>
                 </div>
             </div>
@@ -214,7 +248,7 @@
 
     <script>
         const script = document.createElement('script');
-        script.src = `app.js?v=${APP_VERSION}`;
+        script.src = `app.js?v=${window.APP_VERSION_READY}`;
         document.body.appendChild(script);
     </script>
 </body>
