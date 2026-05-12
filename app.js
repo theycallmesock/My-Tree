@@ -257,7 +257,12 @@ class CuratorApp {
   // ─── NAVIGATION ───────────────────────────────────────────────────────────
   _navigateTo(viewKey) {
     this.state.view = viewKey;
-    location.hash = viewKey === 'home' ? '' : viewKey;
+    // Use history.pushState for Home to prevent the browser from snapping to the top-left
+    if (viewKey === 'home') {
+      history.pushState(null, null, window.location.pathname + window.location.search);
+    } else {
+      location.hash = viewKey;
+    }
 
     // Update all nav highlights
     document.querySelectorAll('[data-view]').forEach(el => {
