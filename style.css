@@ -1513,5 +1513,22 @@ select { appearance: none; cursor: pointer; }
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
+/* Fix: Only hide animation targets inside the hero zone to avoid page-wide flicker */
+.bounce-in,
+.slide-up,
+.slide-up-delay-1,
+.slide-up-delay-2,
+.slide-up-delay-3 {
+  opacity: 0;
+  transition: none;
+}
+
+/* Immediately show content on the initial active slide */
+.hero-slide:first-child.animate-active .bounce-in,
+.hero-slide:first-child.animate-active .slide-up,
+.hero-slide:first-child.animate-active .slide-up-delay-1,
+.hero-slide:first-child.animate-active .slide-up-delay-2,
+.hero-slide:first-child.animate-active .slide-up-delay-3 {
+  animation-fill-mode: forwards;
 }
 .fade-in { animation: fadeIn 0.3s ease forwards; }
