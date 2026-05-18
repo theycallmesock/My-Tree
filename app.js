@@ -12,66 +12,26 @@
 
 const MEDIA_DATA = [
   // ── GAMES ────────────────────────────────────────────────────────────────
-  { id:"101", title:"Bloodborne",                  type:"game",   status:"playing",   rating:9.5, image:"https://upload.wikimedia.org/wikipedia/en/6/68/Bloodborne_Cover_Wallpaper.jpg",              genres:["Souls-like","Action RPG"],    year:2015, notes:"The atmosphere in Yharnam is unmatched. A masterpiece of environmental storytelling." },
-  { id:"102", title:"God of War (2018)",            type:"game",   status:"completed", rating:8.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/library_600x900.jpg", genres:["Action","Adventure"],         year:2018, notes:"Incredible soft reboot. The Leviathan axe mechanics feel weighty and satisfying." },
-  { id:"103", title:"The Last of Us Part I",        type:"game",   status:"playing",   rating:9.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/library_600x900.jpg", genres:["Narrative","Survival"],       year:2022 },
-  { id:"104", title:"Ghost of Tsushima",            type:"game",   status:"dropped",   rating:6.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/library_600x900.jpg", genres:["Action","Open World"],        year:2021 },
-  { id:"105", title:"Horizon Zero Dawn",            type:"game",   status:"dropped",   rating:5.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1151640/library_600x900.jpg", genres:["RPG","Open World"],           year:2020 },
-  { id:"106", title:"Forza Horizon 5",              type:"game",   status:"completed", rating:6.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551360/library_600x900.jpg", genres:["Racing","Open World"],        year:2021 },
-  { id:"107", title:"The Witcher 3: Wild Hunt",     type:"game",   status:"completed", rating:7.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/292030/library_600x900.jpg",  genres:["RPG","Open World"],           year:2015 },
-  { id:"108", title:"Red Dead Redemption 2",        type:"game",   status:"completed", rating:9.3, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/library_600x900.jpg", genres:["Open World","Narrative"],     year:2018, notes:"Arthur Morgan's journey is a masterpiece of storytelling. The open world feels remarkably alive." },
-  { id:"109", title:"Grand Theft Auto V",           type:"game",   status:"completed", rating:7.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/library_600x900.jpg",  genres:["Open World","Action"],        year:2013 },
-  { id:"110", title:"Cyberpunk 2077",               type:"game",   status:"completed", rating:9.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900.jpg", genres:["RPG","Cyberpunk"],            year:2020 },
-  { id:"111", title:"Skyrim",                       type:"game",   status:"dropped",   rating:0,   image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/489830/library_600x900.jpg",  genres:["RPG","Open World"],           year:2011 },
-  { id:"112", title:"Half-Life 2",                  type:"game",   status:"completed", rating:9.6, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220/library_600x900.jpg",     genres:["FPS","Sci-Fi"],               year:2004 },
-  { id:"113", title:"Portal 2",                     type:"game",   status:"completed", rating:8.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/620/library_600x900.jpg",     genres:["Puzzle","Sci-Fi"],            year:2011 },
-  { id:"114", title:"Dishonored",                   type:"game",   status:"completed", rating:8.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/205100/library_600x900.jpg",  genres:["Stealth","Action"],           year:2012 },
-  { id:"115", title:"Dark Souls",                   type:"game",   status:"completed", rating:10,  image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/570940/library_600x900.jpg",  genres:["Action RPG","Dark Fantasy"],  year:2018 },
-  { id:"116", title:"Dark Souls III",               type:"game",   status:"completed", rating:9.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/374320/library_600x900.jpg",  genres:["Action RPG","Dark Fantasy"],  year:2016 },
-  { id:"117", title:"Elden Ring",                   type:"game",   status:"completed", rating:9.9, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg", genres:["Open World","Action RPG"],    year:2022 },
-  { id:"118", title:"Sekiro: Shadows Die Twice",    type:"game",   status:"completed", rating:10,  image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/814380/library_600x900.jpg",  genres:["Action","Souls-like"],        year:2019 },
-  { id:"119", title:"Baldur's Gate 3",              type:"game",   status:"dropped",   rating:0,   image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1086940/library_600x900.jpg", genres:["RPG","Turn-Based"],           year:2023 },
-  { id:"120", title:"World of Warcraft: WotLK",     type:"game",   status:"completed", rating:9.5, image:"https://upload.wikimedia.org/wikipedia/en/e/e5/World_of_Warcraft_Wrath_of_the_Lich_King_box_art.jpg", genres:["MMORPG"],              year:2008 },
-  { id:"122", title:"Terraria",                     type:"game",   status:"completed", rating:7.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/105600/library_600x900.jpg",  genres:["Sandbox","Survival"],         year:2011 },
-  { id:"123", title:"Minecraft",                    type:"game",   status:"completed", rating:8.5, image:"https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",                            genres:["Sandbox","Survival"],         year:2011 },
-  { id:"124", title:"Outer Wilds",                  type:"game",   status:"completed", rating:10,  image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/753640/library_600x900.jpg",  genres:["Exploration","Puzzle"],       year:2019, notes:"A philosophical masterpiece about curiosity and the end of everything. Changed how I think about games." },
-  { id:"125", title:"StarCraft II",                 type:"game",   status:"completed", rating:8.0, image:"https://upload.wikimedia.org/wikipedia/en/2/20/StarCraft_II_-_Box_Art.jpg",                      genres:["RTS","Sci-Fi"],               year:2010 },
-  { id:"126", title:"Counter-Strike 2",             type:"game",   status:"playing",   rating:8.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/library_600x900.jpg",     genres:["FPS","Competitive"],          year:2023 },
-  { id:"127", title:"Valorant",                     type:"game",   status:"playing",   rating:8.4, image:"https://upload.wikimedia.org/wikipedia/en/a/ab/Valorant_cover_art.jpg",                         genres:["FPS","Tactical"],             year:2020 },
-  { id:"129", title:"Fortnite",                     type:"game",   status:"playing",   rating:9.9, image:"https://upload.wikimedia.org/wikipedia/en/a/a8/FortniteCoverArt.jpg",                           genres:["Battle Royale"],              year:2017 },
-  { id:"130", title:"Overwatch 2",                  type:"game",   status:"dropped",   rating:1.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2357570/library_600x900.jpg", genres:["FPS","Hero Shooter"],         year:2022 },
-  { id:"131", title:"Rocket League",                type:"game",   status:"dropped",   rating:4.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252950/library_600x900.jpg",  genres:["Sports","Competitive"],       year:2015 },
-  { id:"134", title:"Super Mario 64",               type:"game",   status:"completed", rating:8.0, image:"https://upload.wikimedia.org/wikipedia/en/6/6a/Super_Mario_64_box_cover.jpg",                    genres:["Platformer","Classic"],       year:1996 },
-  { id:"138", title:"Sifu",                         type:"game",   status:"completed", rating:7.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2138710/library_600x900.jpg", genres:["Action","Martial Arts"],      year:2022 },
-  { id:"139", title:"Cyberpunk 2077: Phantom Liberty",type:"game", status:"completed", rating:9.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2138330/library_600x900.jpg", genres:["RPG","Cyberpunk"],            year:2023 },
-  { id:"141", title:"Far Cry 3",                    type:"game",   status:"completed", rating:9.7, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220240/library_600x900.jpg",  genres:["FPS","Open World"],           year:2012 },
-  { id:"143", title:"Alien: Isolation",             type:"game",   status:"completed", rating:8.7, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/214490/library_600x900.jpg",  genres:["Horror","Survival"],          year:2014 },
-  { id:"144", title:"Outlast",                      type:"game",   status:"completed", rating:9.3, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/238320/library_600x900.jpg",  genres:["Horror"],                     year:2013 },
-  { id:"147", title:"The Forest",                   type:"game",   status:"completed", rating:7.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/242760/library_600x900.jpg",  genres:["Survival","Horror"],          year:2018 },
-  { id:"150", title:"Black Myth: Wukong",           type:"game",   status:"playing",   rating:0,   image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/library_600x900.jpg", genres:["Action RPG","Mythology"],     year:2024 },
-  { id:"153", title:"God of War Ragnarök",          type:"game",   status:"completed", rating:8.3, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2322010/library_600x900.jpg", genres:["Action","Adventure"],         year:2022 },
-  { id:"160", title:"Half-Life",                    type:"game",   status:"completed", rating:10,  image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/70/library_600x900.jpg",      genres:["FPS","Sci-Fi"],               year:1998 },
-  { id:"167", title:"Hollow Knight",                type:"game",   status:"planned",   rating:0,   image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/367520/library_600x900.jpg",  genres:["Metroidvania","Platformer"],  year:2017 },
-  { id:"168", title:"Firewatch",                    type:"game",   status:"completed", rating:9.1, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/383870/library_600x900.jpg",  genres:["Narrative","Walking Sim"],    year:2016 },
-  { id:"169", title:"SOMA",                         type:"game",   status:"completed", rating:9.6, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/282140/library_600x900.jpg",  genres:["Horror","Sci-Fi"],            year:2015, notes:"A haunting meditation on consciousness and identity. The ending is unforgettable." },
-  { id:"170", title:"It Takes Two",                 type:"game",   status:"completed", rating:8.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/library_600x900.jpg", genres:["Co-op","Platformer"],         year:2021 },
-  { id:"172", title:"Little Nightmares",            type:"game",   status:"completed", rating:8.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/424840/library_600x900.jpg",  genres:["Horror","Puzzle"],            year:2017 },
-  { id:"174", title:"Elden Ring: Shadow of the Erdtree",type:"game",status:"completed",rating:10, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2778580/library_600x900.jpg", genres:["Action RPG","Dark Fantasy"],  year:2024 },
-  { id:"175", title:"Assassin's Creed I",           type:"game",   status:"completed", rating:7.8, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/15100/library_600x900.jpg",   genres:["Action","Stealth"],           year:2007 },
-  { id:"176", title:"Assassin's Creed II",          type:"game",   status:"completed", rating:9.0, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/33230/library_600x900.jpg",   genres:["Action","Stealth"],           year:2009 },
-  { id:"180", title:"Lethal Company",               type:"game",   status:"playing",   rating:6.5, image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1966720/library_600x900.jpg", genres:["Horror","Co-op"],             year:2023 },
+  { id:"101", title:"Bloodborne",                  type:"game",   status:"playing",   rating:9.5, url:"https://store.playstation.com/", image:"https://upload.wikimedia.org/wikipedia/en/6/68/Bloodborne_Cover_Wallpaper.jpg",              genres:["Souls-like","Action RPG"],    year:2015, notes:"The atmosphere in Yharnam is unmatched. A masterpiece of environmental storytelling." },
+  { id:"102", title:"God of War (2018)",            type:"game",   status:"completed", rating:8.5, url:"https://store.steampowered.com/app/1593500/", image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/library_600x900.jpg", genres:["Action","Adventure"],         year:2018, notes:"Incredible soft reboot. The Leviathan axe mechanics feel weighty and satisfying." },
+  { id:"108", title:"Red Dead Redemption 2",        type:"game",   status:"completed", rating:9.3, url:"https://store.steampowered.com/app/1174180/", image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/library_600x900.jpg", genres:["Open World","Narrative"],     year:2018, notes:"Arthur Morgan's journey is a masterpiece of storytelling. The open world feels remarkably alive." },
+  { id:"112", title:"Half-Life 2",                  type:"game",   status:"completed", rating:9.6, url:"https://store.steampowered.com/app/220/", image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220/library_600x900.jpg",     genres:["FPS","Sci-Fi"],               year:2004 },
+  { id:"117", title:"Elden Ring",                   type:"game",   status:"completed", rating:9.9, url:"https://store.steampowered.com/app/1245620/", image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg", genres:["Open World","Action RPG"],    year:2022 },
+  { id:"124", title:"Outer Wilds",                  type:"game",   status:"completed", rating:10,  url:"https://store.steampowered.com/app/753640/", image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/753640/library_600x900.jpg",  genres:["Exploration","Puzzle"],       year:2019, notes:"A philosophical masterpiece about curiosity and the end of everything. Changed how I think about games." },
+  { id:"169", title:"SOMA",                         type:"game",   status:"completed", rating:9.6, url:"https://store.steampowered.com/app/282140/", image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/282140/library_600x900.jpg",  genres:["Horror","Sci-Fi"],            year:2015, notes:"A haunting meditation on consciousness and identity. The ending is unforgettable." },
+  { id:"174", title:"Elden Ring: Shadow of the Erdtree",type:"game",status:"completed",rating:10, url:"https://store.steampowered.com/app/2778580/", image:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2778580/library_600x900.jpg", genres:["Action RPG","Dark Fantasy"],  year:2024 },
 
   // ── ANIME ────────────────────────────────────────────────────────────────
-  { id:"901", title:"Attack on Titan",  type:"anime", status:"completed", rating:9.8, image:"https://upload.wikimedia.org/wikipedia/en/d/d6/Shingeki_no_Kyojin_manga_volume_1.jpg", genres:["Action","Dark Fantasy"],             year:2013, notes:"Masterpiece of foreshadowing. Flawless narrative structure with one of the best endings in anime." },
-  { id:"902", title:"Jujutsu Kaisen",   type:"anime", status:"playing",   rating:8.5, image:"https://upload.wikimedia.org/wikipedia/en/4/46/Jujutsu_kaisen.jpg",                   genres:["Action","Supernatural"],            year:2020 },
+  { id:"901", title:"Attack on Titan",  type:"anime", status:"completed", rating:9.8, url:"https://www.crunchyroll.com/series/GR751KNZY/attack-on-titan", image:"https://upload.wikimedia.org/wikipedia/en/d/d6/Shingeki_no_Kyojin_manga_volume_1.jpg", genres:["Action","Dark Fantasy"],             year:2013, notes:"Masterpiece of foreshadowing. Flawless narrative structure with one of the best endings in anime." },
+  { id:"902", title:"Jujutsu Kaisen",   type:"anime", status:"playing",   rating:8.5, url:"https://www.crunchyroll.com/series/GRDV0019R/jujutsu-kaisen", image:"https://upload.wikimedia.org/wikipedia/en/4/46/Jujutsu_kaisen.jpg",                   genres:["Action","Supernatural"],            year:2020 },
   { id:"903", title:"Death Note",       type:"anime", status:"completed", rating:9.0, image:"https://upload.wikimedia.org/wikipedia/en/6/6f/Death_Note_Vol_1.jpg",                  genres:["Psychological Thriller","Mystery"], year:2006, notes:"A psychological cat-and-mouse thriller that defines the genre. Light vs L is unmatched." },
 
   // ── TV SHOWS ─────────────────────────────────────────────────────────────
-  { id:"904", title:"Arcane",           type:"tv",    status:"completed", rating:10,  image:"https://upload.wikimedia.org/wikipedia/en/a/a6/Arcane_League_of_Legends_Season_1_poster.jpg", genres:["Sci-Fi","Action","Animation"], year:2021, notes:"The gold standard for video game adaptations. Animation is groundbreaking. Every frame is a painting." },
+  { id:"904", title:"Arcane",           type:"tv",    status:"completed", rating:10,  url:"https://www.netflix.com/title/81435684", image:"https://upload.wikimedia.org/wikipedia/en/a/a6/Arcane_League_of_Legends_Season_1_poster.jpg", genres:["Sci-Fi","Action","Animation"], year:2021, notes:"The gold standard for video game adaptations. Animation is groundbreaking. Every frame is a painting." },
 
   // ── MOVIES ───────────────────────────────────────────────────────────────
-  { id:"801", title:"Interstellar",     type:"movie", status:"completed", rating:10,  image:"https://upload.wikimedia.org/wikipedia/en/b/bc/Interstellar_film_poster.jpg",           genres:["Sci-Fi","Drama"],               year:2014, notes:"Visually stunning. Zimmer's score is transcendental. The docking scene is cinema perfection." },
-  { id:"802", title:"Dune: Part Two",   type:"movie", status:"completed", rating:9.5, image:"https://upload.wikimedia.org/wikipedia/en/8/8e/Dune_Part_Two_poster.jpg",              genres:["Sci-Fi","Epic"],                year:2024, notes:"Denis Villeneuve cements himself as the greatest living sci-fi director. Every frame is immaculate." },
+  { id:"801", title:"Interstellar",     type:"movie", status:"completed", rating:10,  url:"https://www.imdb.com/title/tt0816692/", image:"https://upload.wikimedia.org/wikipedia/en/b/bc/Interstellar_film_poster.jpg",           genres:["Sci-Fi","Drama"],               year:2014, notes:"Visually stunning. Zimmer's score is transcendental. The docking scene is cinema perfection." },
+  { id:"802", title:"Dune: Part Two",   type:"movie", status:"completed", rating:9.5, url:"https://www.imdb.com/title/tt15239678/", image:"https://upload.wikimedia.org/wikipedia/en/8/8e/Dune_Part_Two_poster.jpg",              genres:["Sci-Fi","Epic"],                year:2024, notes:"Denis Villeneuve cements himself as the greatest living sci-fi director. Every frame is immaculate." },
 ];
 
 // ─── NAV CONFIG ───────────────────────────────────────────────────────────────
@@ -86,7 +46,6 @@ const NAV_ITEMS = [
   { view: 'socials',  icon: 'ph-link-simple',    label: 'Socials', mobile: true },
 ];
 
-// Sidebar browse items
 const SIDEBAR_BROWSE = [
   { view: 'home',   icon: 'ph-house-simple',   label: 'Home' },
   { view: 'games',  icon: 'ph-game-controller',label: 'Games' },
@@ -137,7 +96,6 @@ function ratingStars(rating) {
 }
 
 function fallbackSvg(title='') {
-  // Uses your existing esc() function instead of ruining spaces with %20
   const t = esc(title || 'No Image'); 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900"><rect fill="#12121f" width="600" height="900"/><text fill="#4a4a6a" font-family="sans-serif" font-size="16" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">${t}</text></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -174,7 +132,6 @@ class CuratorApp {
     this._boot();
   }
 
-  // ─── NORMALIZE ────────────────────────────────────────────────────────────
   _normalizeData(arr) {
     return arr.map(d => ({
       id: String(d.id),
@@ -182,6 +139,7 @@ class CuratorApp {
       type: String(d.type || 'game'),
       status: this._normStatus(d.status),
       rating: parseFloat(d.rating) || 0,
+      url: d.url || null,
       image: d.image || '',
       genres: Array.isArray(d.genres) ? d.genres : [],
       year: d.year || '',
@@ -195,9 +153,7 @@ class CuratorApp {
     return ['playing','completed','planned','dropped'].includes(s) ? s : 'planned';
   }
 
-  // ─── NAV BUILD ────────────────────────────────────────────────────────────
   _buildNav() {
-    // Sidebar browse list
     const sidebarList = document.getElementById('sidebar-nav-list');
     if (sidebarList) {
       sidebarList.innerHTML = SIDEBAR_BROWSE.map(n => `
@@ -207,7 +163,6 @@ class CuratorApp {
       `).join('');
     }
 
-    // Drawer (mobile)
     const drawerList = document.getElementById('drawer-nav-list');
     if (drawerList) {
       drawerList.innerHTML = NAV_ITEMS.map(n => `
@@ -217,7 +172,6 @@ class CuratorApp {
       `).join('');
     }
 
-    // Bottom nav (mobile)
     const bnav = document.getElementById('bottom-nav');
     if (bnav) {
       bnav.innerHTML = NAV_ITEMS.filter(n => n.mobile).map(n => `
@@ -227,7 +181,6 @@ class CuratorApp {
       `).join('');
     }
 
-    // Socials grid
     const sg = document.getElementById('socials-grid');
     if (sg) {
       sg.innerHTML = SOCIALS.map(s => `
@@ -240,7 +193,6 @@ class CuratorApp {
     }
   }
 
-  // ─── BOOT ─────────────────────────────────────────────────────────────────
   _boot() {
     const loader = document.getElementById('app-loader');
     setTimeout(() => {
@@ -248,31 +200,21 @@ class CuratorApp {
       setTimeout(() => loader && loader.classList.add('hidden'), 500);
     }, 300);
 
-    // Hash routing
     const hash = location.hash.replace('#','');
     const validViews = ['home','games','movies','anime','tv','stats','favorites','socials'];
     this._navigateTo(validViews.includes(hash) ? hash : 'home');
   }
 
-  // ─── NAVIGATION ───────────────────────────────────────────────────────────
   _navigateTo(viewKey) {
     this.state.view = viewKey;
-    // Use history.pushState for Home to prevent the browser from snapping to the top-left
-    if (viewKey === 'home') {
-      history.pushState(null, null, window.location.pathname + window.location.search);
-    } else {
-      location.hash = viewKey;
-    }
+    location.hash = viewKey; // Fixed: Standardized hash routing for all pages
 
-    // Update all nav highlights
     document.querySelectorAll('[data-view]').forEach(el => {
       el.classList.toggle('active', el.dataset.view === viewKey);
     });
 
-    // Close mobile drawer
     this._closeDrawer();
 
-    // Hide all views
     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
 
     const isLibrary = ['games','movies','anime','tv'].includes(viewKey);
@@ -280,7 +222,6 @@ class CuratorApp {
     const viewEl = document.getElementById(viewId);
     if (viewEl) viewEl.classList.remove('hidden');
 
-    // Render
     if (viewKey === 'home') {
       this._renderHome();
     } else if (isLibrary) {
@@ -308,7 +249,6 @@ class CuratorApp {
     if (grid) { grid.classList.remove('list-layout'); }
   }
 
-  // ─── HOME ─────────────────────────────────────────────────────────────────
   _renderHome() {
     this._renderHero();
     this._renderTicker();
@@ -324,7 +264,6 @@ class CuratorApp {
     const zone = document.getElementById('hero-zone');
     if (!zone) return;
 
-    // Pick items with notes/reviews or high ratings for spotlight
     this._heroItems = this.data
       .filter(d => d.rating >= 9 || d.notes)
       .sort(() => Math.random() - 0.5)
@@ -434,7 +373,6 @@ class CuratorApp {
     this._bindCardClicks(grid);
   }
 
-  // ─── LIBRARY ──────────────────────────────────────────────────────────────
   _renderLibrary() {
     const cfg = LIBRARY_CONFIG[this.state.librarySection];
     if (!cfg) return;
@@ -443,7 +381,6 @@ class CuratorApp {
     document.getElementById('library-title').textContent   = cfg.title;
     document.getElementById('library-sub').textContent     = cfg.sub;
 
-    // Build filter pills
     const pillsWrap = document.getElementById('filter-pills');
     if (pillsWrap) {
       const statuses = ['all','playing','completed','planned','dropped'];
@@ -468,22 +405,10 @@ class CuratorApp {
     const cfg = LIBRARY_CONFIG[this.state.librarySection];
     let items = this.data.filter(d => d.type === cfg.type);
 
-    // Status filter
     if (this.state.filterStatus !== 'all') {
       items = items.filter(d => d.status === this.state.filterStatus);
     }
 
-    // Search filter (from sidebar input)
-    const q = (document.getElementById('sidebar-search-input')?.value || '').toLowerCase().trim();
-    if (q) {
-      items = items.filter(d =>
-        d.title.toLowerCase().includes(q) ||
-        d.genres.some(g => g.toLowerCase().includes(q)) ||
-        String(d.year).includes(q)
-      );
-    }
-
-    // Sort
     switch (this.state.sortBy) {
       case 'rating-high': items.sort((a,b) => b.rating - a.rating); break;
       case 'rating-low':  items.sort((a,b) => a.rating - b.rating); break;
@@ -493,7 +418,6 @@ class CuratorApp {
       case 'year-old':    items.sort((a,b) => (a.year||0) - (b.year||0)); break;
     }
 
-    // Count display
     document.getElementById('library-count-display').textContent = items.length;
     const resultCount = document.getElementById('result-count');
     if (resultCount) resultCount.innerHTML = `Showing <span>${items.length}</span> ${items.length === 1 ? 'entry' : 'entries'}`;
@@ -518,7 +442,6 @@ class CuratorApp {
     this._bindCardClicks(grid);
   }
 
-  // ─── STATS ────────────────────────────────────────────────────────────────
   _renderStats() {
     const container = document.getElementById('stats-content');
     if (!container) return;
@@ -530,18 +453,15 @@ class CuratorApp {
     const dropped   = this.data.filter(d => d.status === 'dropped').length;
     const rated     = this.data.filter(d => d.rating > 0);
     const avgRating = rated.length ? (rated.reduce((a,d)=>a+d.rating,0)/rated.length).toFixed(2) : '—';
-    const maxRating = rated.length ? Math.max(...rated.map(d=>d.rating)) : 0; // Added safe-guard here
-    const topRated  = rated.filter(d => d.rating === maxRating);
+    const maxRating = rated.length ? Math.max(...rated.map(d=>d.rating)) : 0; 
     const reviewed  = this.data.filter(d => d.notes).length;
     const perfect   = this.data.filter(d => d.rating === 10).length;
 
-    // Genre counts
     const genreMap = {};
     this.data.forEach(d => d.genres.forEach(g => { genreMap[g] = (genreMap[g]||0)+1; }));
     const topGenres = Object.entries(genreMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
     const maxGenreCount = topGenres[0]?.[1] || 1;
 
-    // Rating distribution (1-10)
     const ratingDist = Array.from({length:10},(_,i)=>({score:i+1,count:0}));
     rated.forEach(d => {
       const bucket = Math.min(Math.round(d.rating),10) - 1;
@@ -549,7 +469,6 @@ class CuratorApp {
     });
     const maxDistCount = Math.max(...ratingDist.map(r=>r.count), 1);
 
-    // Type breakdown
     const gameCount  = this.data.filter(d=>d.type==='game').length;
     const movieCount = this.data.filter(d=>d.type==='movie').length;
     const animeCount = this.data.filter(d=>d.type==='anime').length;
@@ -601,7 +520,6 @@ class CuratorApp {
     `;
   }
 
-  // ─── FAVORITES ────────────────────────────────────────────────────────────
   _renderFavorites() {
     const grid = document.getElementById('favorites-grid');
     if (!grid) return;
@@ -610,7 +528,6 @@ class CuratorApp {
     this._bindCardClicks(grid);
   }
 
-  // ─── CARDS ────────────────────────────────────────────────────────────────
   _cardHtml(item) {
     const ratingHtml = item.rating > 0
       ? `<span class="media-card-rating"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</span>`
@@ -662,7 +579,6 @@ class CuratorApp {
     });
   }
 
-  // ─── MODAL ────────────────────────────────────────────────────────────────
   _openModal(id) {
     const item = this.data.find(d => d.id === id);
     if (!item) return;
@@ -670,29 +586,18 @@ class CuratorApp {
     const wrap = document.getElementById('modal-wrap');
     if (!wrap) return;
 
-    // Banner
-    const bannerImg = document.getElementById('modal-banner-img');
-    imgWithFallback(item.image, item.title, bannerImg);
+    imgWithFallback(item.image, item.title, document.getElementById('modal-banner-img'));
+    imgWithFallback(item.image, item.title, document.getElementById('modal-cover-img'));
 
-    // Cover
-    const coverImg = document.getElementById('modal-cover-img');
-    imgWithFallback(item.image, item.title, coverImg);
-
-    // Type badge
     document.getElementById('modal-type-badge').textContent = typeLabel(item.type).toUpperCase();
-
-    // Title
     document.getElementById('modal-title').textContent = item.title;
 
-    // Status chip
     const statusEl = document.getElementById('modal-status-chip');
     statusEl.textContent = statusLabel(item);
     statusEl.className = `modal-status-chip chip-${item.status}`;
 
-    // Year
     document.getElementById('modal-year').textContent = item.year ? String(item.year) : '';
 
-    // Rating
     const ratingBlock = document.getElementById('modal-rating-block');
     const ratingScore = document.getElementById('modal-rating-score');
     const ratingStarsEl = document.getElementById('modal-rating-stars');
@@ -705,11 +610,8 @@ class CuratorApp {
       ratingStarsEl.innerHTML = '';
     }
 
-    // Genres
-    const genresEl = document.getElementById('modal-genres');
-    genresEl.innerHTML = item.genres.map(g => `<span class="genre-tag">${esc(g)}</span>`).join('');
+    document.getElementById('modal-genres').innerHTML = item.genres.map(g => `<span class="genre-tag">${esc(g)}</span>`).join('');
 
-    // Review
     const reviewBody = document.getElementById('modal-review-body');
     if (item.notes) {
       reviewBody.classList.remove('no-review');
@@ -719,7 +621,6 @@ class CuratorApp {
       reviewBody.innerHTML = '<p>No review written yet for this entry.</p>';
     }
 
-    // Meta table
     const metaTable = document.getElementById('modal-meta-table');
     const metaRows = [
       ['Type', typeLabel(item.type)],
@@ -732,29 +633,28 @@ class CuratorApp {
       <span class="meta-val">${esc(String(v))}</span>
     `).join('');
 
-    // Action buttons
+    // Fixed: Ensure the UI components are completely implemented based on realistic properties
     const actions = document.getElementById('modal-actions');
-    if (item.type === 'movie' || item.type === 'anime' || item.type === 'tv') {
-      actions.innerHTML = `
-        <a href="#" class="modal-btn modal-btn-watch" target="_blank" rel="noopener noreferrer">
-          <i class="ph-fill ph-play-circle"></i> Watch Online
-        </a>
-      `;
-    } else if (item.type === 'game') {
-      actions.innerHTML = `
-        <a href="#" class="modal-btn modal-btn-download" target="_blank" rel="noopener noreferrer">
-          <i class="ph ph-download-simple"></i> Download
-        </a>
-        <p class="modal-btn-note">Link placeholder — update in data</p>
-      `;
+    if (item.url) {
+        const actionText = item.type === 'game' ? 'View Details' : 'Watch Online';
+        const icon = item.type === 'game' ? 'ph-download-simple' : 'ph-play-circle';
+        const btnClass = item.type === 'game' ? 'modal-btn-download' : 'modal-btn-watch';
+        actions.innerHTML = `
+            <a href="${item.url}" class="modal-btn ${btnClass}" target="_blank" rel="noopener noreferrer">
+                <i class="ph ${item.type === 'game' ? '' : 'ph-fill'} ${icon}"></i> ${actionText}
+            </a>
+        `;
     } else {
-      actions.innerHTML = '';
+        actions.innerHTML = `<p class="modal-btn-note">No external link available.</p>`;
     }
 
-    // Show modal
     wrap.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
-    requestAnimationFrame(() => wrap.classList.add('active'));
+    requestAnimationFrame(() => {
+        wrap.classList.add('active');
+        // Set focus to the modal for screenreaders / keyboard accessibility
+        setTimeout(() => document.getElementById('modal-close')?.focus(), 100);
+    });
     this._modalOpen = true;
   }
 
@@ -774,10 +674,8 @@ class CuratorApp {
     }, 350);
   }
 
-  // ─── SEARCH ───────────────────────────────────────────────────────────────
   _handleSearch(query) {
     const q = query.toLowerCase().trim();
-    const overlay = document.getElementById('search-overlay');
     const results = document.getElementById('search-results');
     const clearBtn = document.getElementById('search-clear-btn');
     if (!results) return;
@@ -804,7 +702,7 @@ class CuratorApp {
     }
 
     results.innerHTML = matches.map(item => `
-      <div class="search-result-item" data-id="${item.id}">
+      <div class="search-result-item" data-id="${item.id}" tabindex="0">
         <img class="search-result-thumb" src="${item.image || fallbackSvg(item.title)}" alt="${esc(item.title)}" loading="lazy" onerror="this.src='${fallbackSvg(item.title)}'">
         <div class="search-result-info">
           <div class="search-result-title">${esc(item.title)}</div>
@@ -815,10 +713,12 @@ class CuratorApp {
     `).join('');
 
     results.querySelectorAll('[data-id]').forEach(el => {
-      el.onclick = () => {
+      const openResult = () => {
         this._closeSearch();
         this._openModal(el.dataset.id);
       };
+      el.onclick = openResult;
+      el.onkeydown = e => { if (e.key === 'Enter') openResult(); };
     });
   }
 
@@ -840,7 +740,6 @@ class CuratorApp {
     document.getElementById('search-clear-btn')?.classList.add('hidden');
   }
 
-  // ─── DRAWER ───────────────────────────────────────────────────────────────
   _openDrawer() {
     const drawer = document.getElementById('mobile-drawer');
     drawer?.classList.add('open');
@@ -855,9 +754,7 @@ class CuratorApp {
     document.body.style.overflow = '';
   }
 
-  // ─── EVENTS ───────────────────────────────────────────────────────────────
   _bindGlobalEvents() {
-    // Sidebar nav + drawer nav clicks (delegated)
     document.addEventListener('click', e => {
       const navItem = e.target.closest('[data-view]');
       if (navItem && !navItem.closest('.modal-wrap')) {
@@ -865,57 +762,47 @@ class CuratorApp {
       }
     });
 
-    // Mobile menu
     document.getElementById('mobile-menu-btn')?.addEventListener('click', () => this._openDrawer());
     document.getElementById('drawer-close')?.addEventListener('click', () => this._closeDrawer());
     document.getElementById('drawer-backdrop')?.addEventListener('click', () => this._closeDrawer());
-
-    // Mobile search
     document.getElementById('mobile-search-btn')?.addEventListener('click', () => this._openSearch());
 
-    // Search overlay
     document.getElementById('global-search-input')?.addEventListener('input', e => {
       clearTimeout(this._searchDebounce);
       this._searchDebounce = setTimeout(() => this._handleSearch(e.target.value), 200);
     });
+    
     document.getElementById('search-clear-btn')?.addEventListener('click', () => {
       const inp = document.getElementById('global-search-input');
       if (inp) { inp.value = ''; inp.focus(); }
       document.getElementById('search-results').innerHTML = '';
       document.getElementById('search-clear-btn').classList.add('hidden');
     });
+    
     document.getElementById('search-close-btn')?.addEventListener('click', () => this._closeSearch());
     document.getElementById('search-overlay-scrim')?.addEventListener('click', () => this._closeSearch());
 
-    // Sidebar quick search → Triggers Global Search across ALL libraries
     document.getElementById('sidebar-search-input')?.addEventListener('input', e => {
       const q = e.target.value.trim();
       if (q) {
-        this._openSearch(); // Open the global search overlay
-        
-        // Pass the query to the global search and execute
+        this._openSearch();
         const globalInput = document.getElementById('global-search-input');
         if (globalInput) {
           globalInput.value = q;
           this._handleSearch(q);
         }
-        
-        // Clear sidebar input so it acts like a clean launcher button
         e.target.value = ''; 
       }
     });
 
-    // Modal close
     document.getElementById('modal-close')?.addEventListener('click', () => this._closeModal());
     document.getElementById('modal-backdrop')?.addEventListener('click', () => this._closeModal());
 
-    // Sort select
     document.getElementById('sort-select')?.addEventListener('change', e => {
       this.state.sortBy = e.target.value;
       this._renderLibraryGrid();
     });
 
-    // Layout toggle
     document.querySelectorAll('.view-toggle-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
@@ -925,7 +812,6 @@ class CuratorApp {
       });
     });
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
         if (this._modalOpen) this._closeModal();
@@ -937,7 +823,6 @@ class CuratorApp {
       }
     });
 
-    // Hash change
     window.addEventListener('hashchange', () => {
       const hash = location.hash.replace('#','');
       const valid = ['home','games','movies','anime','tv','stats','favorites','socials'];
@@ -948,9 +833,6 @@ class CuratorApp {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   window.curator = new CuratorApp();
 });
