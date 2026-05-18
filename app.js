@@ -141,6 +141,7 @@ class CuratorApp {
       rating: parseFloat(d.rating) || 0,
       url: d.url || null,
       image: d.image || '',
+      banner: d.banner || d.image || '', // <-- Added banner support (falls back to cover image)
       genres: Array.isArray(d.genres) ? d.genres : [],
       year: d.year || '',
       notes: d.notes || '',
@@ -627,7 +628,8 @@ class CuratorApp {
     const wrap = document.getElementById('modal-wrap');
     if (!wrap) return;
 
-    imgWithFallback(item.image, item.title, document.getElementById('modal-banner-img'));
+    // Inside _openModal(id)
+    imgWithFallback(item.banner, item.title, document.getElementById('modal-banner-img')); // <-- Changed to item.banner
     imgWithFallback(item.image, item.title, document.getElementById('modal-cover-img'));
 
     document.getElementById('modal-type-badge').textContent = typeLabel(item.type).toUpperCase();
