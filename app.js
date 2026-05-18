@@ -260,72 +260,113 @@ class CuratorApp {
     });
   }
 
-  _renderHero() {
+ _renderHero() {
     const zone = document.getElementById('hero-zone');
     if (!zone) return;
 
+    // Grab up to 10 of your highest rated items (preferring games/movies with notes)
     this._heroItems = this.data
-      .filter(d => d.rating >= 9 || d.notes)
+      .filter(d => d.rating >= 8.5) 
       .sort(() => Math.random() - 0.5)
-      .slice(0, 5);
+      .slice(0, 10); // Now grabs 10 items instead of 5
 
     if (!this._heroItems.length) { zone.innerHTML = ''; return; }
+
+    // Generate the individual slides
+    const slidesHtml = this._heroItems.map((item, i) => `
+      <div class="hero-slide" style="background-image: url('${item.image}')">
+        <div class="hero-gradient"></div>
+        <div class="hero-content">
+          <div class="hero-type-badge bounce-in">
+            <i class="ph ph-${item.type === 'game' ? 'game-controller' : item.type === 'movie' ? 'film-strip' : item.type === 'anime' ? 'star-four' : 'monitor-play'}"></i> 
+            ${typeLabel(item.type)}
+          </div>
+          <h1 class="hero-title slide-up">${esc(item.title)}</h1>
+          <div class="hero-genres slide-up-delay-1">${item.genres.slice(0,3).map(g=>`<span class="hero-genre-pill">${esc(g)}</span>`).join('')}</div>
+          ${item.notes ? `<p class="hero-notes slide-up-delay-2">${esc(item.notes)}</p>` : ''}
+          <div class="hero-actions slide-up-delay-3">
+            <button class="hero-btn hero-btn-primary" data-id="${item.id}">
+              <i class="ph ph-info"></i> View Details
+            </button>
+            ${item.rating > 0 ? `<div class="hero-rating-chip"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>` : ''}
+          </div>
+        </div>
+      </div>
+    `).join('');
 
     const dotsHtml = this._heroItems.map((_,i) =>
       `<span class="hero-dot${i===0?' active':''}" data-i="${i}"></span>`
     ).join('');
 
+    // Inject the new Slider DOM structure
     zone.innerHTML = `
-      <div class="hero-bg" id="hero-bg"></div>
-      <div class="hero-gradient"></div>
-      <div class="hero-content" id="hero-text-content"></div>
+      <div class="hero-slider-viewport">
+        <div class="hero-slider-track" id="hero-slider-track">
+          ${slidesHtml}
+        </div>
+      </div>
+      <button class="hero-nav-arrow hero-prev" id="hero-prev" aria-label="Previous Slide"><i class="ph ph-caret-left"></i></button>
+      <button class="hero-nav-arrow hero-next" id="hero-next" aria-label="Next Slide"><i class="ph ph-caret-right"></i></button>
       <div class="hero-dots">${dotsHtml}</div>
     `;
 
+    // Bind Button Events
+    zone.querySelectorAll('.hero-btn-primary').forEach(btn => {
+      btn.onclick = () => this._openModal(btn.dataset.id);
+    });
+
+    // Bind Dot Events
     zone.querySelectorAll('.hero-dot').forEach(dot => {
       dot.onclick = () => this._setHero(parseInt(dot.dataset.i));
     });
 
-    this._setHero(0);
+    // Bind Arrow Events
+    document.getElementById('hero-prev').onclick = () => this._setHero(this._heroIndex - 1);
+    document.getElementById('hero-next').onclick = () => this._setHero(this._heroIndex + 1);
+
+    this._heroIndex = 0;
+    this._updateHeroUI();
   }
 
   _setHero(idx) {
-    clearTimeout(this._heroTimer);
     if (!this._heroItems.length) return;
+    
+    // Clear existing timer so manual clicks don't result in double-skips
+    clearInterval(this._heroTimer);
+    
+    // Handle infinite wrap-around logic
     idx = ((idx % this._heroItems.length) + this._heroItems.length) % this._heroItems.length;
     this._heroIndex = idx;
-    const item = this._heroItems[idx];
+    
+    this._updateHeroUI();
 
-    const bg = document.getElementById('hero-bg');
-    const content = document.getElementById('hero-text-content');
-    if (!bg || !content) return;
+    // Restart the auto-slide timer
+    this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
+  }
 
-    bg.classList.remove('active');
-    bg.style.backgroundImage = `url('${item.image}')`;
-    requestAnimationFrame(() => bg.classList.add('active'));
+  _updateHeroUI() {
+    const track = document.getElementById('hero-slider-track');
+    if (track) {
+      // Hardware accelerated sliding
+      track.style.transform = `translateX(-${this._heroIndex * 100}%)`;
+    }
+    
+    // Update active dot
+    document.querySelectorAll('.hero-dot').forEach((d,i) => {
+      d.classList.toggle('active', i === this._heroIndex);
+    });
 
-    const ratingHtml = item.rating > 0
-      ? `<div class="hero-rating-chip"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>`
-      : '';
-
-    content.innerHTML = `
-      <div class="hero-type-badge"><i class="ph ph-${item.type === 'game' ? 'game-controller' : item.type === 'movie' ? 'film-strip' : item.type === 'anime' ? 'star-four' : 'monitor-play'}"></i> ${typeLabel(item.type)}</div>
-      <h1 class="hero-title">${esc(item.title)}</h1>
-      <div class="hero-genres">${item.genres.slice(0,3).map(g=>`<span class="hero-genre-pill">${esc(g)}</span>`).join('')}</div>
-      ${item.notes ? `<p class="hero-notes">${esc(item.notes)}</p>` : ''}
-      <div class="hero-actions">
-        <button class="hero-btn hero-btn-primary" data-id="${item.id}">
-          <i class="ph ph-info"></i> View Details
-        </button>
-        ${ratingHtml}
-      </div>
-    `;
-
-    content.querySelector('.hero-btn-primary').onclick = () => this._openModal(item.id);
-
-    document.querySelectorAll('.hero-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
-
-    this._heroTimer = setTimeout(() => this._setHero(idx + 1), 6000);
+    // Re-trigger text/icon animations by forcing a DOM reflow
+    const slides = document.querySelectorAll('.hero-slide');
+    slides.forEach((slide, i) => {
+      if (i === this._heroIndex) {
+        slide.classList.remove('animate-active');
+        void slide.offsetWidth; // Reflow hack
+        slide.classList.add('animate-active');
+      } else {
+        slide.classList.remove('animate-active');
+      }
+    });
   }
 
   _renderTicker() {
