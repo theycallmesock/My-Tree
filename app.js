@@ -423,17 +423,13 @@ class CuratorApp {
     d.classList.toggle('active', i === this._heroIndex);
   });
 
-  // Trigger animations on the newly active slide
   const slides = document.querySelectorAll('.hero-slide');
-  slides.forEach((slide, i) => {
-    slide.classList.remove('animate-active');
-  });
+  slides.forEach(slide => slide.classList.remove('animate-active'));
 
-  // Use a short delay so the slide transition starts before text animates in
   setTimeout(() => {
     const activeSlide = slides[this._heroIndex];
     if (activeSlide) activeSlide.classList.add('animate-active');
-  }, 150);
+  }, 100);
 }
 
   _renderTicker() {
