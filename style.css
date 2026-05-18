@@ -612,7 +612,8 @@ select { appearance: none; cursor: pointer; }
   border-radius: 3px;
 }
 
-/* --- Slide content animations --- */
+/* ─── HERO SLIDE ANIMATIONS ──────────────────────────────────────────────── */
+/* FIX: These rules must live OUTSIDE any @keyframes block. */
 .bounce-in,
 .slide-up,
 .slide-up-delay-1,
@@ -641,6 +642,7 @@ select { appearance: none; cursor: pointer; }
   0%   { transform: scale(0.85) translateY(8px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
+
 @keyframes slideUpFade {
   0%   { transform: translateY(18px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
@@ -653,6 +655,7 @@ select { appearance: none; cursor: pointer; }
   .hero-zone { height: 52vh; min-height: 380px; }
   .hero-title { font-size: 1.9rem; }
 }
+
 /* ─── STATS TICKER ───────────────────────────────────────────────────────── */
 .stats-ticker {
   display: flex;
@@ -728,7 +731,6 @@ select { appearance: none; cursor: pointer; }
   cursor: pointer;
   transition: transform var(--transition), box-shadow var(--transition);
   border: 1px solid var(--border);
-  group: true;
 }
 .media-card:hover {
   transform: translateY(-4px);
@@ -881,10 +883,9 @@ select { appearance: none; cursor: pointer; }
 }
 .filter-pills-wrap {
   display: flex; gap: 8px;
-  /* Enables native horizontal swiping on mobile */
-  overflow-x: auto; 
-  scrollbar-width: none; 
-  -webkit-overflow-scrolling: touch; 
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;
 }
 .filter-pills-wrap::-webkit-scrollbar { display: none; }
@@ -897,9 +898,8 @@ select { appearance: none; cursor: pointer; }
   background: var(--bg-card);
   border: 1px solid var(--border);
   transition: all var(--transition);
-  /* Prevents pills from squishing on small screens */
-  flex-shrink: 0; 
-  white-space: nowrap; 
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .filter-pill:hover { color: var(--text-primary); border-color: var(--border-strong); }
 .filter-pill.active {
@@ -1051,9 +1051,7 @@ select { appearance: none; cursor: pointer; }
   padding: 3rem 2rem 2rem;
   border-bottom: 1px solid var(--border);
 }
-.profile-avatar-wrap {
-  flex-shrink: 0;
-}
+.profile-avatar-wrap { flex-shrink: 0; }
 .profile-avatar {
   width: 80px; height: 80px;
   border-radius: 50%;
@@ -1113,18 +1111,29 @@ select { appearance: none; cursor: pointer; }
 .social-tile:hover .social-arrow { transform: translate(2px,-2px); color: var(--text-secondary); }
 
 /* ─── DETAIL MODAL ───────────────────────────────────────────────────────── */
+/*
+ * FIX: The original code had a convoluted mix of `display:flex` being commented
+ * out, `pointer-events` toggling, and `:not([hidden])` selector fighting the
+ * `hidden` attribute. Replaced with a clean, standard pattern:
+ * - `[hidden]` attribute controls whether the element participates in layout (display:none)
+ * - `.active` class controls visibility + pointer events via opacity/pointer-events
+ * - The JS removes `hidden` before adding `.active`, and adds `hidden` after the
+ *   close animation finishes — this is already what the JS does.
+ */
 .modal-wrap {
   position: fixed; inset: 0; z-index: 500;
-  /* Removed 'display: flex' so the HTML 'hidden' attribute works properly */
+  display: flex;
   align-items: center; justify-content: center;
   opacity: 0;
-  pointer-events: none; /* Allows clicks to pass through when hidden */
+  pointer-events: none;
   transition: opacity var(--transition);
 }
-.modal-wrap:not([hidden]) { display: flex; }
-.modal-wrap.active { 
-  opacity: 1; 
-  pointer-events: auto; /* Re-enables clicks when the modal is open */
+.modal-wrap[hidden] {
+  display: none;
+}
+.modal-wrap.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 .modal-backdrop {
   position: absolute; inset: 0;
@@ -1166,20 +1175,11 @@ select { appearance: none; cursor: pointer; }
   overflow: hidden;
   background: var(--bg-elevated);
 }
-/* Add or update this in your style.css */
 #modal-banner-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center 30%;
-}
-
-/* Also ensure your main grid covers don't stretch */
-.library-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover !important;
-  object-position: center !important;
 }
 .modal-banner-overlay {
   position: absolute; inset: 0;
@@ -1221,10 +1221,10 @@ select { appearance: none; cursor: pointer; }
   padding: 3px 10px;
   border-radius: 20px;
 }
-.chip-playing  { background: rgba(74,232,120,0.15); color: var(--green); border: 1px solid rgba(74,232,120,0.3); }
-.chip-completed{ background: rgba(74,138,232,0.15); color: var(--blue); border: 1px solid rgba(74,138,232,0.3); }
-.chip-planned  { background: rgba(144,144,168,0.1); color: var(--text-muted); border: 1px solid var(--border); }
-.chip-dropped  { background: rgba(232,74,74,0.15); color: var(--red); border: 1px solid rgba(232,74,74,0.3); }
+.chip-playing   { background: rgba(74,232,120,0.15); color: var(--green); border: 1px solid rgba(74,232,120,0.3); }
+.chip-completed { background: rgba(74,138,232,0.15); color: var(--blue); border: 1px solid rgba(74,138,232,0.3); }
+.chip-planned   { background: rgba(144,144,168,0.1); color: var(--text-muted); border: 1px solid var(--border); }
+.chip-dropped   { background: rgba(232,74,74,0.15); color: var(--red); border: 1px solid rgba(232,74,74,0.3); }
 .modal-year {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -1357,7 +1357,6 @@ select { appearance: none; cursor: pointer; }
 .bottom-nav {
   display: none;
   position: fixed; bottom: 0; left: 0; right: 0;
-  /* Dynamically adds padding for iPhone home swipe bar */
   padding: 0 0.5rem env(safe-area-inset-bottom);
   height: calc(var(--bottomnav-h) + env(safe-area-inset-bottom));
   background: rgba(8,8,16,0.95);
@@ -1414,7 +1413,6 @@ select { appearance: none; cursor: pointer; }
     padding-bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom) + 1.5rem);
   }
 
-  /* App-like Hero Section */
   .hero-zone {
     height: auto; min-height: 60vh;
     border-radius: 0 0 var(--radius-xl) var(--radius-xl);
@@ -1425,7 +1423,6 @@ select { appearance: none; cursor: pointer; }
   .hero-title { font-size: 2.2rem; text-shadow: 0 2px 16px rgba(0,0,0,0.9); }
   .hero-notes { display: -webkit-box; -webkit-line-clamp: 3; font-size: 0.85rem; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
-  /* Native Horizontal Scrolling for Home Page Rows (Netflix style) */
   #view-home .media-grid {
     display: flex;
     flex-wrap: nowrap;
@@ -1435,22 +1432,20 @@ select { appearance: none; cursor: pointer; }
     scrollbar-width: none;
     padding: 0 1.5rem 1rem;
     gap: 1rem;
-    -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+    -webkit-overflow-scrolling: touch;
   }
   #view-home .media-grid::-webkit-scrollbar { display: none; }
   #view-home .media-card {
-    flex: 0 0 calc(40vw); /* Shows 2.5 cards to naturally hint at scrolling */
+    flex: 0 0 40vw;
     max-width: 160px;
     scroll-snap-align: start;
-    transform: none !important; /* Disable hover jumps on mobile */
+    transform: none !important;
   }
 
-  /* Library Headers - Clean and Compact */
   .library-hero { padding: 1.5rem 1.5rem 1rem; flex-direction: column; align-items: flex-start; gap: 0; border-bottom: none; }
   .library-hero-title { font-size: 2rem; }
-  .library-hero-sub, .library-hero-count { display: none; } /* Hide extra text to save space */
+  .library-hero-sub, .library-hero-count { display: none; }
 
-  /* Sticky Controls Bar (Stays on screen while scrolling library) */
   .controls-bar {
     position: sticky; top: var(--topbar-h); z-index: 40;
     background: rgba(8,8,16,0.95);
@@ -1463,15 +1458,14 @@ select { appearance: none; cursor: pointer; }
   .section-header { padding: 1.5rem 1.5rem 0.75rem; }
   .result-count { padding: 0.25rem 1.5rem 1rem; }
 
-  /* Stats Ticker natively scrollable */
   .stats-ticker-item { padding: 1rem; min-width: 100px; }
   .stats-ticker-value { font-size: 1.5rem; }
 
-  /* Slide-Up Fullscreen Modal Rework */
-  .modal-panel { 
-    width: 100%; height: 100vh; max-height: 100vh; 
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0; 
-    transform: translateY(100%); /* Slides up from bottom */
+  /* Slide-up fullscreen modal on mobile */
+  .modal-panel {
+    width: 100%; height: 100vh; max-height: 100vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    transform: translateY(100%);
   }
   .modal-wrap.active .modal-panel { transform: translateY(0); }
   .modal-banner { height: 35vh; }
@@ -1479,21 +1473,18 @@ select { appearance: none; cursor: pointer; }
   .modal-close-btn { top: env(safe-area-inset-top, 1rem); right: 1rem; background: rgba(0,0,0,0.5); }
   .modal-body-layout { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem; }
   .modal-left-col { display: flex; flex-direction: column; gap: 1rem; }
-  
-  /* Hide poster in modal on mobile, the banner is enough */
-  .modal-cover-frame { display: none; } 
+  .modal-cover-frame { display: none; }
   .modal-rating-block { background: transparent; border: none; padding: 0; text-align: left; display: flex; align-items: center; gap: 10px; margin-top: 0; }
   .rating-score { font-size: 1.5rem; }
   .rating-stars { margin-top: 0; font-size: 0.8rem; }
 }
 
 @media (max-width: 480px) {
-  /* Keep standard 2-column Grid for Library & Favorites */
   #view-library .media-grid, #view-favorites .media-grid {
     grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 0 1.5rem 1.5rem;
   }
-  .filter-pill { font-size: 0.85rem; padding: 6px 16px; } /* Larger touch targets */
-  .view-toggle { display: none; } /* Force grid view on mobile to keep it clean */
+  .filter-pill { font-size: 0.85rem; padding: 6px 16px; }
+  .view-toggle { display: none; }
   .sort-wrap select { font-size: 0.85rem; }
 }
 
@@ -1513,22 +1504,5 @@ select { appearance: none; cursor: pointer; }
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
-/* Fix: Only hide animation targets inside the hero zone to avoid page-wide flicker */
-.bounce-in,
-.slide-up,
-.slide-up-delay-1,
-.slide-up-delay-2,
-.slide-up-delay-3 {
-  opacity: 0;
-  transition: none;
-}
-
-/* Immediately show content on the initial active slide */
-.hero-slide:first-child.animate-active .bounce-in,
-.hero-slide:first-child.animate-active .slide-up,
-.hero-slide:first-child.animate-active .slide-up-delay-1,
-.hero-slide:first-child.animate-active .slide-up-delay-2,
-.hero-slide:first-child.animate-active .slide-up-delay-3 {
-  animation-fill-mode: forwards;
 }
 .fade-in { animation: fadeIn 0.3s ease forwards; }
