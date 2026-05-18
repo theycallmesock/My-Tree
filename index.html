@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>The Curator — Personal Media Archive</title>
 
-  <!-- SEO & OpenGraph -->
   <meta name="description" content="A curated personal media archive of games, films, anime, and TV shows — with honest ratings and reviews." />
   <meta name="theme-color" content="#0a0a0f" />
   <meta property="og:title" content="The Curator — Personal Media Archive" />
@@ -13,25 +12,19 @@
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-  <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-  <link rel="stylesheet" href="style.css?v={{BUILD_ID}}" />
+  <link rel="stylesheet" href="style.css?v=1.0.0" />
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       APP LOADER
-  ═══════════════════════════════════════════════════════════ -->
   <div id="app-loader" class="app-loader" aria-hidden="true">
     <div class="loader-inner">
       <div class="loader-ring"></div>
@@ -39,9 +32,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       MOBILE TOPBAR
-  ═══════════════════════════════════════════════════════════ -->
   <header class="mobile-topbar" id="mobile-topbar">
     <div class="mobile-brand">
       <span class="brand-glyph">⬡</span>
@@ -57,7 +47,6 @@
     </div>
   </header>
 
-  <!-- Mobile Nav Drawer -->
   <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
     <div class="drawer-backdrop" id="drawer-backdrop"></div>
     <nav class="drawer-panel" id="drawer-panel">
@@ -72,15 +61,12 @@
     </nav>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       SEARCH OVERLAY
-  ═══════════════════════════════════════════════════════════ -->
   <div class="search-overlay" id="search-overlay" aria-hidden="true">
     <div class="search-overlay-scrim" id="search-overlay-scrim"></div>
     <div class="search-overlay-box">
       <div class="search-input-row">
         <i class="ph ph-magnifying-glass search-icon"></i>
-        <input type="text" id="global-search-input" placeholder="Search titles, genres, years…" autocomplete="off" spellcheck="false" />
+        <input type="text" id="global-search-input" placeholder="Search across all libraries…" autocomplete="off" spellcheck="false" />
         <button id="search-clear-btn" class="search-clear-btn hidden" aria-label="Clear">
           <i class="ph ph-x-circle"></i>
         </button>
@@ -92,12 +78,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       APP SHELL
-  ═══════════════════════════════════════════════════════════ -->
   <div class="app-shell">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar" role="navigation" aria-label="Primary navigation">
       <div class="sidebar-brand">
         <div class="sidebar-brand-icon">⬡</div>
@@ -107,10 +88,9 @@
         </div>
       </div>
 
-      <!-- Desktop search -->
       <div class="sidebar-search-wrap">
         <i class="ph ph-magnifying-glass"></i>
-        <input type="text" id="sidebar-search-input" placeholder="Quick search…" autocomplete="off" aria-label="Search library" />
+        <input type="text" id="sidebar-search-input" placeholder="Global search…" autocomplete="off" aria-label="Search all media" />
       </div>
 
       <nav class="sidebar-nav">
@@ -138,10 +118,7 @@
       </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="main-content" id="main-content" role="main">
-
-      <!-- HOME VIEW -->
       <section class="view" id="view-home" data-view="home">
         <div id="hero-zone" class="hero-zone"></div>
         <div id="stats-ticker" class="stats-ticker"></div>
@@ -158,7 +135,6 @@
         <div id="toprated-grid" class="media-grid"></div>
       </section>
 
-      <!-- LIBRARY VIEW (shared for all categories) -->
       <section class="view hidden" id="view-library" data-view="library">
         <div class="library-hero" id="library-hero">
           <div class="library-hero-text">
@@ -169,7 +145,6 @@
           <div class="library-hero-count" id="library-count-display"></div>
         </div>
 
-        <!-- Controls bar -->
         <div class="controls-bar">
           <div class="filter-pills-wrap" id="filter-pills" role="group" aria-label="Filter by status"></div>
           <div class="controls-right">
@@ -201,7 +176,6 @@
         </div>
       </section>
 
-      <!-- STATS VIEW -->
       <section class="view hidden" id="view-stats" data-view="stats">
         <div class="page-header">
           <div class="page-eyebrow">ANALYTICS</div>
@@ -211,7 +185,6 @@
         <div id="stats-content" class="stats-content"></div>
       </section>
 
-      <!-- FAVORITES VIEW -->
       <section class="view hidden" id="view-favorites" data-view="favorites">
         <div class="page-header">
           <div class="page-eyebrow">CURATED</div>
@@ -221,7 +194,6 @@
         <div id="favorites-grid" class="media-grid"></div>
       </section>
 
-      <!-- SOCIALS VIEW -->
       <section class="view hidden" id="view-socials" data-view="socials">
         <div class="profile-section">
           <div class="profile-avatar-wrap">
@@ -241,18 +213,13 @@
     </main>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       DETAIL MODAL
-  ═══════════════════════════════════════════════════════════ -->
   <div class="modal-wrap" id="modal-wrap" hidden role="dialog" aria-modal="true" aria-label="Media details">
     <div class="modal-backdrop" id="modal-backdrop"></div>
     <div class="modal-panel" id="modal-panel">
-
       <button class="modal-close-btn" id="modal-close" aria-label="Close details">
         <i class="ph ph-x"></i>
       </button>
 
-      <!-- Banner -->
       <div class="modal-banner" id="modal-banner">
         <img id="modal-banner-img" src="" alt="" loading="lazy" />
         <div class="modal-banner-overlay"></div>
@@ -266,9 +233,7 @@
         </div>
       </div>
 
-      <!-- Body -->
       <div class="modal-body-layout">
-        <!-- Left col: cover + actions -->
         <div class="modal-left-col">
           <div class="modal-cover-frame">
             <img id="modal-cover-img" src="" alt="" loading="lazy" />
@@ -280,7 +245,6 @@
           <div class="modal-action-list" id="modal-actions"></div>
         </div>
 
-        <!-- Right col: details -->
         <div class="modal-right-col">
           <div class="modal-genres" id="modal-genres"></div>
 
@@ -295,34 +259,24 @@
           <div class="modal-meta-table" id="modal-meta-table"></div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       BOTTOM NAV (mobile)
-  ═══════════════════════════════════════════════════════════ -->
   <nav class="bottom-nav" id="bottom-nav" role="navigation" aria-label="Mobile navigation"></nav>
 
-  <!-- Service Worker -->
   <script>
-    // 1. Force clear old caches for returning users automatically
-    const APP_VERSION = '{{BUILD_ID}}';
+    const APP_VERSION = '1.0.0';
     
     if (localStorage.getItem('curator_version') !== APP_VERSION) {
-      // Wipe all local caches
       if ('caches' in window) {
         caches.keys().then(names => Promise.all(names.map(name => caches.delete(name))));
       }
-      // Unregister the old sticky Service Worker
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(reg => reg.unregister()));
       }
-      // Save new version and instantly reload from the live server
       localStorage.setItem('curator_version', APP_VERSION);
       window.location.reload(true); 
     } else {
-      // 2. Normal Service Worker Registration (Network-first)
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
           .then(r => r.update())
@@ -330,7 +284,6 @@
       }
     }
   </script>
-
   <script src="app.js" defer></script>
 </body>
 </html>
