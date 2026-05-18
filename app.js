@@ -336,74 +336,66 @@ class CuratorApp {
   }
 
  _renderHero() {
-    const zone = document.getElementById('hero-zone');
-    if (!zone) return;
+  const zone = document.getElementById('hero-zone');
+  if (!zone) return;
 
-    // Grab up to 10 of your highest rated items (preferring games/movies with notes)
-    this._heroItems = this.data
-      .filter(d => d.rating >= 8.5) 
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 10); // Now grabs 10 items instead of 5
+  this._heroItems = this.data
+    .filter(d => d.rating >= 8.5)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 10);
 
-    if (!this._heroItems.length) { zone.innerHTML = ''; return; }
+  if (!this._heroItems.length) { zone.innerHTML = ''; return; }
 
-    // Generate the individual slides
-    const slidesHtml = this._heroItems.map((item, i) => `
-      <div class="hero-slide" style="background-image: url('${item.image}')">
-        <div class="hero-gradient"></div>
-        <div class="hero-content">
-          <div class="hero-type-badge bounce-in">
-            <i class="ph ph-${item.type === 'game' ? 'game-controller' : item.type === 'movie' ? 'film-strip' : item.type === 'anime' ? 'star-four' : 'monitor-play'}"></i> 
-            ${typeLabel(item.type)}
-          </div>
-          <h1 class="hero-title slide-up">${esc(item.title)}</h1>
-          <div class="hero-genres slide-up-delay-1">${item.genres.slice(0,3).map(g=>`<span class="hero-genre-pill">${esc(g)}</span>`).join('')}</div>
-          ${item.notes ? `<p class="hero-notes slide-up-delay-2">${esc(item.notes)}</p>` : ''}
-          <div class="hero-actions slide-up-delay-3">
-            <button class="hero-btn hero-btn-primary" data-id="${item.id}">
-              <i class="ph ph-info"></i> View Details
-            </button>
-            ${item.rating > 0 ? `<div class="hero-rating-chip"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>` : ''}
-          </div>
+  const slidesHtml = this._heroItems.map((item) => `
+    <div class="hero-slide" style="background-image: url('${item.banner || item.image}')">
+      <div class="hero-gradient"></div>
+      <div class="hero-content">
+        <div class="hero-type-badge bounce-in">
+          <i class="ph ph-${item.type === 'game' ? 'game-controller' : item.type === 'movie' ? 'film-strip' : item.type === 'anime' ? 'star-four' : 'monitor-play'}"></i>
+          ${typeLabel(item.type)}
+        </div>
+        <h1 class="hero-title slide-up">${esc(item.title)}</h1>
+        <div class="hero-genres slide-up-delay-1">${item.genres.slice(0,3).map(g=>`<span class="hero-genre-pill">${esc(g)}</span>`).join('')}</div>
+        ${item.notes ? `<p class="hero-notes slide-up-delay-2">${esc(item.notes)}</p>` : ''}
+        <div class="hero-actions slide-up-delay-3">
+          <button class="hero-btn hero-btn-primary" data-id="${item.id}">
+            <i class="ph ph-info"></i> View Details
+          </button>
+          ${item.rating > 0 ? `<div class="hero-rating-chip"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>` : ''}
         </div>
       </div>
-    `).join('');
+    </div>
+  `).join('');
 
-    const dotsHtml = this._heroItems.map((_,i) =>
-      `<span class="hero-dot${i===0?' active':''}" data-i="${i}"></span>`
-    ).join('');
+  const dotsHtml = this._heroItems.map((_,i) =>
+    `<span class="hero-dot${i===0?' active':''}" data-i="${i}"></span>`
+  ).join('');
 
-    // Inject the new Slider DOM structure
-    zone.innerHTML = `
-      <div class="hero-slider-viewport">
-        <div class="hero-slider-track" id="hero-slider-track">
-          ${slidesHtml}
-        </div>
+  zone.innerHTML = `
+    <div class="hero-slider-viewport">
+      <div class="hero-slider-track" id="hero-slider-track">
+        ${slidesHtml}
       </div>
-      <button class="hero-nav-arrow hero-prev" id="hero-prev" aria-label="Previous Slide"><i class="ph ph-caret-left"></i></button>
-      <button class="hero-nav-arrow hero-next" id="hero-next" aria-label="Next Slide"><i class="ph ph-caret-right"></i></button>
-      <div class="hero-dots">${dotsHtml}</div>
-    `;
+    </div>
+    <button class="hero-nav-arrow hero-prev" id="hero-prev" aria-label="Previous Slide"><i class="ph ph-caret-left"></i></button>
+    <button class="hero-nav-arrow hero-next" id="hero-next" aria-label="Next Slide"><i class="ph ph-caret-right"></i></button>
+    <div class="hero-dots">${dotsHtml}</div>
+  `;
 
-    // Bind Button Events
-    zone.querySelectorAll('.hero-btn-primary').forEach(btn => {
-      btn.onclick = () => this._openModal(btn.dataset.id);
-    });
+  zone.querySelectorAll('.hero-btn-primary').forEach(btn => {
+    btn.onclick = () => this._openModal(btn.dataset.id);
+  });
+  zone.querySelectorAll('.hero-dot').forEach(dot => {
+    dot.onclick = () => this._setHero(parseInt(dot.dataset.i));
+  });
+  document.getElementById('hero-prev').onclick = () => this._setHero(this._heroIndex - 1);
+  document.getElementById('hero-next').onclick = () => this._setHero(this._heroIndex + 1);
 
-    // Bind Dot Events
-    zone.querySelectorAll('.hero-dot').forEach(dot => {
-      dot.onclick = () => this._setHero(parseInt(dot.dataset.i));
-    });
-
-    // Bind Arrow Events
-    document.getElementById('hero-prev').onclick = () => this._setHero(this._heroIndex - 1);
-    document.getElementById('hero-next').onclick = () => this._setHero(this._heroIndex + 1);
-
-    this._heroIndex = 0;
-    this._updateHeroUI();
-    clearInterval(this._heroTimer);
-    this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
-  }
+  this._heroIndex = 0;
+  this._updateHeroUI();
+  clearInterval(this._heroTimer);
+  this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
+}
 
   _setHero(idx) {
     if (!this._heroItems.length) return;
