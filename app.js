@@ -400,7 +400,10 @@ class CuratorApp {
     document.getElementById('hero-next').onclick = () => this._setHero(this._heroIndex + 1);
 
     this._heroIndex = 0;
-    this._updateHeroUI();
+this._updateHeroUI();
+// Start auto-slide timer
+clearInterval(this._heroTimer);
+this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
   }
 
   _setHero(idx) {
