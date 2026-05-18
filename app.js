@@ -400,10 +400,9 @@ class CuratorApp {
     document.getElementById('hero-next').onclick = () => this._setHero(this._heroIndex + 1);
 
     this._heroIndex = 0;
-this._updateHeroUI();
-// Start auto-slide timer
-clearInterval(this._heroTimer);
-this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
+    this._updateHeroUI();
+    clearInterval(this._heroTimer);
+    this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
   }
 
   _setHero(idx) {
@@ -422,30 +421,28 @@ this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
     this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
   }
 
-  _updateHeroUI() {
-    const track = document.getElementById('hero-slider-track');
-    if (track) {
-      // Hardware accelerated sliding
-      track.style.transform = `translateX(-${this._heroIndex * 100}%)`;
-    }
-    
-    // Update active dot
-    document.querySelectorAll('.hero-dot').forEach((d,i) => {
-      d.classList.toggle('active', i === this._heroIndex);
-    });
-
-    // Re-trigger text/icon animations by forcing a DOM reflow
-    const slides = document.querySelectorAll('.hero-slide');
-    slides.forEach((slide, i) => {
-      if (i === this._heroIndex) {
-        slide.classList.remove('animate-active');
-        void slide.offsetWidth; // Reflow hack
-        slide.classList.add('animate-active');
-      } else {
-        slide.classList.remove('animate-active');
-      }
-    });
+  __updateHeroUI() {
+  const track = document.getElementById('hero-slider-track');
+  if (track) {
+    track.style.transform = `translateX(-${this._heroIndex * 100}%)`;
   }
+
+  document.querySelectorAll('.hero-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === this._heroIndex);
+  });
+
+  // Trigger animations on the newly active slide
+  const slides = document.querySelectorAll('.hero-slide');
+  slides.forEach((slide, i) => {
+    slide.classList.remove('animate-active');
+  });
+
+  // Use a short delay so the slide transition starts before text animates in
+  setTimeout(() => {
+    const activeSlide = slides[this._heroIndex];
+    if (activeSlide) activeSlide.classList.add('animate-active');
+  }, 150);
+}
 
   _renderTicker() {
     const ticker = document.getElementById('stats-ticker');
