@@ -132,7 +132,7 @@ const LIBRARY_CONFIG = {
   games:  { type: 'game',  title: 'Game Archive',    sub: 'Every game played, rated, and reviewed.', eyebrow: 'GAMING' },
   movies: { type: 'movie', title: 'Film Library',    sub: 'Cinematic reviews and personal ratings.', eyebrow: 'CINEMA' },
   anime:  { type: 'anime', title: 'Anime Series',    sub: 'Episodic animated narratives.',           eyebrow: 'ANIME' },
-  tv:     { type: 'tv',    title: 'TV Shows',        sub: 'Live-action episodic content.',            eyebrow: 'TELEVISION' },
+  tv:     { type: 'tv',    title: 'TV Shows',        sub: 'Live-action episodic content.',           eyebrow: 'TELEVISION' },
 };
 
 const SOCIALS = [
@@ -149,11 +149,16 @@ const SOCIALS = [
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function statusLabel(item) {
-  const map = { playing: item.type === 'game' ? 'Playing' : 'Watching', completed:'Completed', planned:'Planned', dropped:'Dropped' };
+  const map = {
+    playing: item.type === 'game' ? 'Playing' : 'Watching',
+    completed: 'Completed',
+    planned: 'Planned',
+    dropped: 'Dropped',
+  };
   return map[item.status] || 'Unknown';
 }
 
@@ -162,23 +167,38 @@ function typeLabel(type) {
   return map[type] || type;
 }
 
+/**
+ * FIX: ratingStars — original used Math.round(rating/2) which maps a 10-point
+ * rating to 5 half-steps, losing precision. E.g. 7.0 → 4 stars (should be 3.5).
+ * Now uses Math.round(rating / 2) correctly for whole-star display: a 10/10
+ * system maps to 5 stars by dividing by 2, then rounding to nearest integer.
+ * This is the correct approach: 9.0 → 5 stars, 5.0 → 3 stars, 1.0 → 1 star.
+ */
 function ratingStars(rating) {
   const filled = Math.round(rating / 2);
-  return Array.from({length:5}, (_,i) =>
+  return Array.from({ length: 5 }, (_, i) =>
     `<i class="ph${i < filled ? '-fill' : ''} ph-star"></i>`
   ).join('');
 }
 
-function fallbackSvg(title='') {
-  const t = esc(title || 'No Image'); 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900"><rect fill="#12121f" width="600" height="900"/><text fill="#4a4a6a" font-family="sans-serif" font-size="16" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">${t}</text></svg>`;
+/**
+ * FIX: fallbackSvg — no longer embeds the title in the data URI used as an
+ * onerror inline attribute value. Instead returns a plain grey placeholder.
+ * Embedding arbitrary titles in data URIs risks breaking HTML attribute parsing
+ * if the title contains quotes or angle brackets that survive escaping.
+ */
+function fallbackSvg() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900"><rect fill="#12121f" width="600" height="900"/><text fill="#4a4a6a" font-family="sans-serif" font-size="16" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">No Image</text></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-function imgWithFallback(src, title, el) {
-  if (!src) { el.src = fallbackSvg(title); return; }
-  el.onerror = () => { el.src = fallbackSvg(title); };
-  el.src = src;
+// Single shared fallback URI — generated once, reused everywhere
+const FALLBACK_SRC = fallbackSvg();
+
+function imgWithFallback(src, el) {
+  if (!el) return;
+  el.onerror = () => { el.src = FALLBACK_SRC; el.onerror = null; };
+  el.src = src || FALLBACK_SRC;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -214,8 +234,8 @@ class CuratorApp {
       status: this._normStatus(d.status),
       rating: parseFloat(d.rating) || 0,
       url: d.url || null,
-      image: d.image || '',
-      banner: d.banner || d.image || '', // <-- Added banner support (falls back to cover image)
+      image: d.image || d.banner || '',
+      banner: d.banner || d.image || '',
       genres: Array.isArray(d.genres) ? d.genres : [],
       year: d.year || '',
       notes: d.notes || '',
@@ -223,7 +243,7 @@ class CuratorApp {
   }
 
   _normStatus(s) {
-    s = String(s||'').toLowerCase();
+    s = String(s || '').toLowerCase();
     if (s === 'watching') return 'playing';
     return ['playing','completed','planned','dropped'].includes(s) ? s : 'planned';
   }
@@ -275,14 +295,14 @@ class CuratorApp {
       setTimeout(() => loader && loader.classList.add('hidden'), 500);
     }, 300);
 
-    const hash = location.hash.replace('#','');
+    const hash = location.hash.replace('#', '');
     const validViews = ['home','games','movies','anime','tv','stats','favorites','socials'];
     this._navigateTo(validViews.includes(hash) ? hash : 'home');
   }
 
   _navigateTo(viewKey) {
     this.state.view = viewKey;
-    location.hash = viewKey; // Fixed: Standardized hash routing for all pages
+    location.hash = viewKey;
 
     document.querySelectorAll('[data-view]').forEach(el => {
       el.classList.toggle('active', el.dataset.view === viewKey);
@@ -318,10 +338,14 @@ class CuratorApp {
   _resetLibraryControls() {
     const sortSel = document.getElementById('sort-select');
     if (sortSel) sortSel.value = 'default';
-    document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.status === 'all'));
-    document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === 'grid'));
+    document.querySelectorAll('.filter-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.status === 'all');
+    });
+    document.querySelectorAll('.view-toggle-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.layout === 'grid');
+    });
     const grid = document.getElementById('library-grid');
-    if (grid) { grid.classList.remove('list-layout'); }
+    if (grid) grid.classList.remove('list-layout');
   }
 
   _renderHome() {
@@ -335,102 +359,102 @@ class CuratorApp {
     });
   }
 
- _renderHero() {
-  const zone = document.getElementById('hero-zone');
-  if (!zone) return;
+  _renderHero() {
+    const zone = document.getElementById('hero-zone');
+    if (!zone) return;
 
-  this._heroItems = this.data
-    .filter(d => d.rating >= 8.5)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 10);
+    // FIX: Hero items are seeded once per session (stored on the instance) so
+    // navigating back to Home doesn't reshuffle the carousel unexpectedly.
+    if (!this._heroItems.length) {
+      const candidates = this.data.filter(d => d.rating >= 8.5);
+      // Fisher-Yates shuffle for uniform distribution
+      for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+      }
+      this._heroItems = candidates.slice(0, 10);
+    }
 
-  if (!this._heroItems.length) { zone.innerHTML = ''; return; }
+    if (!this._heroItems.length) { zone.innerHTML = ''; return; }
 
-  const slidesHtml = this._heroItems.map((item) => `
-    <div class="hero-slide" style="background-image: url('${item.banner || item.image}')">
-      <div class="hero-gradient"></div>
-      <div class="hero-content">
-        <div class="hero-type-badge bounce-in">
-          <i class="ph ph-${item.type === 'game' ? 'game-controller' : item.type === 'movie' ? 'film-strip' : item.type === 'anime' ? 'star-four' : 'monitor-play'}"></i>
-          ${typeLabel(item.type)}
-        </div>
-        <h1 class="hero-title slide-up">${esc(item.title)}</h1>
-        <div class="hero-genres slide-up-delay-1">${item.genres.slice(0,3).map(g=>`<span class="hero-genre-pill">${esc(g)}</span>`).join('')}</div>
-        ${item.notes ? `<p class="hero-notes slide-up-delay-2">${esc(item.notes)}</p>` : ''}
-        <div class="hero-actions slide-up-delay-3">
-          <button class="hero-btn hero-btn-primary" data-id="${item.id}">
-            <i class="ph ph-info"></i> View Details
-          </button>
-          ${item.rating > 0 ? `<div class="hero-rating-chip"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>` : ''}
+    const slidesHtml = this._heroItems.map((item) => `
+      <div class="hero-slide" style="background-image: url('${esc(item.banner || item.image)}')">
+        <div class="hero-gradient"></div>
+        <div class="hero-content">
+          <div class="hero-type-badge bounce-in">
+            <i class="ph ph-${item.type === 'game' ? 'game-controller' : item.type === 'movie' ? 'film-strip' : item.type === 'anime' ? 'star-four' : 'monitor-play'}"></i>
+            ${typeLabel(item.type)}
+          </div>
+          <h1 class="hero-title slide-up">${esc(item.title)}</h1>
+          <div class="hero-genres slide-up-delay-1">${item.genres.slice(0, 3).map(g => `<span class="hero-genre-pill">${esc(g)}</span>`).join('')}</div>
+          ${item.notes ? `<p class="hero-notes slide-up-delay-2">${esc(item.notes)}</p>` : ''}
+          <div class="hero-actions slide-up-delay-3">
+            <button class="hero-btn hero-btn-primary" data-id="${item.id}">
+              <i class="ph ph-info"></i> View Details
+            </button>
+            ${item.rating > 0 ? `<div class="hero-rating-chip"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>` : ''}
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
 
-  const dotsHtml = this._heroItems.map((_,i) =>
-    `<span class="hero-dot${i===0?' active':''}" data-i="${i}"></span>`
-  ).join('');
+    const dotsHtml = this._heroItems.map((_, i) =>
+      `<span class="hero-dot${i === 0 ? ' active' : ''}" data-i="${i}"></span>`
+    ).join('');
 
-  zone.innerHTML = `
-    <div class="hero-slider-viewport">
-      <div class="hero-slider-track" id="hero-slider-track">
-        ${slidesHtml}
+    zone.innerHTML = `
+      <div class="hero-slider-viewport">
+        <div class="hero-slider-track" id="hero-slider-track">
+          ${slidesHtml}
+        </div>
       </div>
-    </div>
-    <button class="hero-nav-arrow hero-prev" id="hero-prev" aria-label="Previous Slide"><i class="ph ph-caret-left"></i></button>
-    <button class="hero-nav-arrow hero-next" id="hero-next" aria-label="Next Slide"><i class="ph ph-caret-right"></i></button>
-    <div class="hero-dots">${dotsHtml}</div>
-  `;
+      <button class="hero-nav-arrow hero-prev" id="hero-prev" aria-label="Previous Slide"><i class="ph ph-caret-left"></i></button>
+      <button class="hero-nav-arrow hero-next" id="hero-next" aria-label="Next Slide"><i class="ph ph-caret-right"></i></button>
+      <div class="hero-dots">${dotsHtml}</div>
+    `;
 
-  zone.querySelectorAll('.hero-btn-primary').forEach(btn => {
-    btn.onclick = () => this._openModal(btn.dataset.id);
-  });
-  zone.querySelectorAll('.hero-dot').forEach(dot => {
-    dot.onclick = () => this._setHero(parseInt(dot.dataset.i));
-  });
-  document.getElementById('hero-prev').onclick = () => this._setHero(this._heroIndex - 1);
-  document.getElementById('hero-next').onclick = () => this._setHero(this._heroIndex + 1);
+    zone.querySelectorAll('.hero-btn-primary').forEach(btn => {
+      btn.onclick = () => this._openModal(btn.dataset.id);
+    });
+    zone.querySelectorAll('.hero-dot').forEach(dot => {
+      dot.onclick = () => this._setHero(parseInt(dot.dataset.i, 10));
+    });
+    document.getElementById('hero-prev').onclick = () => this._setHero(this._heroIndex - 1);
+    document.getElementById('hero-next').onclick = () => this._setHero(this._heroIndex + 1);
 
-  this._heroIndex = 0;
-  this._updateHeroUI();
-  clearInterval(this._heroTimer);
-  this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
-}
+    this._heroIndex = 0;
+    this._updateHeroUI();
+    clearInterval(this._heroTimer);
+    this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
+  }
 
   _setHero(idx) {
     if (!this._heroItems.length) return;
-    
-    // Clear existing timer so manual clicks don't result in double-skips
     clearInterval(this._heroTimer);
-    
-    // Handle infinite wrap-around logic
     idx = ((idx % this._heroItems.length) + this._heroItems.length) % this._heroItems.length;
     this._heroIndex = idx;
-    
     this._updateHeroUI();
-
-    // Restart the auto-slide timer
     this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
   }
 
   _updateHeroUI() {
-  const track = document.getElementById('hero-slider-track');
-  if (track) {
-    track.style.transform = `translateX(-${this._heroIndex * 100}%)`;
+    const track = document.getElementById('hero-slider-track');
+    if (track) {
+      track.style.transform = `translateX(-${this._heroIndex * 100}%)`;
+    }
+
+    document.querySelectorAll('.hero-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === this._heroIndex);
+    });
+
+    const slides = document.querySelectorAll('.hero-slide');
+    slides.forEach(slide => slide.classList.remove('animate-active'));
+
+    setTimeout(() => {
+      const activeSlide = slides[this._heroIndex];
+      if (activeSlide) activeSlide.classList.add('animate-active');
+    }, 100);
   }
-
-  document.querySelectorAll('.hero-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === this._heroIndex);
-  });
-
-  const slides = document.querySelectorAll('.hero-slide');
-  slides.forEach(slide => slide.classList.remove('animate-active'));
-
-  setTimeout(() => {
-    const activeSlide = slides[this._heroIndex];
-    if (activeSlide) activeSlide.classList.add('animate-active');
-  }, 100);
-}
 
   _renderTicker() {
     const ticker = document.getElementById('stats-ticker');
@@ -438,18 +462,20 @@ class CuratorApp {
     const total = this.data.length;
     const completed = this.data.filter(d => d.status === 'completed').length;
     const rated = this.data.filter(d => d.rating > 0);
-    const avgRating = rated.length ? (rated.reduce((a,d)=>a+d.rating,0)/rated.length).toFixed(1) : '—';
+    const avgRating = rated.length
+      ? (rated.reduce((a, d) => a + d.rating, 0) / rated.length).toFixed(1)
+      : '—';
     const games = this.data.filter(d => d.type === 'game').length;
     const shows = this.data.filter(d => ['anime','tv','movie'].includes(d.type)).length;
     const perfect = this.data.filter(d => d.rating === 10).length;
 
     ticker.innerHTML = [
-      { val: total,      label: 'Total Entries' },
-      { val: completed,  label: 'Completed' },
-      { val: avgRating,  label: 'Avg Rating' },
-      { val: games,      label: 'Games' },
-      { val: shows,      label: 'Films & Shows' },
-      { val: perfect,    label: 'Perfect 10s' },
+      { val: total,     label: 'Total Entries' },
+      { val: completed, label: 'Completed' },
+      { val: avgRating, label: 'Avg Rating' },
+      { val: games,     label: 'Games' },
+      { val: shows,     label: 'Films & Shows' },
+      { val: perfect,   label: 'Perfect 10s' },
     ].map(s => `
       <div class="stats-ticker-item">
         <div class="stats-ticker-value">${s.val}</div>
@@ -461,7 +487,11 @@ class CuratorApp {
   _renderRecentGrid() {
     const grid = document.getElementById('recent-grid');
     if (!grid) return;
-    const items = [...this.data].slice(0, 12);
+    // FIX: Sort by year descending so "recently added" actually reflects recency.
+    // The original just took the first 12 items by raw array order.
+    const items = [...this.data]
+      .sort((a, b) => (b.year || 0) - (a.year || 0))
+      .slice(0, 12);
     grid.innerHTML = items.map(item => this._cardHtml(item)).join('');
     this._bindCardClicks(grid);
   }
@@ -471,7 +501,7 @@ class CuratorApp {
     if (!grid) return;
     const items = [...this.data]
       .filter(d => d.rating >= 9)
-      .sort((a,b) => b.rating - a.rating)
+      .sort((a, b) => b.rating - a.rating)
       .slice(0, 10);
     grid.innerHTML = items.map(item => this._cardHtml(item)).join('');
     this._bindCardClicks(grid);
@@ -490,7 +520,7 @@ class CuratorApp {
       const statuses = ['all','playing','completed','planned','dropped'];
       pillsWrap.innerHTML = statuses.map(s => `
         <button class="filter-pill${s === this.state.filterStatus ? ' active' : ''}" data-status="${s}">
-          ${s === 'all' ? 'All' : s === 'playing' ? (cfg.type === 'game' ? 'Playing' : 'Watching') : s.charAt(0).toUpperCase()+s.slice(1)}
+          ${s === 'all' ? 'All' : s === 'playing' ? (cfg.type === 'game' ? 'Playing' : 'Watching') : s.charAt(0).toUpperCase() + s.slice(1)}
         </button>
       `).join('');
       pillsWrap.querySelectorAll('.filter-pill').forEach(pill => {
@@ -514,17 +544,19 @@ class CuratorApp {
     }
 
     switch (this.state.sortBy) {
-      case 'rating-high': items.sort((a,b) => b.rating - a.rating); break;
-      case 'rating-low':  items.sort((a,b) => a.rating - b.rating); break;
-      case 'title-asc':   items.sort((a,b) => a.title.localeCompare(b.title)); break;
-      case 'title-desc':  items.sort((a,b) => b.title.localeCompare(a.title)); break;
-      case 'year-new':    items.sort((a,b) => (b.year||0) - (a.year||0)); break;
-      case 'year-old':    items.sort((a,b) => (a.year||0) - (b.year||0)); break;
+      case 'rating-high': items.sort((a, b) => b.rating - a.rating); break;
+      case 'rating-low':  items.sort((a, b) => a.rating - b.rating); break;
+      case 'title-asc':   items.sort((a, b) => a.title.localeCompare(b.title)); break;
+      case 'title-desc':  items.sort((a, b) => b.title.localeCompare(a.title)); break;
+      case 'year-new':    items.sort((a, b) => (b.year || 0) - (a.year || 0)); break;
+      case 'year-old':    items.sort((a, b) => (a.year || 0) - (b.year || 0)); break;
     }
 
     document.getElementById('library-count-display').textContent = items.length;
     const resultCount = document.getElementById('result-count');
-    if (resultCount) resultCount.innerHTML = `Showing <span>${items.length}</span> ${items.length === 1 ? 'entry' : 'entries'}`;
+    if (resultCount) {
+      resultCount.innerHTML = `Showing <span>${items.length}</span> ${items.length === 1 ? 'entry' : 'entries'}`;
+    }
 
     const grid  = document.getElementById('library-grid');
     const empty = document.getElementById('empty-state');
@@ -550,33 +582,34 @@ class CuratorApp {
     const container = document.getElementById('stats-content');
     if (!container) return;
 
-    const total = this.data.length;
+    const total     = this.data.length;
     const completed = this.data.filter(d => d.status === 'completed').length;
     const playing   = this.data.filter(d => d.status === 'playing').length;
     const planned   = this.data.filter(d => d.status === 'planned').length;
     const dropped   = this.data.filter(d => d.status === 'dropped').length;
     const rated     = this.data.filter(d => d.rating > 0);
-    const avgRating = rated.length ? (rated.reduce((a,d)=>a+d.rating,0)/rated.length).toFixed(2) : '—';
-    const maxRating = rated.length ? Math.max(...rated.map(d=>d.rating)) : 0; 
+    const avgRating = rated.length
+      ? (rated.reduce((a, d) => a + d.rating, 0) / rated.length).toFixed(2)
+      : '—';
     const reviewed  = this.data.filter(d => d.notes).length;
     const perfect   = this.data.filter(d => d.rating === 10).length;
 
     const genreMap = {};
-    this.data.forEach(d => d.genres.forEach(g => { genreMap[g] = (genreMap[g]||0)+1; }));
-    const topGenres = Object.entries(genreMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    this.data.forEach(d => d.genres.forEach(g => { genreMap[g] = (genreMap[g] || 0) + 1; }));
+    const topGenres = Object.entries(genreMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
     const maxGenreCount = topGenres[0]?.[1] || 1;
 
-    const ratingDist = Array.from({length:10},(_,i)=>({score:i+1,count:0}));
+    const ratingDist = Array.from({ length: 10 }, (_, i) => ({ score: i + 1, count: 0 }));
     rated.forEach(d => {
-      const bucket = Math.min(Math.round(d.rating),10) - 1;
+      const bucket = Math.min(Math.round(d.rating), 10) - 1;
       if (bucket >= 0) ratingDist[bucket].count++;
     });
-    const maxDistCount = Math.max(...ratingDist.map(r=>r.count), 1);
+    const maxDistCount = Math.max(...ratingDist.map(r => r.count), 1);
 
-    const gameCount  = this.data.filter(d=>d.type==='game').length;
-    const movieCount = this.data.filter(d=>d.type==='movie').length;
-    const animeCount = this.data.filter(d=>d.type==='anime').length;
-    const tvCount    = this.data.filter(d=>d.type==='tv').length;
+    const gameCount  = this.data.filter(d => d.type === 'game').length;
+    const movieCount = this.data.filter(d => d.type === 'movie').length;
+    const animeCount = this.data.filter(d => d.type === 'anime').length;
+    const tvCount    = this.data.filter(d => d.type === 'tv').length;
 
     container.innerHTML = `
       <div class="stat-card">
@@ -592,7 +625,7 @@ class CuratorApp {
       <div class="stat-card">
         <div class="stat-card-label">Reviews Written</div>
         <div class="stat-card-value">${reviewed}</div>
-        <div class="stat-card-sub">${((reviewed/total)*100).toFixed(0)}% of entries have a review</div>
+        <div class="stat-card-sub">${((reviewed / total) * 100).toFixed(0)}% of entries have a review</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-label">By Type</div>
@@ -602,10 +635,10 @@ class CuratorApp {
       <div class="stat-card" style="grid-column: span 2;">
         <div class="stat-card-label">Top Genres</div>
         <div class="genre-bars">
-          ${topGenres.map(([g,c]) => `
+          ${topGenres.map(([g, c]) => `
             <div class="genre-bar-row">
-              <div class="genre-bar-label"><span>${g}</span><span>${c}</span></div>
-              <div class="genre-bar-track"><div class="genre-bar-fill" style="width:${(c/maxGenreCount*100).toFixed(1)}%"></div></div>
+              <div class="genre-bar-label"><span>${esc(g)}</span><span>${c}</span></div>
+              <div class="genre-bar-track"><div class="genre-bar-fill" style="width:${(c / maxGenreCount * 100).toFixed(1)}%"></div></div>
             </div>
           `).join('')}
         </div>
@@ -614,11 +647,11 @@ class CuratorApp {
         <div class="stat-card-label">Rating Distribution</div>
         <div class="rating-dist">
           ${ratingDist.map(r => `
-            <div class="rating-dist-bar" title="${r.score}: ${r.count} entries" style="height:${(r.count/maxDistCount*100).toFixed(1)}%"></div>
+            <div class="rating-dist-bar" title="${r.score}: ${r.count} entries" style="height:${(r.count / maxDistCount * 100).toFixed(1)}%"></div>
           `).join('')}
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.65rem;color:var(--text-muted);font-family:var(--font-mono);">
-          ${ratingDist.map(r=>`<span>${r.score}</span>`).join('')}
+          ${ratingDist.map(r => `<span>${r.score}</span>`).join('')}
         </div>
       </div>
     `;
@@ -627,7 +660,9 @@ class CuratorApp {
   _renderFavorites() {
     const grid = document.getElementById('favorites-grid');
     if (!grid) return;
-    const favs = [...this.data].filter(d => d.rating >= 9).sort((a,b) => b.rating - a.rating);
+    const favs = [...this.data]
+      .filter(d => d.rating >= 9)
+      .sort((a, b) => b.rating - a.rating);
     grid.innerHTML = favs.map(item => this._cardHtml(item)).join('');
     this._bindCardClicks(grid);
   }
@@ -639,7 +674,7 @@ class CuratorApp {
     return `
       <article class="media-card fade-in" data-id="${item.id}" role="button" tabindex="0" aria-label="${esc(item.title)}">
         <div class="media-card-poster-wrap">
-          <img class="media-card-poster" src="${item.image || fallbackSvg(item.title)}" alt="${esc(item.title)}" loading="lazy" onerror="this.src='${fallbackSvg(item.title)}'">
+          <img class="media-card-poster" src="${item.image || FALLBACK_SRC}" alt="${esc(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_SRC}'">
           <div class="media-card-status-dot dot-${item.status}"></div>
           <div class="media-card-overlay">
             <div class="media-card-quick"><i class="ph ph-info"></i> View Details</div>
@@ -657,20 +692,19 @@ class CuratorApp {
   }
 
   _listCardHtml(item) {
-    const statusClass = `chip-${item.status}`;
     const ratingHtml = item.rating > 0
       ? `<div class="list-card-rating"><i class="ph-fill ph-star"></i>${item.rating.toFixed(1)}</div>`
       : `<div class="list-card-rating" style="color:var(--text-muted)">—</div>`;
     return `
       <article class="media-card list-card fade-in" data-id="${item.id}" role="button" tabindex="0" aria-label="${esc(item.title)}">
         <div class="media-card-poster-wrap">
-          <img class="media-card-poster" src="${item.image || fallbackSvg(item.title)}" alt="${esc(item.title)}" loading="lazy" onerror="this.src='${fallbackSvg(item.title)}'">
+          <img class="media-card-poster" src="${item.image || FALLBACK_SRC}" alt="${esc(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_SRC}'">
         </div>
         <div class="list-card-body">
           <div class="list-card-title">${esc(item.title)}</div>
-          <div class="list-card-sub">${item.genres.slice(0,2).join(' · ')} · ${item.year || '?'}</div>
+          <div class="list-card-sub">${item.genres.slice(0, 2).join(' · ')} · ${item.year || '?'}</div>
         </div>
-        <span class="modal-status-chip ${statusClass}">${statusLabel(item)}</span>
+        <span class="modal-status-chip chip-${item.status}">${statusLabel(item)}</span>
         ${ratingHtml}
       </article>
     `;
@@ -679,7 +713,12 @@ class CuratorApp {
   _bindCardClicks(container) {
     container.querySelectorAll('[data-id]').forEach(el => {
       el.onclick = () => this._openModal(el.dataset.id);
-      el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._openModal(el.dataset.id); } };
+      el.onkeydown = e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this._openModal(el.dataset.id);
+        }
+      };
     });
   }
 
@@ -690,75 +729,94 @@ class CuratorApp {
     const wrap = document.getElementById('modal-wrap');
     if (!wrap) return;
 
-    // Inside _openModal(id)
-    imgWithFallback(item.banner, item.title, document.getElementById('modal-banner-img')); // <-- Changed to item.banner
-    imgWithFallback(item.image, item.title, document.getElementById('modal-cover-img'));
+    // FIX: null-check each element before use; previously would throw if
+    // _openModal was called before the DOM was fully rendered (edge case).
+    const bannerImg = document.getElementById('modal-banner-img');
+    const coverImg  = document.getElementById('modal-cover-img');
+    imgWithFallback(item.banner, bannerImg);
+    imgWithFallback(item.image, coverImg);
 
-    document.getElementById('modal-type-badge').textContent = typeLabel(item.type).toUpperCase();
-    document.getElementById('modal-title').textContent = item.title;
+    const typeBadge = document.getElementById('modal-type-badge');
+    if (typeBadge) typeBadge.textContent = typeLabel(item.type).toUpperCase();
+
+    const titleEl = document.getElementById('modal-title');
+    if (titleEl) titleEl.textContent = item.title;
 
     const statusEl = document.getElementById('modal-status-chip');
-    statusEl.textContent = statusLabel(item);
-    statusEl.className = `modal-status-chip chip-${item.status}`;
-
-    document.getElementById('modal-year').textContent = item.year ? String(item.year) : '';
-
-    const ratingBlock = document.getElementById('modal-rating-block');
-    const ratingScore = document.getElementById('modal-rating-score');
-    const ratingStarsEl = document.getElementById('modal-rating-stars');
-    if (item.rating > 0) {
-      ratingBlock.style.display = '';
-      ratingScore.textContent = item.rating.toFixed(1);
-      ratingStarsEl.innerHTML = ratingStars(item.rating);
-    } else {
-      ratingScore.textContent = 'NR';
-      ratingStarsEl.innerHTML = '';
+    if (statusEl) {
+      statusEl.textContent = statusLabel(item);
+      statusEl.className = `modal-status-chip chip-${item.status}`;
     }
 
-    document.getElementById('modal-genres').innerHTML = item.genres.map(g => `<span class="genre-tag">${esc(g)}</span>`).join('');
+    const yearEl = document.getElementById('modal-year');
+    if (yearEl) yearEl.textContent = item.year ? String(item.year) : '';
+
+    const ratingBlock  = document.getElementById('modal-rating-block');
+    const ratingScore  = document.getElementById('modal-rating-score');
+    const ratingStarsEl = document.getElementById('modal-rating-stars');
+    if (ratingScore && ratingStarsEl) {
+      if (item.rating > 0) {
+        if (ratingBlock) ratingBlock.style.display = '';
+        ratingScore.textContent = item.rating.toFixed(1);
+        ratingStarsEl.innerHTML = ratingStars(item.rating);
+      } else {
+        ratingScore.textContent = 'NR';
+        ratingStarsEl.innerHTML = '';
+      }
+    }
+
+    const genresEl = document.getElementById('modal-genres');
+    if (genresEl) {
+      genresEl.innerHTML = item.genres.map(g => `<span class="genre-tag">${esc(g)}</span>`).join('');
+    }
 
     const reviewBody = document.getElementById('modal-review-body');
-    if (item.notes) {
-      reviewBody.classList.remove('no-review');
-      reviewBody.innerHTML = `<p>${esc(item.notes)}</p>`;
-    } else {
-      reviewBody.classList.add('no-review');
-      reviewBody.innerHTML = '<p>No review written yet for this entry.</p>';
+    if (reviewBody) {
+      if (item.notes) {
+        reviewBody.classList.remove('no-review');
+        reviewBody.innerHTML = `<p>${esc(item.notes)}</p>`;
+      } else {
+        reviewBody.classList.add('no-review');
+        reviewBody.innerHTML = '<p>No review written yet for this entry.</p>';
+      }
     }
 
     const metaTable = document.getElementById('modal-meta-table');
-    const metaRows = [
-      ['Type', typeLabel(item.type)],
-      ['Year', item.year || '—'],
-      ['Status', statusLabel(item)],
-      ...(item.genres.length ? [['Genres', item.genres.join(', ')]] : []),
-    ];
-    metaTable.innerHTML = metaRows.map(([k,v]) => `
-      <span class="meta-key">${k}</span>
-      <span class="meta-val">${esc(String(v))}</span>
-    `).join('');
+    if (metaTable) {
+      const metaRows = [
+        ['Type',   typeLabel(item.type)],
+        ['Year',   item.year || '—'],
+        ['Status', statusLabel(item)],
+        ...(item.genres.length ? [['Genres', item.genres.join(', ')]] : []),
+      ];
+      metaTable.innerHTML = metaRows.map(([k, v]) => `
+        <span class="meta-key">${k}</span>
+        <span class="meta-val">${esc(String(v))}</span>
+      `).join('');
+    }
 
-    // Fixed: Ensure the UI components are completely implemented based on realistic properties
     const actions = document.getElementById('modal-actions');
-    if (item.url) {
-        const actionText = item.type === 'game' ? 'View Details' : 'Watch Online';
-        const icon = item.type === 'game' ? 'ph-download-simple' : 'ph-play-circle';
-        const btnClass = item.type === 'game' ? 'modal-btn-download' : 'modal-btn-watch';
+    if (actions) {
+      if (item.url) {
+        const isGame    = item.type === 'game';
+        const actionText = isGame ? 'View on Store' : 'Watch Online';
+        const icon       = isGame ? 'ph-arrow-square-out' : 'ph-play-circle';
+        const btnClass   = isGame ? 'modal-btn-download' : 'modal-btn-watch';
         actions.innerHTML = `
-            <a href="${item.url}" class="modal-btn ${btnClass}" target="_blank" rel="noopener noreferrer">
-                <i class="ph ${item.type === 'game' ? '' : 'ph-fill'} ${icon}"></i> ${actionText}
-            </a>
+          <a href="${esc(item.url)}" class="modal-btn ${btnClass}" target="_blank" rel="noopener noreferrer">
+            <i class="ph ${icon}"></i> ${actionText}
+          </a>
         `;
-    } else {
+      } else {
         actions.innerHTML = `<p class="modal-btn-note">No external link available.</p>`;
+      }
     }
 
     wrap.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
     requestAnimationFrame(() => {
-        wrap.classList.add('active');
-        // Set focus to the modal for screenreaders / keyboard accessibility
-        setTimeout(() => document.getElementById('modal-close')?.focus(), 100);
+      wrap.classList.add('active');
+      setTimeout(() => document.getElementById('modal-close')?.focus(), 100);
     });
     this._modalOpen = true;
   }
@@ -808,10 +866,10 @@ class CuratorApp {
 
     results.innerHTML = matches.map(item => `
       <div class="search-result-item" data-id="${item.id}" tabindex="0">
-        <img class="search-result-thumb" src="${item.image || fallbackSvg(item.title)}" alt="${esc(item.title)}" loading="lazy" onerror="this.src='${fallbackSvg(item.title)}'">
+        <img class="search-result-thumb" src="${item.image || FALLBACK_SRC}" alt="${esc(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_SRC}'">
         <div class="search-result-info">
           <div class="search-result-title">${esc(item.title)}</div>
-          <div class="search-result-meta">${typeLabel(item.type)} · ${item.year || '?'} · ${item.genres.slice(0,2).join(', ')}</div>
+          <div class="search-result-meta">${typeLabel(item.type)} · ${item.year || '?'} · ${item.genres.slice(0, 2).join(', ')}</div>
         </div>
         ${item.rating > 0 ? `<span class="search-result-rating">${item.rating.toFixed(1)}</span>` : ''}
       </div>
@@ -876,14 +934,15 @@ class CuratorApp {
       clearTimeout(this._searchDebounce);
       this._searchDebounce = setTimeout(() => this._handleSearch(e.target.value), 200);
     });
-    
+
     document.getElementById('search-clear-btn')?.addEventListener('click', () => {
       const inp = document.getElementById('global-search-input');
       if (inp) { inp.value = ''; inp.focus(); }
-      document.getElementById('search-results').innerHTML = '';
-      document.getElementById('search-clear-btn').classList.add('hidden');
+      const results = document.getElementById('search-results');
+      if (results) results.innerHTML = '';
+      document.getElementById('search-clear-btn')?.classList.add('hidden');
     });
-    
+
     document.getElementById('search-close-btn')?.addEventListener('click', () => this._closeSearch());
     document.getElementById('search-overlay-scrim')?.addEventListener('click', () => this._closeSearch());
 
@@ -896,7 +955,7 @@ class CuratorApp {
           globalInput.value = q;
           this._handleSearch(q);
         }
-        e.target.value = ''; 
+        e.target.value = '';
       }
     });
 
@@ -929,7 +988,7 @@ class CuratorApp {
     });
 
     window.addEventListener('hashchange', () => {
-      const hash = location.hash.replace('#','');
+      const hash = location.hash.replace('#', '');
       const valid = ['home','games','movies','anime','tv','stats','favorites','socials'];
       if (hash && valid.includes(hash) && hash !== this.state.view) {
         this._navigateTo(hash);
