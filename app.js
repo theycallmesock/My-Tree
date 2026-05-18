@@ -421,7 +421,7 @@ class CuratorApp {
     this._heroTimer = setInterval(() => this._setHero(this._heroIndex + 1), 6000);
   }
 
-  __updateHeroUI() {
+  _updateHeroUI() {
   const track = document.getElementById('hero-slider-track');
   if (track) {
     track.style.transform = `translateX(-${this._heroIndex * 100}%)`;
